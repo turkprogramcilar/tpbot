@@ -16,8 +16,9 @@ wss.on('connection', (ws) => {
     ws.on('close', () => console.log('Client disconnected'));
 });
 
+const xss = require("xss");
 module.exports.send_all = (msg) => {
     wss.clients.forEach((client) => {
-        client.send(msg);
+        client.send(xss(msg));
     });
 };
