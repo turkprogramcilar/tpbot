@@ -1,0 +1,63 @@
+<!doctype html>
+<style>
+    textarea { vertical-align: bottom; }
+    #output { overflow: auto; }
+    #output > p { overflow-wrap: break-word; }
+    #output span { color: blue; }
+    #output span.error { color: red; }
+</style>
+<h2>WebSocket Test</h2>
+<!--textarea cols=60 rows=6></textarea>
+<button>send</button>-->
+<div id=output></div>
+<script>
+    // http://www.websocket.org/echo.html
+
+    var HOST = location.origin.replace(/^http/, 'ws')
+
+    var button = document.querySelector("button"),
+        output = document.querySelector("#output"),
+        textarea = document.querySelector("textarea"),
+        // wsUri = "ws://echo.websocket.org/",
+        domain = document.domain;
+        domain = domain.length == 0 ? "localhost" : domain;
+        ssl = window.location.protocol == "https:";
+        wsUri = `ws${ssl ?"s":""}://${domain}${document.URL.includes("file")?":8080":""}/`,
+        websocket = new WebSocket(HOST);
+
+    //button.addEventListener("click", onClickButton);
+
+    websocket.onopen = function (e) {
+        writeToScreen("CONNECTED");
+        doSend("WebSocket rocks");
+    };
+
+    websocket.onclose = function (e) {
+        writeToScreen("DISCONNECTED");
+    };
+
+    websocket.onmessage = function (e) {
+        writeToScreen("<span>" + e.data + "</span>");
+    };
+
+    websocket.onerror = function (e) {
+        writeToScreen("<span class=error>ERROR:</span> " + e.data);
+    };
+
+    function doSend(message) {
+        writeToScreen("SENT: " + message);
+        websocket.send(message);
+    }
+
+    function writeToScreen(message) {
+        output.insertAdjacentHTML("afterbegin", "<p>" + message + "</p>");
+    }
+
+    function onClickButton() {
+        var text = textarea.value;
+
+        text && doSend(text);
+        textarea.value = "";
+        textarea.focus();
+    }
+</script>

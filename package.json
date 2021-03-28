@@ -1,0 +1,19 @@
+{
+  "name": "dcbotjs",
+  "version": "1.0.0",
+  "description": "",
+  "main": "main.js",
+  "scripts": {
+    "start": "node main.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "bufferutil": "^4.0.3",
+    "discord.js": "^12.5.1",
+    "express": "^4.17.1",
+    "utf-8-validate": "^5.0.4",
+    "ws": "^7.4.4"
+  }
+}
