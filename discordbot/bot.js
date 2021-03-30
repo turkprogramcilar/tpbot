@@ -7,6 +7,20 @@ client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
 });
 
+let prefix = "%";
+
+/**
+ * @param {Discord.Message} msg
+ * @param {string} cmd
+ */
+function command(msg, cmd) {
+    if (msg.content.startsWith(prefix+cmd)) {
+        msg.content = msg.content.slice(cmd.length+prefix.length);
+        return true;
+    }
+    return false;
+}
+
 client.on('message', msg => {
     if (msg.author == client.user)
         return;
@@ -19,18 +33,19 @@ client.on('message', msg => {
         let guild = msg.guild;
         let member = guild.member(msg.author);
         let nickname = member ? member.displayName : msg.author.username;
-        console.log(nickname);
-        send_all(`${nickname}: ${msg.content}`)
+        sendmsg = `${nickname}: ${msg.content}`;
+        console.log(sendmsg);
+        ws.send_all(sendmsg);
     }
 
-    else if (msg.content === '%ping') {
-        msg.reply('Pong!');
+    else if (command(msg, "echo")) {
+        msg.reply(msg.content);
     }
 });
 
 client.login('ODIwNzE3ODcwMjcwMjUxMDI5.YE5PFA.ryq3CBLWM7-nIzMfyPXMFGEWar4');
 
-var send_all;
+var ws = {};
 module.exports.set_sendallF = (f) => {
-    send_all = f;
+    ws.send_all = f;
 }
