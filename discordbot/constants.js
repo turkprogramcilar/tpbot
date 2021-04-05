@@ -15,6 +15,25 @@ uid_admins = [
 cid_p2p = 824685500686008350;
 cid_gameserver = 825713784848252938;
 
+// category ids
+caid_muzik = 826154162638946355
+caid_kodlama = 792034825640738826
+caid_etkinlik = 821422645744369784
+caid_diller = 782713598245077013
+caid_soru = 810183265029586974
+caid_az_diller = 827074947272146974
+caid_tp_bot = 823470264025088020
+
+caid_fix = [
+    caid_muzik,
+    caid_kodlama,
+    caid_etkinlik,
+    caid_diller,
+    caid_soru,
+    caid_az_diller,
+    caid_tp_bot,
+];
+
 // msg constants
 msg_testmode = "Bakımdan dolayı sadece yetkililer komut çalıştırabilir.";
 
