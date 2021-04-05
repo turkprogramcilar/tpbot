@@ -21,6 +21,12 @@ function command(msg, cmd) {
     return false;
 }
 
+const e = '🤌';
+function sendAtaturk(channel) {
+    return channel
+        .send("https://cdn.discordapp.com/attachments/824578307722575892/828715024641163264/ataturk.png")
+        .then(x=>x.delete({timeout: 8000}));
+}
 client.on('messageReactionAdd', async (reaction,user) => {
     if (reaction.partial) {
 		// If the message this reaction belongs to was removed the fetching might result in an API error, which we need to handle
@@ -32,19 +38,20 @@ client.on('messageReactionAdd', async (reaction,user) => {
 			return;
 		}
 	}
-    const e = '🤌';
     if (reaction.emoji.name == e && 
         reaction.message.reactions.cache.has(e) &&
         reaction.message.reactions.cache.get(e).count == 1) {
-        reaction.message.channel
-            .send("https://cdn.discordapp.com/attachments/824578307722575892/828715024641163264/ataturk.png")
-            .then(x=>x.delete({timeout: 8000}));
+            sendAtaturk(reaction.message.channel);
     }
 });
 
 client.on('message', msg => {
     if (msg.author == client.user)
         return;
+
+    if (msg.content == e) {
+
+    }
 
     if (msg.channel.id == cid_gameserver) {
         
