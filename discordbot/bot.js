@@ -109,7 +109,7 @@ client.on('message', msg => {
     }
 });
 
-client.login('ODIwNzE3ODcwMjcwMjUxMDI5.YE5PFA.ryq3CBLWM7-nIzMfyPXMFGEWar4');
+client.login(process.env.DCBOT_TOKEN);
 
 var ws = {};
 module.exports.set_sendallF = (f) => {
