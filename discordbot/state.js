@@ -1,0 +1,3 @@
+marqueeTimer = null;
+
+module.exports = {};

@@ -1,4 +1,5 @@
 require("./constants.js");
+require("./state.js");
 
 const Discord = require('discord.js');
 const client = new Discord.Client();
@@ -20,7 +21,7 @@ client.on('ready', () => {
         : mi != ml ? mm.slice(mi, ml) + mm.slice(0, mw - ml + ++mi)
         : (mi = 0) | true ? mm.slice(mi, ++mi + mw) : "";
 
-    setInterval(() => { client.user.setActivity(marqueeStatus(), { type: "CUSTOM_STATUS" }); }, 2000);
+    marqueeTimer = setInterval(() => client.user.setActivity(marqueeStatus()), 2000);
 });
 
 let prefix = "%";
