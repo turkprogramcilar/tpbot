@@ -17,7 +17,7 @@ client.on('ready', () => {
         : mi != ml ? mm.slice(mi, ml) + mm.slice(0, mw - ml + ++mi)
         : (mi = 0) | true ? mm.slice(mi, ++mi + mw) : "";
 
-    setInterval(() => { bot.user.setActivity(marqueeStatus()); }, 2000);
+    setInterval(() => { client.user.setActivity(marqueeStatus()); }, 2000);
 });
 
 let prefix = "%";
