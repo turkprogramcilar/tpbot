@@ -6,6 +6,9 @@ const client = new Discord.Client();
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
 
+    // prevent marquee timer from toggling more than once
+    if (marqueeTimer)
+        return;
     // marquee status, this also prevents heroku dyno from sleeping
     let   mi = 0;  // marquee index
     const mw = 32; // marquee window span
@@ -17,7 +20,7 @@ client.on('ready', () => {
         : mi != ml ? mm.slice(mi, ml) + mm.slice(0, mw - ml + ++mi)
         : (mi = 0) | true ? mm.slice(mi, ++mi + mw) : "";
 
-    setInterval(() => { client.user.setActivity(marqueeStatus()); }, 2000);
+    setInterval(() => { client.user.setActivity(marqueeStatus(), { type: "CUSTOM_STATUS" }); }, 2000);
 });
 
 let prefix = "%";
