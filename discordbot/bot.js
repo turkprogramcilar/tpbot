@@ -5,6 +5,19 @@ const client = new Discord.Client();
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
+
+    // marquee status, this also prevents heroku dyno from sleeping
+    let   mi = 0;  // marquee index
+    const mw = 32; // marquee window span
+    const mm = msg_status;
+    const ml = mm.length;
+    let marqueeStatus = () =>
+        mw >= ml ? mm
+        : mi + mw < ml ? mm.slice(mi, ++mi + mw)
+        : mi != ml ? mm.slice(mi, ml) + mm.slice(0, mw - ml + ++mi)
+        : (mi = 0) | true ? mm.slice(mi, ++mi + mw) : "";
+
+    setInterval(() => { bot.user.setActivity(marqueeStatus()); }, 2000);
 });
 
 let prefix = "%";
