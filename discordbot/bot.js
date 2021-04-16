@@ -109,16 +109,10 @@ client.on('message', msg => {
     if (command(msg, "sync")) {
         // print all categories
         msg.guild.channels.cache.each(x=>{
-            
-            if (x.type == "category") {
-                console.log(`${x.name} ${x.id}`);
-            }
-            else if (x.type == "text") {
-                msg.channel.send(`x.parent: ${x.parent} :: x.parent.name: ${x.parent.name}`);
-
-                /*x.lockPermissions()
-                    .then(() => console.log('Successfully synchronized permissions with parent channel'))
-                    .catch(console.error);*/
+            if (x.type == "text" && x.parent) {
+                x.lockPermissions()
+                    .then(() => console.log('Successfully synchronized permissions with parent channel'+`${x.parent.name}->${x.name}`))
+                    .catch(console.error);
             }
         });
     }
