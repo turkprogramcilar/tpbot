@@ -96,10 +96,12 @@ client.on('message', msg => {
             if (x.type == "category") {
                 console.log(`${x.name} ${x.id}`);
             }
-            else if (x.type == "text" && caid_fix.includes(parseInt(x.parentID))) {
-                x.lockPermissions()
+            else if (x.type == "text") {
+                msg.channel.send(`x.parent: ${x.parent} :: x.parent.name: ${x.parent.name}`);
+
+                /*x.lockPermissions()
                     .then(() => console.log('Successfully synchronized permissions with parent channel'))
-                    .catch(console.error);
+                    .catch(console.error);*/
             }
         });
     }
