@@ -36,5 +36,8 @@ caid_fix = [
 
 // msg constants
 msg_testmode = "Bakımdan dolayı sadece yetkililer komut çalıştırabilir.";
+msg_status   = "Türk Programcılar discord sunucusuna hoşgeldin! Programlama "
+    + "öğrenmek için harika bir gün! Hadi ne bekliyorsun! Hemen öğrenmeye "
+    + "başla!... ";
 
 module.exports = {};
