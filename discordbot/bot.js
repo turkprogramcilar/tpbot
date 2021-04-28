@@ -12,14 +12,11 @@ client.on('ready', () => {
         return;
     // marquee status, this also prevents heroku dyno from sleeping
     let   mi = 0;  // marquee index
-    const mw = 32; // marquee window span
     const mm = msg_status;
     const ml = mm.length;
     let marqueeStatus = () =>
-        mw >= ml ? mm
-        : mi + mw < ml ? mm.slice(mi, ++mi + mw)
-        : mi != ml ? mm.slice(mi, ml) + mm.slice(0, mw - ml + ++mi)
-        : (mi = 0) | true ? mm.slice(mi, ++mi + mw) : "";
+        mi != ml ? mm[mi++]
+                 : mm[mi=0];
 
     marqueeTimer = setInterval(() => client.user.setActivity(marqueeStatus()), 2000);
 });
