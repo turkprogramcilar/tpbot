@@ -36,8 +36,10 @@ caid_fix = [
 
 // msg constants
 msg_testmode = "Bakımdan dolayı sadece yetkililer komut çalıştırabilir.";
-msg_status   = "Türk Programcılar discord sunucusuna hoşgeldin! Programlama "
-    + "öğrenmek için harika bir gün! Hadi ne bekliyorsun! Hemen öğrenmeye "
-    + "başla!... ";
+msg_status   = process.env.DCBOT_DEBUGGING ? [process.env.DCBOT_DEBUGGING] : [
+    "Türk Programcılar discord sunucusuna hoşgeldin!",
+    "Programlama öğrenmek için harika bir gün!",
+    "Hemen programlamaya başla"
+];
 
 module.exports = {};
