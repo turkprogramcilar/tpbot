@@ -14,11 +14,13 @@ client.on('ready', () => {
     let   mi = 0;  // marquee index
     const mm = msg_status;
     const ml = mm.length;
-    let marqueeStatus = () =>
+    const marqueeStatus = () =>
         mi != ml ? mm[mi++]
                  : mm[mi=0];
 
-    marqueeTimer = setInterval(() => client.user.setActivity(marqueeStatus()), 10000*(1+Math.random()));
+    const setStatus = () => client.user.setActivity(marqueeStatus());
+    setStatus();
+    marqueeTimer = setInterval(setStatus, 10000*(1+Math.random()));
 });
 
 let prefix = "%";
