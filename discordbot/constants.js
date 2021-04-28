@@ -36,7 +36,7 @@ caid_fix = [
 
 // msg constants
 msg_testmode = "Bakımdan dolayı sadece yetkililer komut çalıştırabilir.";
-msg_status   = process.env.DCBOT_DEBUGGING ? [process.env.DCBOT_DEBUGGING] : [
+msg_status   = process.env.DCBOT_DEBUGGING ? ["",process.env.DCBOT_DEBUGGING] : [
     "Türk Programcılar discord sunucusuna hoşgeldin!",
     "Programlama öğrenmek için harika bir gün!",
     "Hemen programlamaya başla"
