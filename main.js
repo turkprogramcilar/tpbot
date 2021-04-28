@@ -1,9 +1,9 @@
 const webserver =
-process.env.WEBSERVER == null || process.env.WEBSERVER != false
-? require("./webserver/server.js")
-: null;
+    process.env.WEBSERVER != undefined && process.env.WEBSERVER != false
+    ? require("./webserver/server.js")
+    : undefined;
 
 const bot = require("./discordbot/bot.js")
 
-if (webserver != null)
-bot.set_sendallF(webserver.send_all);
+if (webserver != undefined)
+    bot.set_sendallF(webserver.send_all);
