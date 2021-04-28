@@ -1,5 +1,5 @@
 const webserver =
-    process.env.WEBSERVER != undefined && process.env.WEBSERVER != false
+    process.env.WEBSERVER != undefined && process.env.WEBSERVER != 'false'
     ? require("./webserver/server.js")
     : undefined;
 
