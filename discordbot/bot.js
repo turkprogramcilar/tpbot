@@ -18,7 +18,7 @@ client.on('ready', () => {
         mi != ml ? mm[mi++]
                  : mm[mi=0];
 
-    marqueeTimer = setInterval(() => client.user.setActivity(marqueeStatus()), 2000);
+    marqueeTimer = setInterval(() => client.user.setActivity(marqueeStatus()), 10000*(1+Math.random()));
 });
 
 let prefix = "%";
