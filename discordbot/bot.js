@@ -15,7 +15,7 @@ client.on('ready', () => {
     const mm = msg_status;
     const ml = mm.length;
     const marqueeStatus = () =>
-        mi != ml ? mm[mi++]
+        mi != ml ? mm[++mi]
                  : mm[mi=0];
 
     const setStatus = () => client.user.setActivity(marqueeStatus());
