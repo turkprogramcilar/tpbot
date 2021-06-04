@@ -1,5 +1,6 @@
 require("./constants.js");
 require("./state.js");
+let arena = require("./arena.js");
 
 const Discord = require('discord.js');
 const client = new Discord.Client();
@@ -86,19 +87,67 @@ client.on('message', msg => {
         return;
     }
 
+        
+
     // if not command anywhere, return
-    if (!command(msg, "%"))
+    if (!command(msg, "%")) {        
+        // messages send on arena (not commands)
+        if (msg.channel.id == cid_arena) msg.delete();
         return;
+    }
+
+    // command send on arena
+    if (msg.channel.id == cid_arena) {
+        if (command(msg, "vur")) {
+            arena.hit(Discord, msg);
+        }
+        else {
+            if (arenaToggle) msg.delete();
+        }
+    }
 
     if (command(msg, "echo")) {
         if (msg.content.length>0)
             msg.channel.send(msg.content);
+        return;
     }
 
 
     // beyond is administrative, if not admin return
     if (msg.author.id != uid_ockis)
         return;
+
+    if (command(msg, "gm_arena")) {
+        arenaToggle = !arenaToggle;
+        msg.channel.send(`Arenaya atilan tum mesajlari sil: ${arenaToggle}`);
+        return;
+    }
+
+    if (command(msg, "gm_vur ")) {
+        if (isNaN(msg)==false) {
+            try {
+                arena.hit(Discord, msg, true, parseInt(msg));
+            } finally {}
+        }
+        return;
+    }
+    if (command(msg, "gm_yarat ")) {
+        r = msg.content.match(/<:([A-z]+):([0-9]+)>\s*([0-9]+)/)
+        if (r) {
+            id=r[2]; nm=r[1]; hp=parseInt(r[3]);
+            if (!msg.guild.emojis.cache.get(id)) return;
+            arena.create(Discord, msg, nm, id, hp)
+        }
+        return;
+    }
+    if (command(msg, "gm_frekans ")) {
+        if (isNaN(msg)==false) {
+            try {
+                arena.frequency = parseInt(msg)
+            } finally {}
+        }
+        return;
+    }
 
     // beyond is admin + fix prefix,
     if (!command(msg, "fix"))
