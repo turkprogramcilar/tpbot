@@ -14,7 +14,7 @@ uid_admins = [
 // channel ids
 cid_p2p = 824685500686008350;
 cid_gameserver = 825713784848252938;
-
+cid_arena = "850465092537286656"
 // category ids
 caid_muzik = 826154162638946355
 caid_kodlama = 792034825640738826
