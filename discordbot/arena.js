@@ -6,13 +6,7 @@ exports.create = (dc, msg, name, id, hp) => {
     ch = msg.guild.channels.cache.get(cid_arena);
     if (ch) ch.send(embed(dc, name, id, hp, hp)).then((msg) => {
         alive.push({
-            name: name,
-            id: id,
-            msg: msg, 
-            mhp: hp,
-             hp: hp,
-            lasthit: +new Date(),
-            dmgdone: {},
+            name: name, id: id, msg: msg, mhp: hp, hp: hp, lasthit: 0, dmgdone: {},
         });
     });
 }
