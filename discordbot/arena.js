@@ -1,4 +1,5 @@
-let alive = []
+let alive = [];
+exports.buff = 1;
 exports.frequency = 10;
 exports.create = (dc, msg, name, id, hp) => {
     if (alive.length>0) return null;
@@ -17,7 +18,7 @@ exports.create = (dc, msg, name, id, hp) => {
 }
 exports.hit = (dc, msg, gm=false,gmdmg=0) => {
     if (alive.length==0) return;
-    dmg=Math.random()*100|0;
+    dmg=Math.random()*100*buff|0;
     if (gm) dmg=gmdmg;
     monster=alive[0];
     uname=msg.author.username;
