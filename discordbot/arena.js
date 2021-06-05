@@ -1,6 +1,6 @@
 let alive = [];
 exports.buff = 1;
-exports.frequency = 10;
+exports.frequency = 3;
 exports.create = (dc, msg, name, id, hp) => {
     if (alive.length>0) return null;
     ch = msg.guild.channels.cache.get(cid_arena);
@@ -18,7 +18,7 @@ exports.create = (dc, msg, name, id, hp) => {
 }
 exports.hit = (dc, msg, gm=false,gmdmg=0) => {
     if (alive.length==0) return;
-    dmg=Math.random()*100*buff|0;
+    dmg=Math.random()*100*exports.buff|0;
     if (gm) dmg=gmdmg;
     monster=alive[0];
     uname=msg.author.username;
@@ -57,7 +57,7 @@ const embed = (dc, name, id, hp, mhp, top=[], last='') => {
         //.addField('Sonuncu', t4, true) bu calismiyor anlamadim.
         .setThumbnail(`https://cdn.discordapp.com/emojis/${id}.png`)
         .setTimestamp()
-        .setFooter('%vur komutu ile düşmana saldır. Daha fazla hasar vermek için saldırını emojiler ile desteklendir!');
+        .setFooter('%vur komutu ile düşmana saldır.');// Daha fazla hasar vermek için saldırını emojiler ile desteklendir!');
 }
 
 const title = (name, hp, mhp) => {

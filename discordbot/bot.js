@@ -26,6 +26,18 @@ client.on('ready', () => {
 
 let prefix = "%";
 
+function regex_arg(msg, f, f_else, fr, regex) {
+    r = msg.content.trimStart().match(regex); if (r) {
+        msg.content = msg.content.trimStart().slice(r[0].length);
+        f(fr.call(null, r[0]));
+    } else {
+        f_else();
+    }
+}
+function ui_arg(msg, f, fe=()=>{}) { regex_arg(msg, f, fe, parseInt, /^[0-9]+/); }
+function  i_arg(msg, f, fe=()=>{}) { regex_arg(msg, f, fe, parseInt, /^[+-][0-9]+?/); }
+function  f_arg(msg, f, fe=()=>{}) { regex_arg(msg, f, fe, parseFloat, /^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)/); }
+
 /**
  * @param {Discord.Message} msg
  * @param {string} cmd
@@ -119,10 +131,15 @@ client.on('message', msg => {
         return;
 
     if (command(msg, "gm_")) {
+        
         if (command(msg, "arena")) {
             arenaToggle = !arenaToggle;
             msg.channel.send(`Arenaya atilan tum mesajlari sil: ${arenaToggle}`);
         }
+        else if (command(msg, "buff")) { f_arg(msg, f => {
+            arena.buff = f;
+            msg.channel.send(`Arena hasar oranını düzenle: ${f}`);
+        })}
         else if (command(msg, "vur ")) {
             if (isNaN(msg)==false) {
                 try {
