@@ -117,37 +117,37 @@ client.on('message', msg => {
     if (msg.author.id != uid_ockis)
         return;
 
-    if (command(msg, "gm_arena")) {
-        arenaToggle = !arenaToggle;
-        msg.channel.send(`Arenaya atilan tum mesajlari sil: ${arenaToggle}`);
-        return;
-    }
-
-    if (command(msg, "gm_vur ")) {
-        if (isNaN(msg)==false) {
-            try {
-                arena.hit(Discord, msg, true, parseInt(msg));
-            } finally {}
+    if (command(msg, "gm_")) {
+        if (command(msg, "arena")) {
+            arenaToggle = !arenaToggle;
+            msg.channel.send(`Arenaya atilan tum mesajlari sil: ${arenaToggle}`);
         }
-        return;
-    }
-    if (command(msg, "gm_yarat ")) {
-        r = msg.content.match(/<:([A-z]+):([0-9]+)>\s*([0-9]+)/)
-        if (r) {
-            id=r[2]; nm=r[1]; hp=parseInt(r[3]);
-            if (!msg.guild.emojis.cache.get(id)) return;
-            arena.create(Discord, msg, nm, id, hp)
+        else if (command(msg, "vur ")) {
+            if (isNaN(msg)==false) {
+                try {
+                    arena.hit(Discord, msg, true, parseInt(msg));
+                } finally {}
+            }
         }
-        return;
-    }
-    if (command(msg, "gm_frekans ")) {
-        if (isNaN(msg)==false) {
-            try {
-                arena.frequency = parseInt(msg)
-            } finally {}
+        else if (command(msg, "yarat ")) {
+            r = msg.content.match(/<:([A-z]+):([0-9]+)>\s*([0-9]+)/)
+            if (r) {
+                id=r[2]; nm=r[1]; hp=parseInt(r[3]);
+                if (!msg.guild.emojis.cache.get(id)) return;
+                arena.create(Discord, msg, nm, id, hp)
+            }
         }
+        else if (command(msg, "frekans ")) {
+            if (isNaN(msg)==false) {
+                try {
+                    arena.frequency = parseInt(msg)
+                } finally {}
+            }
+        }
+        // unknown gm_ command, return
         return;
     }
+    
 
     // beyond is admin + fix prefix,
     if (!command(msg, "fix"))
