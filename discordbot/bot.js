@@ -113,7 +113,8 @@ client.on('message', msg => {
     }
 
 
-    // beyond is administrative, if not admin return
+    // beyond is administrative or feature previews only, 
+    // if not admin return
     if (msg.author.id != uid_ockis)
         return;
 
