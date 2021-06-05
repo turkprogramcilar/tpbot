@@ -90,7 +90,7 @@ client.on('message', msg => {
         
 
     // if not command anywhere, return
-    if (!command(msg, "%")) {        
+    if (!command(msg, prefix)) {        
         // messages send on arena (not commands)
         if (msg.channel.id == cid_arena) msg.delete();
         return;
