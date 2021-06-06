@@ -1,6 +1,7 @@
 require("./constants.js");
 require("./state.js");
-let arena = require("./arena.js");
+const db = require("./phpdb.js")
+const arena = require("./arena.js");
 
 const Discord = require('discord.js');
 const client = new Discord.Client();
@@ -34,6 +35,7 @@ function regex_arg(msg, f, f_else, fr, regex) {
         f_else();
     }
 }
+function  r_arg(msg, regex, f, fe=()=>{}) { regex_arg(msg, f, fe, x=>x, regex); }
 function ui_arg(msg, f, fe=()=>{}) { regex_arg(msg, f, fe, parseInt, /^[0-9]+/); }
 function  i_arg(msg, f, fe=()=>{}) { regex_arg(msg, f, fe, parseInt, /^[+-][0-9]+?/); }
 function  f_arg(msg, f, fe=()=>{}) { regex_arg(msg, f, fe, parseFloat, /^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)/); }
@@ -74,7 +76,7 @@ client.on('messageReactionAdd', async (reaction,user) => {
     }
 });
 
-client.on('message', msg => {
+client.on('message', async msg => {
     if (msg.author == client.user)
         return;
 
@@ -130,6 +132,8 @@ client.on('message', msg => {
     if (msg.author.id != uid_ockis)
         return;
 
+    db.get_exp(msg.author.id);
+
     if (command(msg, "gm_")) {
         
         if (command(msg, "arena")) {
@@ -159,9 +163,14 @@ client.on('message', msg => {
             if (isNaN(msg)==false) {
                 try {
                     arena.frequency = parseInt(msg)
+                    msg.channel.send(`Arena güncelleme sıklığı (sn): ${arena.frequency}`);
                 } finally {}
             }
         }
+        else if (command(msg, "exp ")) r_arg(msg, /^[0-9]+/, async n => {
+            xp = await db.get_exp(n);
+            msg.channel.send(xp);
+        });
         // unknown gm_ command, return
         return;
     }
@@ -181,10 +190,6 @@ client.on('message', msg => {
                     .catch(console.error);
             }
         });
-    }
-    else if (command(msg, "role")) {
-        
-
     }
 });
 

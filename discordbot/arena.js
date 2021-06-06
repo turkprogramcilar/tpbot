@@ -12,7 +12,7 @@ exports.create = (dc, msg, name, id, hp) => {
 }
 exports.hit = (dc, msg, gm=false,gmdmg=0) => {
     if (alive.length==0) return;
-    dmg=Math.random()*100*exports.buff|0;
+    dmg=(Math.random()*100)*exports.buff|0;
     if (gm) dmg=gmdmg;
     monster=alive[0];
     uname=msg.author.username;
