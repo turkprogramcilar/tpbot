@@ -10,6 +10,9 @@ exports.create = (dc, msg, name, id, hp) => {
         });
     });
 }
+// Anlik sunucuda en fazla exp 148k, yaklasik 0.6~ + 1 -> 1.6 kat fazla
+// damage veriyor bu formul
+exports.dmg = (xp) => Math.log(1*xp/200000+1);
 exports.hit = (dc, msg, gm=false,gmdmg=0) => {
     if (alive.length==0) return;
     dmg=(Math.random()*100)*exports.buff|0;

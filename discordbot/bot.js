@@ -167,10 +167,28 @@ client.on('message', async msg => {
                 } finally {}
             }
         }
-        else if (command(msg, "exp ")) r_arg(msg, /^[0-9]+/, async n => {
+        else if (command(msg, "dmg ")) r_arg(msg, /^[0-9]+/, async n => {
             xp = await db.get_exp(n);
-            msg.channel.send(xp);
-        });
+            msg.channel.send(`Exp: ${xp} | Dmg: ${arena.dmg(xp)}`);
+        })
+        else if (command(msg, "expall")) {
+            const Guild = msg.guild;
+            const Members = Guild.members.cache.map(member => member.id); // Getting the members and mapping them by ID.
+            exps = [];
+            const process_text = "Bu biraz zaman alacak... ";
+            const process_msg = msg.channel.send(process_text);
+            let i = 0;
+            const members = await msg.guild.members.fetch(); 
+            const mn = members.array().length;
+            for (const member of members) {
+                if (i % 50 == 0) (await process_msg).edit(process_text+`${i}\\${mn}`);
+                i++;
+                exps.push({name: member[1].user.username, exp: await db.get_exp(member[0])});
+            }
+            exps.sort((a, b) => -1*(a.exp - b.exp));
+            const table = exps.reduce((a,c)=>a+=`${c.name}: ${c.exp} | `, '');
+            (await process_msg).edit('```'+table.substring(0,2000-1-6)+'```');
+        }
         // unknown gm_ command, return
         return;
     }
