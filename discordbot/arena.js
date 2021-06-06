@@ -1,4 +1,14 @@
 let alive = [];
+let purge_list = [];
+let purge_timer = null;
+exports.toggle_purge = msg => {
+    purge_list.push(msg);
+    if (!purge_timer) purge_timer = setTimeout(() => {
+        const del = purge_list.splice(0,100);
+        msg.channel.bulkDelete(del);
+        purge_timer = null;
+    }, exports.frequency*1000);
+}
 exports.buff = 1;
 exports.frequency = 3;
 exports.create = (dc, msg, name, id, hp) => {
@@ -24,7 +34,6 @@ exports.hit = (dc, msg, gm=false,gmdmg=0) => {
     else
         monster.dmgdone[uname] = dmg;
     monster.hp-=dmg;
-    msg.delete();
     if (monster.hp <= 0) {
         monster.lasthit=0;
         alive=[];

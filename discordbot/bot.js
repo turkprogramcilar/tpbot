@@ -102,11 +102,11 @@ client.on('message', async msg => {
     }
 
         
+    // messages send on arena (command or not, doesn't matter)
+    if (msg.channel.id == cid_arena && arenaToggle) arena.toggle_purge(msg);
 
     // if not command anywhere, return
     if (!command(msg, prefix)) {        
-        // messages send on arena (not commands)
-        if (msg.channel.id == cid_arena) msg.delete();
         return;
     }
 
@@ -114,9 +114,7 @@ client.on('message', async msg => {
     if (msg.channel.id == cid_arena) {
         if (command(msg, "vur")) {
             arena.hit(Discord, msg);
-        }
-        else {
-            if (arenaToggle) msg.delete();
+            return;
         }
     }
 
