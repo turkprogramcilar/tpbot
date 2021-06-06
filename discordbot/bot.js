@@ -40,6 +40,17 @@ function ui_arg(msg, f, fe=()=>{}) { regex_arg(msg, f, fe, parseInt, /^[0-9]+/);
 function  i_arg(msg, f, fe=()=>{}) { regex_arg(msg, f, fe, parseInt, /^[+-][0-9]+?/); }
 function  f_arg(msg, f, fe=()=>{}) { regex_arg(msg, f, fe, parseFloat, /^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)/); }
 
+function set_arg(msg, cmd, setF, channel_msg=null) {
+    if (command(msg, cmd)) { 
+        f_arg(msg, f => {
+            setF(f);
+            if (channel_msg) msg.channel.send(`${channel_msg}: ${f}`);
+        })
+        return true;
+    } else {
+        return false;
+    }
+}
 /**
  * @param {Discord.Message} msg
  * @param {string} cmd
@@ -83,6 +94,13 @@ client.on('message', async msg => {
     if (msg.content == e) {
         sendAtaturk(msg.channel);
         return;
+    }
+
+    // arena spawn test
+    const match = msg.content.match(/<:([A-z]+):([0-9]+)>/);
+    const roll  = Math.random();// if (match) console.log(roll);
+    if (match && roll < arena.spawn_rate) {
+        arena.create(Discord, msg, match[1], match[2], 10000);
     }
 
     if (msg.channel.id == cid_gameserver) {
@@ -138,31 +156,16 @@ client.on('message', async msg => {
             arenaToggle = !arenaToggle;
             msg.channel.send(`Arenaya atilan tum mesajlari sil: ${arenaToggle}`);
         }
-        else if (command(msg, "buff")) { f_arg(msg, f => {
-            arena.buff = f;
-            msg.channel.send(`Arena hasar oranını düzenle: ${f}`);
-        })}
-        else if (command(msg, "vur ")) {
-            if (isNaN(msg)==false) {
-                try {
-                    arena.hit(Discord, msg, true, parseInt(msg));
-                } finally {}
-            }
-        }
+        else if (set_arg(msg, "buff",    f => arena.buff = f,       "Arena hasar oranını düzenle"));
+        else if (set_arg(msg, "sans",    f => arena.spawn_rate = f, "Arena emoji çıkma şansını düzenle"));
+        else if (set_arg(msg, "frekans", f => arena.frequency = f,  "Arena güncelleme sıklığı (sn)"));
+        else if (set_arg(msg, "vur",     f => arena.hit(Discord, msg, true, f)));
         else if (command(msg, "yarat ")) {
-            r = msg.content.match(/<:([A-z]+):([0-9]+)>\s*([0-9]+)/)
+            r = msg.content.match(/^<:([A-z]+):([0-9]+)>\s*([0-9]+)/)
             if (r) {
                 id=r[2]; nm=r[1]; hp=parseInt(r[3]);
                 if (!msg.guild.emojis.cache.get(id)) return;
                 arena.create(Discord, msg, nm, id, hp)
-            }
-        }
-        else if (command(msg, "frekans ")) {
-            if (isNaN(msg)==false) {
-                try {
-                    arena.frequency = parseInt(msg)
-                    msg.channel.send(`Arena güncelleme sıklığı (sn): ${arena.frequency}`);
-                } finally {}
             }
         }
         else if (command(msg, "dmg ")) r_arg(msg, /^[0-9]+/, async n => {

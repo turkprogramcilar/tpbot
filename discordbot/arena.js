@@ -9,6 +9,7 @@ exports.toggle_purge = msg => {
         purge_timer = null;
     }, exports.frequency*1000);
 }
+exports.spawn_rate = .01;
 exports.buff = 1;
 exports.frequency = 3;
 exports.create = (dc, msg, name, id, hp) => {
@@ -26,7 +27,7 @@ exports.dmg = (xp) => Math.log(1*xp/200000+1);
 exports.hit = (dc, msg, gm=false,gmdmg=0) => {
     if (alive.length==0) return;
     dmg=(Math.random()*100)*exports.buff|0;
-    if (gm) dmg=gmdmg;
+    if (gm) dmg=gmdmg|0;
     monster=alive[0];
     uname=msg.author.username;
     if (monster.dmgdone[uname])
