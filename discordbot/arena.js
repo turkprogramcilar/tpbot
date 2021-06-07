@@ -9,9 +9,9 @@ exports.toggle_purge = msg => {
         purge_timer = null;
     }, exports.frequency*1000);
 }
-exports.spawn_rate = .01;
+exports.spawn_rate = .1/3;
 exports.buff = 1;
-exports.frequency = 3;
+exports.frequency = 5;
 exports.create = (dc, msg, name, id, hp) => {
     if (alive.length>0) return null;
     ch = msg.guild.channels.cache.get(cid_arena);
