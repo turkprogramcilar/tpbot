@@ -1,3 +1,6 @@
+const tools = require("./tools.js");
+
+const display_hits = 20;
 let alive = [];
 let purge_list = [];
 let purge_timer = null;
@@ -17,16 +20,17 @@ exports.create = (dc, msg, name, id, hp) => {
     ch = msg.guild.channels.cache.get(cid_arena);
     if (ch) ch.send(embed(dc, name, id, hp, hp)).then((msg) => {
         alive.push({
-            name: name, id: id, msg: msg, mhp: hp, hp: hp, lasthit: 0, dmgdone: {},
+            name: name, id: id, msg: msg, mhp: hp, hp: hp, 
+            timestamp: 0, dmgdone: {}, lasthits: [],
         });
     });
 }
 // Anlik sunucuda en fazla exp 148k, yaklasik 0.6~ + 1 -> 1.6 kat fazla
 // damage veriyor bu formul
 exports.dmg = (xp) => Math.log(1*xp/200000+1);
-exports.hit = (dc, msg, gm=false,gmdmg=0) => {
+exports.hit = async (dc, msg, gm=false,gmdmg=0) => {
     if (alive.length==0) return;
-    dmg=(Math.random()*100)*exports.buff|0;
+    dmg=(.3+Math.random()*.7)*100*exports.buff|0;
     if (gm) dmg=gmdmg|0;
     monster=alive[0];
     uname=msg.author.username;
@@ -36,35 +40,43 @@ exports.hit = (dc, msg, gm=false,gmdmg=0) => {
         monster.dmgdone[uname] = dmg;
     monster.hp-=dmg;
     if (monster.hp <= 0) {
-        monster.lasthit=0;
+        monster.timestamp=0;
         alive=[];
     }
-    now = new Date(); passed = (now - monster.lasthit) / 1000 | 0;
+    if (monster.lasthits.length==display_hits)
+        monster.lasthits.shift();
+    monster.lasthits.push('`'+uname+': '+dmg+'`');
+    now = new Date(); passed = (now - monster.timestamp) / 1000 | 0;
     if (passed >= exports.frequency) {
         //update
         sorted=Object.entries(monster.dmgdone).sort((a,b)=>b[1]-a[1])
         m=monster;
-        m.msg.edit(embed(dc, m.name,m.id,m.hp,m.mhp,sorted.splice(0,3),sorted.splice(-1,1)[0]));
-        monster.lasthit = now;
+        const newmsg=embed(dc, m.name,m.id,m.hp,m.mhp,m.lasthits,sorted.splice(0,3),sorted.splice(-1,1)[0]);
+        if (m.msg.deleted) m.msg = await msg.guild.channels.cache.get(cid_arena).send(newmsg);
+        else m.msg.edit(newmsg);
+        monster.timestamp = now;
     }
 }
-const embed = (dc, name, id, hp, mhp, top=[], last='') => {
+const embed = (dc, name, id, hp, mhp, lasthits=[], top=[], last='') => {
 
     // boyle yapmayinca bir sebepten dolayi calismiyordu belki de simdi t1..t4
     // yerine karsiliklarini yazinca calisabilir.
     t1=top[0]??"-"; t2=top[1]??"-"; t3=top[2]??"-"; t4=last??"-";
 
-    return new dc.MessageEmbed()
-        .setColor('#F80000')
+    return {
+        content: ''+lasthits.reduce((a,c)=>a+=c+' ',''),
+        embed: new dc.MessageEmbed()
+        .setColor('#'+tools.hsv2rgbh(hp/mhp/3,1,1))
         .setTitle(title(name, hp,mhp))
-        .setDescription(`Can: ${hp}/${mhp}`)
+        .setDescription(`\`\`\`Can: ${hp}/${mhp} (%${(hp/mhp*100)|0})\`\`\``)
         .addField('Birinci', t1, true)
         .addField('İkinci',  t2, true)
         .addField('Üçüncü',  t3, true)
         //.addField('Sonuncu', t4, true) bu calismiyor anlamadim.
         .setThumbnail(`https://cdn.discordapp.com/emojis/${id}.png`)
         .setTimestamp()
-        .setFooter('%vur komutu ile düşmana saldır.');// Daha fazla hasar vermek için saldırını emojiler ile desteklendir!');
+        .setFooter('%vur komutu ile düşmana saldır.')// Daha fazla hasar vermek için saldırını emojiler ile desteklendir!');
+    };
 }
 
 const title = (name, hp, mhp) => {
