@@ -153,13 +153,10 @@ client.on('message', async msg => {
         return;
     }
 
-
     // beyond is administrative or feature previews only, 
     // if not admin return
     if (msg.author.id != uid_ockis)
         return;
-
-    db.get_exp(msg.author.id);
 
     if (command(msg, "gm_")) {
         
