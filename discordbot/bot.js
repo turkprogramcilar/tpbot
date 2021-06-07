@@ -102,9 +102,10 @@ client.on('message', async msg => {
     }
 
     // arena spawn test
-    const match = msg.content.match(/<:([A-z]+):([0-9]+)>/);
-    const roll  = Math.random();// if (match) console.log(roll);
-    if (match && roll < arena.spawn_rate) {
+    if (!process.env.DCBOT_NOARENA 
+    && (match = msg.content.match(/<:([A-z]+):([0-9]+)>/))
+    &&  Math.random() < arena.spawn_rate
+    ) {
         arena.create(Discord, msg, match[1], match[2], 10000);
     }
 
