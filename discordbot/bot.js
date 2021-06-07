@@ -141,12 +141,12 @@ client.on('message', async msg => {
         }
     }
 
-    if (command(msg, "echo")) {
+    if (command(msg, "echo ")) {
         if (msg.content.length>0)
             msg.channel.send(msg.content);
         return;
     }
-    if (command(msg, "echoq")) {
+    if (command(msg, "echoq ")) {
         if (msg.content.length>0)
             msg.channel.send(tqs(msg.content));
         return;
