@@ -35,6 +35,11 @@ function regex_arg(msg, f, f_else, fr, regex) {
         f_else();
     }
 }
+// wrap with triple quote
+function tq(str) { return '```'+str+'```'; }
+// wrap with triple quote + safe (2000 char limit)
+function tqs(str) { return tq(str.substr(0,2000-1-6)); }
+
 function  r_arg(msg, regex, f, fe=()=>{}) { regex_arg(msg, f, fe, x=>x, regex); }
 function ui_arg(msg, f, fe=()=>{}) { regex_arg(msg, f, fe, parseInt, /^[0-9]+/); }
 function  i_arg(msg, f, fe=()=>{}) { regex_arg(msg, f, fe, parseInt, /^[+-][0-9]+?/); }
@@ -139,6 +144,11 @@ client.on('message', async msg => {
     if (command(msg, "echo")) {
         if (msg.content.length>0)
             msg.channel.send(msg.content);
+        return;
+    }
+    if (command(msg, "echoq")) {
+        if (msg.content.length>0)
+            msg.channel.send(tqs(msg.content));
         return;
     }
 
