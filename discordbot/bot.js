@@ -25,7 +25,7 @@ client.on('ready', () => {
     marqueeTimer = setInterval(setStatus, 10000*(1+Math.random()));
 });
 
-let prefix = "%";
+let prefix = process.env.DCBOT_PREFIX ?? "%";
 
 function regex_arg(msg, f, f_else, fr, regex) {
     r = msg.content.trimStart().match(regex); if (r) {
