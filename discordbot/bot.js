@@ -1,10 +1,12 @@
 require("./constants.js");
-require("./state.js");
 const php = require("./php.js")
 const arena = require("./arena.js");
 
 const Discord = require('discord.js');
 const client = new Discord.Client();
+
+marqueeTimer = null;
+arenaToggle = true;
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
