@@ -1,6 +1,6 @@
 require("./constants.js");
 require("./state.js");
-const db = require("./phpdb.js")
+const php = require("./php.js")
 const arena = require("./arena.js");
 
 const Discord = require('discord.js');
@@ -176,8 +176,24 @@ client.on('message', async msg => {
                 arena.create(Discord, msg, nm, id, hp)
             }
         }
+        /*else if (command(msg, test)) {
+            const embed = new Discord.MessageEmbed()
+            .setColor('#F80000')
+            .setTitle(title(name, hp,mhp))
+            .setDescription(`Can: ${hp}/${mhp}`)
+            .addField('Birinci', 'test', true)
+            .addField('Birinci', 'test', true)
+            .addField('Birinci', 'test', true)
+            .addField('Birinci', 'test', true)
+            .addField('Birinci', 'test', true)
+            .addField('Birinci', 'test', true)
+            .setThumbnail(`https://cdn.discordapp.com/emojis/${id}.png`)
+            .setTimestamp()
+            .setFooter('%vur komutu ile düşmana saldır.');// Daha fazla hasar vermek için saldırını emojiler ile desteklendir!');
+            msg.channel.send(embed)
+        }*/
         else if (command(msg, "dmg ")) r_arg(msg, /^[0-9]+/, async n => {
-            xp = await db.get_exp(n);
+            xp = await php.get_exp(n);
             msg.channel.send(`Exp: ${xp} | Dmg: ${arena.dmg(xp)}`);
         })
         else if (command(msg, "expall")) {
@@ -192,7 +208,7 @@ client.on('message', async msg => {
             for (const member of members) {
                 if (i % 50 == 0) (await process_msg).edit(process_text+`${i}\\${mn}`);
                 i++;
-                exps.push({name: member[1].user.username, exp: await db.get_exp(member[0])});
+                exps.push({name: member[1].user.username, exp: await php.get_exp(member[0])});
             }
             exps.sort((a, b) => -1*(a.exp - b.exp));
             const table = exps.reduce((a,c)=>a+=`${c.name}: ${c.exp} | `, '');
