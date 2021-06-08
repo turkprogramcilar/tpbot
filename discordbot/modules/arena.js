@@ -94,8 +94,6 @@ exports.on_event = async (evt, args) => {
         }
         break;
     }
-    
-
 }
 
 
@@ -105,7 +103,7 @@ const display_hits = 20;
 let alive = [];
 let purge_list = [];
 let purge_timer = null;
-
+let update_timer = null;
 let toggle = true;
 let spawn_rate = .1/3;
 
@@ -117,7 +115,19 @@ let frequency = 5;
 // damage veriyor bu formul
 const getdmg = (xp) => Math.log(1*xp/200000+1);
 
-
+need_update = false;
+const toggle_update = (f) => {
+    if (!update_timer) {
+        f();
+        need_update = false;
+        update_timer = setTimeout(() => {
+            update_timer = null;
+            if (need_update) toggle_update(f);
+        }, frequency*1000);
+    } else {
+        need_update = true;
+    }
+}
 const toggle_purge = msg => {
     purge_list.push(msg);
     if (!purge_timer) purge_timer = setTimeout(() => {
@@ -131,8 +141,7 @@ const create = (msg, name, id, hp) => {
     ch = msg.guild.channels.cache.get(cid_arena);
     if (ch) ch.send(embed(name, id, hp, hp)).then((msg) => {
         alive.push({
-            name: name, id: id, msg: msg, mhp: hp, hp: hp, 
-            timestamp: 0, dmgdone: {}, lasthits: [],
+            name: name, id: id, msg: msg, mhp: hp, hp: hp, dmgdone: {}, lasthits: [],
         });
     });
 }
@@ -154,16 +163,14 @@ const hit = async (msg, gm=false,gmdmg=0) => {
     if (monster.lasthits.length==display_hits)
         monster.lasthits.shift();
     monster.lasthits.push('`'+uname+': '+dmg+'`');
-    now = new Date(); passed = (now - monster.timestamp) / 1000 | 0;
-    if (passed >= frequency) {
+    toggle_update(()=> {
         //update
         sorted=Object.entries(monster.dmgdone).sort((a,b)=>b[1]-a[1])
         m=monster;
         const newmsg=embed(m.name,m.id,m.hp,m.mhp,m.lasthits,sorted.splice(0,3),sorted.splice(-1,1)[0]);
         if (m.msg.deleted) m.msg = await msg.guild.channels.cache.get(cid_arena).send(newmsg);
         else m.msg.edit(newmsg);
-        monster.timestamp = now;
-    }
+    })
 }
 const embed = (name, id, hp, mhp, lasthits=[], top=[], last='') => {
 
