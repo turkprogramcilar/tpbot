@@ -1,30 +1,18 @@
 require("./constants.js");
+
+const status = require("./marquee_status.js");
 const php = require("./php.js")
 const arena = require("./arena.js");
 
 const Discord = require('discord.js');
 const client = new Discord.Client();
 
-marqueeTimer = null;
 arenaToggle = true;
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
 
-    // prevent marquee timer from toggling more than once
-    if (marqueeTimer)
-        return;
-    // marquee status, this also prevents heroku dyno from sleeping
-    let   mi = 0;  // marquee index
-    const mm = msg_status;
-    const ml = mm.length;
-    const marqueeStatus = () =>
-        mi != ml-1 ? mm[++mi]
-                   : mm[mi=0];
-
-    const setStatus = () => client.user.setActivity(marqueeStatus());
-    setStatus();
-    marqueeTimer = setInterval(setStatus, 10000*(1+Math.random()));
+    status.init();
 });
 
 let prefix = process.env.DCBOT_PREFIX ?? "%";
