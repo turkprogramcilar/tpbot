@@ -4,7 +4,7 @@ const webserver =
     : undefined;
 
 const bot = require("./discordbot/bot.js")
-    .init(process.env.DCBOT_TOKEN, ["gamemaster"]);
+    .init(process.env.DCBOT_TOKEN, ["ataturk","arena"]);
 
 if (webserver != undefined)
     bot.set_sendallF(webserver.send_all);

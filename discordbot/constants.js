@@ -1,3 +1,11 @@
+consts = {
+    env: {
+        phphost: process.env.DCBOT_PHPHOST,
+        noarena: process.env.DCBOT_NOARENA,
+        prefix : process.env.DCBOT_PREFIX,
+    }
+};
+
 // emoji ids
 eid_kekt = 823934807724785664;
 eid_keky = 824702674712526879;
@@ -13,7 +21,7 @@ uid_admins = [
 
 // channel ids
 cid_p2p = 824685500686008350;
-cid_gameserver = 825713784848252938;
+cid_wschannel = 825713784848252938;
 cid_arena = "850465092537286656"
 // category ids
 caid_muzik = 826154162638946355

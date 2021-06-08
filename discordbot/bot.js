@@ -9,11 +9,8 @@ const mpath = "./modules/";
 
 let modules = [];
 let state = {
-    arena       : require("./arena.js"),
-    arena_toggle: true,
+    prefix = consts.env.prefix ?? "%",
 };
-
-let prefix = process.env.DCBOT_PREFIX ?? "%";
 
 exports.init = (token, mods = []) => {
 
@@ -31,85 +28,26 @@ client.on('ready', () => {
     status.init(client, msg_status);
 });
 
-function switch_module(module, msg, cmd=null) {
-    if ((cmd && !parse.is(msg, cmd)) || !modules[module]) return false;
-    modules[module].on_message(msg);
-    return true;
-}
-
-const e = '🤌';
-function sendAtaturk(channel) {
-    return channel
-        .send("https://cdn.discordapp.com/attachments/824578307722575892/828715024641163264/ataturk.png")
-        .then(x=>x.delete({timeout: 8000}));
-}
 client.on('messageReactionAdd', async (reaction,user) => {
-    if (reaction.partial) {
-		// If the message this reaction belongs to was removed the fetching might result in an API error, which we need to handle
-		try {
-			await reaction.fetch();
-		} catch (error) {
-			console.error('Something went wrong when fetching the message: ', error);
-			// Return as `reaction.message.author` may be undefined/null
-			return;
-		}
-	}
-    if (reaction.emoji.name == e && 
-        reaction.message.reactions.cache.has(e) &&
-        reaction.message.reactions.cache.get(e).count == 1) {
-            sendAtaturk(reaction.message.channel);
-    }
+    if (msg.author == client.user)
+        return;
+
+    for (const m of modules) 
+        switch_module(m, 'messageReactionAdd', {reaction: reaction, user: user});
 });
 client.on('message', async msg => {
     if (msg.author == client.user)
         return;
 
-    if (msg.content == e) {
-        sendAtaturk(msg.channel);
+    for (const m of modules)
+        switch_module(m, 'message', {msg: msg});
+    
+    // beyond is only commands with prefixes, if not return immediately
+    if (!parse.is(msg, state.prefix)) {        
         return;
     }
 
-    // arena spawn test
-    if (!process.env.DCBOT_NOARENA 
-    && (match = msg.content.match(/<:([A-z]+):([0-9]+)>/))
-    &&  Math.random() < state.arena.spawn_rate
-    ) {
-        state.arena.create(Discord, msg, match[1], match[2], 10000);
-    }
-
-    if (msg.channel.id == cid_gameserver) {
-        
-        if (msg.content.length <= 0) 
-            return;
-
-        let guild = msg.guild;
-        let member = guild.member(msg.author);
-        let nickname = member ? member.displayName : msg.author.username;
-        sendmsg = `${nickname}: ${msg.content}`;
-        console.log(sendmsg);
-        ws.send_all(sendmsg);
-
-        //handled channel, return
-        return;
-    }
-
-        
-    // messages send on arena (command or not, doesn't matter)
-    if (msg.channel.id == cid_arena && state.arena_toggle) state.arena.toggle_purge(msg);
-
-    // if not command anywhere, return
-    if (!parse.is(msg, prefix)) {        
-        return;
-    }
-
-    // command send on arena
-    if (msg.channel.id == cid_arena) {
-        if (parse.is(msg, "vur")) {
-            state.arena.hit(Discord, msg);
-            return;
-        }
-    }
-
+    // basic commands to test if bot is running
     if (parse.is(msg, "echo ")) {
         if (msg.content.length>0)
             msg.channel.send(msg.content);
@@ -123,11 +61,8 @@ client.on('message', async msg => {
 
     // beyond is administrative or feature previews only, 
     // if not admin return
-    if (msg.author.id != uid_ockis)
+    if (msg.author.id in uid_admins == false)
         return;
-
-    if (switch_module("gamemaster", msg, "gm_")) return;
-    
 
     // beyond is admin + fix prefix,
     if (!parse.is(msg, "fix"))
@@ -146,6 +81,11 @@ client.on('message', async msg => {
     }
 });
 
+function switch_module(module, evt, args) {
+    if (!modules[module]) return false;
+    modules[module].on_event(evt, args);
+    return true;
+}
 
 var ws = {};
 module.exports.set_sendallF = (f) => {

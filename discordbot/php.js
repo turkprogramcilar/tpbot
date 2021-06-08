@@ -1,7 +1,8 @@
+require("./constants.js")
 const http = require('http');
 exports.get_exp = async id => new Promise(resolve => {
 
-    const hostname = process.env.DCBOT_PHPHOST;
+    const hostname = consts.env.phphost;
     const path = '/get_exp.php';
     const data = JSON.stringify({
         user_id: id
