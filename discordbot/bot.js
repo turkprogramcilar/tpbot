@@ -61,8 +61,23 @@ client.on('message', async msg => {
 
     // beyond is administrative or feature previews only, 
     // if not admin return
-    if (msg.author.id in uid_admins == false)
+    if (uid_admins.includes(msg.author.id) == false)
         return;
+
+    if (parse.is(msg, "test")) {
+        
+        const embed = new Discord.MessageEmbed()
+        .setColor('#F80000')
+        .setAuthor('auth 1name', 'https://cdn.discordapp.com/embed/avatars/1.png')
+        .setAuthor('auth2 name', 'https://cdn.discordapp.com/embed/avatars/5.png')
+        .addField('`Birinci`', 'test', true)
+        .addField('', '```diff\n+ Birinci```', true)
+        .addField('4', 'test', true)
+        .setTimestamp()
+        .setFooter('%vur komutu ile düşmana saldır.');// Daha fazla hasar vermek için saldırını emojiler ile desteklendir!');
+            msg.channel.send(embed)
+        return
+    }
 
     // beyond is admin + fix prefix,
     if (!parse.is(msg, "fix"))
