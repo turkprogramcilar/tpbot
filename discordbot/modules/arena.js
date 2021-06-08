@@ -163,7 +163,7 @@ const hit = async (msg, gm=false,gmdmg=0) => {
     if (monster.lasthits.length==display_hits)
         monster.lasthits.shift();
     monster.lasthits.push('`'+uname+': '+dmg+'`');
-    toggle_update(()=> {
+    toggle_update(async ()=> {
         //update
         sorted=Object.entries(monster.dmgdone).sort((a,b)=>b[1]-a[1])
         m=monster;
