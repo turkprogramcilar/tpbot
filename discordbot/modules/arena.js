@@ -54,22 +54,6 @@ exports.on_event = async (evt, args) => {
                 create(msg, nm, id, hp)
             }
         }
-        /*else if (parse.is(msg, test)) {
-            const embed = new Discord.MessageEmbed()
-            .setColor('#F80000')
-            .setTitle(title(name, hp,mhp))
-            .setDescription(`Can: ${hp}/${mhp}`)
-            .addField('Birinci', 'test', true)
-            .addField('Birinci', 'test', true)
-            .addField('Birinci', 'test', true)
-            .addField('Birinci', 'test', true)
-            .addField('Birinci', 'test', true)
-            .addField('Birinci', 'test', true)
-            .setThumbnail(`https://cdn.discordapp.com/emojis/${id}.png`)
-            .setTimestamp()
-            .setFooter('%vur komutu ile düşmana saldır.');// Daha fazla hasar vermek için saldırını emojiler ile desteklendir!');
-            msg.channel.send(embed)
-        }*/
         else if (parse.is(msg, "dmg ")) r_arg(msg, /^[0-9]+/, async n => {
             xp = await php.get_exp(n);
             msg.channel.send(`Exp: ${xp} | Dmg: ${dmg(xp)}`);
@@ -147,7 +131,7 @@ const create = (msg, name, id, hp) => {
 }
 const hit = async (msg, gm=false,gmdmg=0) => {
     if (alive.length==0) return;
-    dmg=(.3+Math.random()*.7)*100*buff|0;
+    dmg=(.3+Math.random()*.7)*400*buff|0;
     if (gm) dmg=gmdmg|0;
     monster=alive[0];
     uname=msg.author.username;
@@ -183,10 +167,10 @@ const embed = (name, id, hp, mhp, lasthits=[], top=[], last='') => {
         embed: new Discord.MessageEmbed()
         .setColor('#'+tools.hsv2rgbh(hp/mhp/3,1,1))
         .setTitle(title(name, hp,mhp))
-        .setDescription(`\`\`\`Can: ${hp}/${mhp} (%${(hp/mhp*100)|0})\`\`\``)
-        .addField('Birinci', t1, true)
-        .addField('İkinci',  t2, true)
-        .addField('Üçüncü',  t3, true)
+        .setDescription(`\`\`\`diff\n+ ${hp}/${mhp} (%${(hp/mhp*100)|0})\`\`\``)
+        .addField('`Birinci`', t1[0]+`\`\`\`md\n# ${t1[1]} (%${(t1[1]/mhp*100)|0})\`\`\``, true)
+        .addField('`İkinci`',  t2[0]+`\`\`\`md\n# ${t2[1]} (%${(t2[1]/mhp*100)|0})\`\`\``, true)
+        .addField('`Üçüncü`',  t3[0]+`\`\`\`md\n# ${t3[1]} (%${(t3[1]/mhp*100)|0})\`\`\``, true)
         //.addField('Sonuncu', t4, true) bu calismiyor anlamadim.
         .setThumbnail(`https://cdn.discordapp.com/emojis/${id}.png`)
         .setTimestamp()
@@ -198,7 +182,7 @@ const title = (name, hp, mhp) => {
     
     // pc=percentage
     pc=hp/mhp;
-         if (pc <= 0) return `MEGA ${name} MAĞLUP EDİLDİ. TEBRİKLER! PUAN TABLOSU:`;
+         if (pc <= 0) return `MEGA ${name} MAĞLUP EDİLDİ.`;
     else if (pc < .1) return `MEGA ${name} SON DEMLERİNİ YAŞIYOR!`;
     else if (pc < .3) return `MEGA ${name} ÖLMEK ÜZERE!!!`;
     else if (pc < .6) return `MEGA ${name} TP ÜYELERİ KARŞISINDA ZORLANIYOR!`;
