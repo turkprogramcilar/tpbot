@@ -3,7 +3,7 @@ Türk Programcılar Discord sunucusu tarafından geliştirilen bot
 
 `Environment variable` tanımlamaları
 ```
-DCBOT_TOKEN            discord bot token
+DCBOT_JSON             discord bot tokenların modüllere ayrıldığı JSON yapısı (örnek aşağıdadır)
 DCBOT_PHPHOST          exp php host sunucu adı (örn: google.com formatında, http/s ve www koymayın)
 DCBOT_DEBUGGING        Şu anda sadece status mesajını farklı göstermede yarıyor (tanımlı olması yeter)
 DCBOT_NOARENA          Emoji bulunan mesajlarda arenada otomatik mega yaratma 
@@ -15,6 +15,20 @@ DCBOT_WSPORT           WS portu (bulunmazsa varsayılan 3000)
 `tanımlı olması yeter` ifadesi geçen değerlerin tanımlı olması yeterlidir.
 Değeri önemsizdir. 1 yazabilirsiniz illaki değer tanımlamanız gerekiyorsa. 
 Tanımladığınız herhangi rastgele değer ihmal edilecektir.
+
+`JSON token örneği`
+```json
+{
+    "ODUxMD23ODMzNOD8MzM4NzUy.YL2hxw.U9iB6Sk5XSwpgHvqKQP9Cfl4Ryg": ["ataturk","arena"],
+}
+Yukarıda örneği verilen token karşısında bulunan 2 modül aynı bot içerisinde çalıştırılır.
+```json
+{
+    "ODUxMD23ODMzNOD8MzM4NzUy.YL2hxw.4pDP6SkxQShBgHvqKQP9Cfl4Ryg": ["ataturk"],
+    "ODUxMD23ODMzNOD8MzM4NzUy.YL2hxw.oVDhBnPxTLqYZh81KIwvZybDQy4": ["arena"],
+}
+Yukarıda örneği verilen farkli tokenlar karşısında bulunan modüler ayrı botlar içerisinde çalıştırılır.
+```
 
 # Türk Programcılar Discord Sunucusu
 

@@ -4,23 +4,23 @@ const parse   = require("./cmdparser.js");
 const status  = require("./marquee_status.js");
 const Discord = require('discord.js');
 
-const client  = new Discord.Client();
 const mpath = "./modules/";
 
-let modules = [];
-let state = {
+exports.init = (state, token, mods = []) => {
+state = {
     prefix: consts.env.prefix ?? "%",
+    ws: {},
 };
+const client  = new Discord.Client();
 
-exports.init = (token, mods = []) => {
+let modules = [];
 
-    for (const m of mods) {
+for (const m of mods) {
 
-        let a = modules.push(require(mpath+m))
-        modules[a-1].init(state);
-    }
-    client.login(token);
+    let a = modules.push(require(mpath+m))
+    modules[a-1].init(state);
 }
+client.login(token);
 
 client.on('ready', () => {
     console.log(`Logged in as ${client.user.tag}!`);
@@ -81,7 +81,7 @@ client.on('message', async msg => {
     }
 });
 
-var ws = {};
+}
 module.exports.set_sendallF = (f) => {
-    ws.send_all = f;
+    state.ws.send_all = f;
 }
