@@ -168,9 +168,9 @@ const embed = (name, id, hp, mhp, lasthits=[], top=[], last='') => {
         .setColor('#'+tools.hsv2rgbh(hp/mhp/3,1,1))
         .setTitle(title(name, hp,mhp))
         .setDescription(`\`\`\`diff\n+ ${hp}/${mhp} (%${(hp/mhp*100)|0})\`\`\``)
-        .addField('`Birinci`', t1[0]+`\`\`\`md\n# ${t1[1]} (%${(t1[1]/mhp*100)|0})\`\`\``, true)
-        .addField('`İkinci`',  t2[0]+`\`\`\`md\n# ${t2[1]} (%${(t2[1]/mhp*100)|0})\`\`\``, true)
-        .addField('`Üçüncü`',  t3[0]+`\`\`\`md\n# ${t3[1]} (%${(t3[1]/mhp*100)|0})\`\`\``, true)
+        .addField('`Birinci`', t1[0]+top[0]?`\`\`\`md\n# ${t1[1]} (%${(t1[1]/mhp*100)|0})\`\`\``:'', true)
+        .addField('`İkinci`',  t2[0]+top[1]?`\`\`\`md\n# ${t2[1]} (%${(t2[1]/mhp*100)|0})\`\`\``:'', true)
+        .addField('`Üçüncü`',  t3[0]+top[2]?`\`\`\`md\n# ${t3[1]} (%${(t3[1]/mhp*100)|0})\`\`\``:'', true)
         //.addField('Sonuncu', t4, true) bu calismiyor anlamadim.
         .setThumbnail(`https://cdn.discordapp.com/emojis/${id}.png`)
         .setTimestamp()
