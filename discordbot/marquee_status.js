@@ -1,6 +1,6 @@
 
 marqueeTimer = null;
-exports.init = (status_texts=[
+exports.init = (client, status_texts=[
     "Turk programcılar sunucusuna hoşgeldiniz!",
     "Hemen bugün programlama öğrenmeye başla!"]) => {
     // prevent marquee timer from toggling more than once
