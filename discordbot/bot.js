@@ -9,16 +9,16 @@ const mpath = "./modules/";
 
 let modules = [];
 let state = {
-    prefix = consts.env.prefix ?? "%",
+    prefix: consts.env.prefix ?? "%",
 };
 
 exports.init = (token, mods = []) => {
 
     for (const m of mods) {
-        modules[m] = require(mpath+m);
-        modules[m].init(state);
+
+        let a = modules.push(require(mpath+m))
+        modules[a-1].init(state);
     }
-        
     client.login(token);
 }
 
@@ -29,19 +29,19 @@ client.on('ready', () => {
 });
 
 client.on('messageReactionAdd', async (reaction,user) => {
-    if (msg.author == client.user)
-        return;
-
     for (const m of modules) 
-        switch_module(m, 'messageReactionAdd', {reaction: reaction, user: user});
+        m.on_event('messageReactionAdd', {reaction: reaction, user: user});
 });
 client.on('message', async msg => {
     if (msg.author == client.user)
         return;
 
-    for (const m of modules)
-        switch_module(m, 'message', {msg: msg});
-    
+    const content = msg.content;
+    for (const m of modules) {
+        m.on_event('message', {msg: msg});
+        msg.content = content;
+    }
+        
     // beyond is only commands with prefixes, if not return immediately
     if (!parse.is(msg, state.prefix)) {        
         return;
@@ -80,12 +80,6 @@ client.on('message', async msg => {
         });
     }
 });
-
-function switch_module(module, evt, args) {
-    if (!modules[module]) return false;
-    modules[module].on_event(evt, args);
-    return true;
-}
 
 var ws = {};
 module.exports.set_sendallF = (f) => {
