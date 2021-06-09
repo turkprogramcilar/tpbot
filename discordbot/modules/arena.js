@@ -1,6 +1,5 @@
 const tools = require("../tools.js");
 const parse = require("./../cmdparser.js");
-const php   = require("./../php.js");
 
 const Discord = require("discord.js");
 
@@ -54,10 +53,10 @@ exports.on_event = async (evt, args) => {
                 create(msg, nm, id, hp)
             }
         }
-        else if (parse.is(msg, "dmg ")) r_arg(msg, /^[0-9]+/, async n => {
+        /*else if (parse.is(msg, "dmg ")) r_arg(msg, /^[0-9]+/, async n => {
             xp = await php.get_exp(n);
             msg.channel.send(`Exp: ${xp} | Dmg: ${dmg(xp)}`);
-        })
+        })*/
         break;
     }
 }
