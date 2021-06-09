@@ -24,7 +24,7 @@ exports.init = (state, token, mods = []) => {
     client.login(token);
 
     client.on('ready', () => {
-        console.log(`Logged in as ${client.user.tag}! (for modules=[${modules}])`);
+        console.log(`Logged in as ${client.user.tag}! (for modules=[${mods}])`);
 
         status.init(client, msg_status);
     });
