@@ -69,7 +69,7 @@ const display_hits = 20;
 let alive = [];
 let purge_list = [];
 let delete_messages = true;
-let spawn_rate = .1/3;
+let spawn_rate = .01;
 
 
 
