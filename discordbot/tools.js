@@ -31,7 +31,7 @@ exports.hsv2rgbh = (h,s,v) => {
 let toggler_states = {}
 let toggler_timers = {}
 exports.toggler = (f, k, fq) => {
-    if (toggler_timers[k]) {
+    if (!toggler_timers[k]) {
         f();
         toggler_states[k] = false;
         toggler_timers[k] = setTimeout(() => {
