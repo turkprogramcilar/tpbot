@@ -1,3 +1,4 @@
+// env import
 consts = {
     env: {
         phphost: process.env.DCBOT_PHPHOST,
@@ -20,27 +21,30 @@ uid_admins = [
 ];
 
 // channel ids
-cid_p2p = "824685500686008350";
-cid_wschannel = "825713784848252938";
-cid_arena = "850465092537286656"
-// category ids
-caid_muzik = "826154162638946355"
-caid_kodlama = "792034825640738826"
-caid_etkinlik = "821422645744369784"
-caid_diller = "782713598245077013"
-caid_soru = "810183265029586974"
-caid_az_diller = "827074947272146974"
-caid_tp_bot = "823470264025088020"
+cid = {
+    p2p         : "824685500686008350",
+    wschannel   : "825713784848252938",
+    arena       : "850465092537286656",
+    ozelestiri  : "782947118062764033",
+    hergunogren : "844643095923654667",
+    ogreticisey : "836490628249550878",
+    makale      : "811268737939669063",
+}
 
-caid_fix = [
-    caid_muzik,
-    caid_kodlama,
-    caid_etkinlik,
-    caid_diller,
-    caid_soru,
-    caid_az_diller,
-    caid_tp_bot,
-];
+
+// category ids
+caid = {
+    yonetim       : "782717527587160085",
+    bilgilendirme : "832603333654216704",
+    sorusor       : "827889948941746178",
+    takilmaca     : "825271028476542996",
+    etkinlikler   : "821422645744369784",
+    paylasimlar   : "832158366541283358",
+    kodlama       : "792034825640738826",
+    tpbot         : "823470264025088020",
+    yayin         : "698972054740795455",
+    muzikses      : "826154162638946355",
+}
 
 // msg constants
 msg_testmode = "Bakımdan dolayı sadece yetkililer komut çalıştırabilir.";
@@ -49,5 +53,19 @@ msg_status   = process.env.DCBOT_DEBUGGING ? ["_","¯"].map(x=>x+process.env.DCB
     "Programlama öğrenmek için harika bir gün!",
     "Hemen programlamaya başla"
 ];
+
+// exp system
+exps_by_channel[cid.ozelestri] = 1000;
+exps_by_channel[cid.hergunogren] = 1000;
+exps_by_channel[cid.ogreticisey] = 10;
+exps_by_channel[cid.ogreticimakale] = 15;
+
+exps_by_category[caid.sorusor] = 5
+exps_by_category[caid.etkinlikler] = 3
+exps_by_category[caid.paylasimlar] = 5
+exps_by_category[caid.kodlama] = 5
+exps_by_category[caid.tpbot] = 1
+exps_by_category[caid.yayin] = 2
+exps_by_category[caid.muzikses] = 1
 
 module.exports = {};

@@ -19,14 +19,14 @@ exports.on_event = async (evt, args) => {
             create(msg, match[1], match[2], 10000);
         }
         // messages send on arena (command or not, doesn't matter)
-        if (msg.channel.id == cid_arena) toggle_purge(msg);
+        if (msg.channel.id == cid.arena) toggle_purge(msg);
 
         // if not command anywhere, return
         if (!parse.is(msg, state.prefix)) {        
             return;
         }
         // command send on arena
-        if (msg.channel.id == cid_arena) {
+        if (msg.channel.id == cid.arena) {
             if (parse.is(msg, "vur")) {
                 hit(msg);
                 return;
@@ -58,24 +58,6 @@ exports.on_event = async (evt, args) => {
             xp = await php.get_exp(n);
             msg.channel.send(`Exp: ${xp} | Dmg: ${dmg(xp)}`);
         })
-        else if (parse.is(msg, "expall")) {
-            const Guild = msg.guild;
-            const Members = Guild.members.cache.map(member => member.id); // Getting the members and mapping them by ID.
-            exps = [];
-            const process_text = "Bu biraz zaman alacak... ";
-            const process_msg = msg.channel.send(process_text);
-            let i = 0;
-            const members = await msg.guild.members.fetch(); 
-            const mn = members.array().length;
-            for (const member of members) {
-                if (i % 50 == 0) (await process_msg).edit(process_text+`${i}\\${mn}`);
-                i++;
-                exps.push({name: member[1].user.username, exp: await php.get_exp(member[0])});
-            }
-            exps.sort((a, b) => -1*(a.exp - b.exp));
-            const table = exps.reduce((a,c)=>a+=`${c.name}: ${c.exp} | `, '');
-            (await process_msg).edit('```'+table.substring(0,2000-1-6)+'```');
-        }
         break;
     }
 }
@@ -122,7 +104,7 @@ const toggle_purge = msg => {
 }
 const create = (msg, name, id, hp) => {
     if (alive.length>0) return null;
-    ch = msg.guild.channels.cache.get(cid_arena);
+    ch = msg.guild.channels.cache.get(cid.arena);
     if (ch) ch.send(embed(name, id, hp, hp)).then((msg) => {
         alive.push({
             name: name, id: id, msg: msg, mhp: hp, hp: hp, dmgdone: {}, lasthits: [],
@@ -152,7 +134,7 @@ const hit = async (msg, gm=false,gmdmg=0) => {
         sorted=Object.entries(monster.dmgdone).sort((a,b)=>b[1]-a[1])
         m=monster;
         const newmsg=embed(m.name,m.id,m.hp,m.mhp,m.lasthits,sorted.splice(0,3),sorted.splice(-1,1)[0]);
-        if (m.msg.deleted) m.msg = await msg.guild.channels.cache.get(cid_arena).send(newmsg);
+        if (m.msg.deleted) m.msg = await msg.guild.channels.cache.get(cid.arena).send(newmsg);
         else m.msg.edit(newmsg);
     })
 }

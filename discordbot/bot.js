@@ -1,5 +1,6 @@
 require("./constants.js");
 
+const db      = require("./mongodb.js");
 const parse   = require("./cmdparser.js");
 const status  = require("./marquee_status.js");
 const Discord = require('discord.js');
@@ -23,7 +24,7 @@ exports.init = (state, token, mods = []) => {
     client.login(token);
 
     client.on('ready', () => {
-        console.log(`Logged in as ${client.user.tag}!`);
+        console.log(`Logged in as ${client.user.tag}! (for modules=[${modules}])`);
 
         status.init(client, msg_status);
     });
@@ -64,26 +65,40 @@ exports.init = (state, token, mods = []) => {
         if (uid_admins.includes(msg.author.id) == false)
             return;
 
-        if (parse.is(msg, "test")) {
-            
-            const embed = new Discord.MessageEmbed()
-            .setColor('#F80000')
-            .setAuthor('auth 1name', 'https://cdn.discordapp.com/embed/avatars/1.png')
-            .setAuthor('auth2 name', 'https://cdn.discordapp.com/embed/avatars/5.png')
-            .addField('`Birinci`', 'test', true)
-            .addField('', '```diff\n+ Birinci```', true)
-            .addField('4', 'test', true)
-            .setTimestamp()
-            .setFooter('%vur komutu ile düşmana saldır.');// Daha fazla hasar vermek için saldırını emojiler ile desteklendir!');
-                msg.channel.send(embed)
-            return
+        if (parse.is(msg, "test ")) {
+            const sent = await msg.channel.send("...");
+            const exp  = await db.get_exp(msg.content);
+            await sent.edit(exp);
         }
-
+        /*else if (parse.is(msg, "testexpall")) {
+            
+            const Guild = msg.guild;
+            const Members = Guild.members.cache.map(member => member.id); // Getting the members and mapping them by ID.
+            exps = [];
+            const process_text = "Bu biraz zaman alacak... ";
+            const process_msg = msg.channel.send(process_text);
+            let i = 0;
+            const members = await msg.guild.members.fetch(); 
+            const mn = members.array().length;
+            for (const member of members) {
+                if (i % 50 == 0) (await process_msg).edit(process_text+`${i}\\${mn}`);
+                i++;
+                exps.push({id: member[0], exp: await php.get_exp(member[0])});
+            }
+            msg.channel.send({
+                files: [{
+                    attachment: Buffer.from(JSON.stringify(exps)),
+                    name: "result.txt"
+                }]
+            });
+            (await process_msg).edit("Tamamlandi... Mesaj linki (kim ugrascak yapmaya atti iste asagida).");
+            return
+        }*/
         // beyond is admin + fix prefix,
         if (!parse.is(msg, "fix"))
             return;
 
-        // syncs channel permssions with categories belonging caid_fix in constants
+        // syncs channel permssions for all channels
         if (parse.is(msg, "sync")) {
             // print all categories
             msg.guild.channels.cache.each(x=>{

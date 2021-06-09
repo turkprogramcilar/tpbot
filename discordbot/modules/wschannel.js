@@ -2,7 +2,7 @@
 state = undefined;
 exports.init = (refState) => state = refState;
 exports.on_event = async (msg) => {
-    if (msg.channel.id == cid_wschannel) {
+    if (msg.channel.id == cid.wschannel) {
         
         if (msg.content.length <= 0) 
             return;

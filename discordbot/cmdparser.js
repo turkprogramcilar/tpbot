@@ -20,7 +20,7 @@ exports.tqs = (str) => { return exports.tq(str.substr(0,2000-1-6)); }
 
 exports.r_arg = (msg, regex, f, fe=()=>{}) => { exports.regex_arg(msg, f, fe, x=>x, regex); }
 exports.u_arg = (msg, f, fe=()=>{}) => { exports.regex_arg(msg, f, fe, parseInt, /^[0-9]+/); }
-exports.i_arg = (msg, f, fe=()=>{}) => { exports.regex_arg(msg, f, fe, parseInt, /^[+-][0-9]+?/); }
+exports.i_arg = (msg, f, fe=()=>{}) => { exports.regex_arg(msg, f, fe, parseInt, /^[+-]?[0-9]+/); }
 exports.f_arg = (msg, f, fe=()=>{}) => { exports.regex_arg(msg, f, fe, parseFloat, /^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)/); }
 
 exports.set_arg = (msg, cmd, setF, channel_msg=null) => {
