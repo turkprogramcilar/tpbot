@@ -19,7 +19,7 @@ exports.on_event = async (evt, args) => {
             create(msg, match[1], match[2], 10000);
         }
         // messages send on arena (command or not, doesn't matter)
-        if (msg.channel.id == cid.arena) toggle_purge(msg);
+        if (msg.channel.id == cid.arena && delete_messages) toggle_purge(msg);
 
         // if not command anywhere, return
         if (!parse.is(msg, state.prefix)) {        
@@ -39,8 +39,8 @@ exports.on_event = async (evt, args) => {
         // gamemaster commands for arena
         if (!parse.is(msg, "gm_")) return;
         if (parse.is(msg, "arena")) {
-            toggle = !toggle;
-            msg.channel.send(`Arenaya atilan tum mesajlari sil: ${state.arena_toggle}`);
+            delete_messages = !delete_messages;
+            msg.channel.send(`Arenaya atilan tum mesajlari sil: ${delete_messages}`);
         }
         else if (parse.set_arg(msg, "buff",    f => buff = f,       "Arena hasar oranını düzenle"));
         else if (parse.set_arg(msg, "sans",    f => spawn_rate = f, "Arena emoji çıkma şansını düzenle"));
@@ -68,7 +68,7 @@ exports.on_event = async (evt, args) => {
 const display_hits = 20;
 let alive = [];
 let purge_list = [];
-let toggle = true;
+let delete_messages = true;
 let spawn_rate = .1/3;
 
 
