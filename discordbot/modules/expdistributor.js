@@ -15,15 +15,15 @@ exports.on_event = async (evt, args) => {
             if (r) await db.differ_exp(r[1], exps.bump);
         }
         else if (Object.keys(exps_by_channel).includes(msg.channel.id)) {
-            console.log(`${msg.author.username}: +${exps_by_channel[msg.channel.id]} (on=${msg.channel.name})`);
+            //console.log(`${msg.author.username}: +${exps_by_channel[msg.channel.id]} (on=${msg.channel.name})`);
             await db.differ_exp(msg.author.id, exps_by_channel[msg.channel.id]);
         }
         else if (Object.keys(exps_by_category).includes(msg.channel.parentID)) {
             await db.differ_exp(msg.author.id, exps_by_category[msg.channel.parentID]);
-            console.log(`${msg.author.username}: +${exps_by_category[msg.channel.parentID]} (on=${msg.channel.name})`);
+            //console.log(`${msg.author.username}: +${exps_by_category[msg.channel.parentID]} (on=${msg.channel.name})`);
         }
         else {
-            console.log(`${msg.author.username}: +(default) (on=${msg.channel.name})`);
+            //console.log(`${msg.author.username}: +(default) (on=${msg.channel.name})`);
             await db.differ_exp(msg.author.id, exps.default);
         }
         break;
