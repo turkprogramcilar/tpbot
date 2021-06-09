@@ -1,8 +1,10 @@
 require("./constants.js");
+const tools = require("./tools.js");
 const { MongoClient } = require("mongodb");
 const dbname = "mongodb_tp"
 const exptb = "users_exp"
 const connstr = consts.env.dbconnstr;
+const push_fq = 60*1000; // push frequency
 
 const db_do = async (f) => {
     const client = new MongoClient(connstr, {
@@ -19,6 +21,17 @@ const db_do = async (f) => {
         // Ensures that the client will close when you finish/error
         await client.close();
     }
+}
+const db_install_keys = () => async(db) => {
+    await db.collection(exptb).createIndex({id: "hashed"});
+}
+const db_exp_manyget = (ids) => async (db) => {
+    const ids = Object.keys(ids);
+    if (ids.length == 0) return {};
+    return await db.collection(exptb).find({id: { $in: ids } });
+}
+const db_exp_manyset = (idexps) => async (db) => {
+    await db.collection(exptb).updateMany()
 }
 const db_exp_get = (id) => async (db) => {
     let result = await db.collection(exptb).find({id: id}).limit(1).toArray();
@@ -46,6 +59,15 @@ const db_exp_differ = (id, diff) => async (db) => {
  */
 exports.get_exp = async (id) => db_do(db_exp_get(id));
 exports.differ_exp = async (id, diff) => db_do(db_exp_differ(id, diff));
+exp_list = {}
+exports.push_differ_exp = (id, diff) => {
+    if (exp_list[id]) exp_list[id] += diff;
+    else exp_list[id] = diff;
+    tools.toggler(exports.push_now, "push_differ_exp", push_fq);
+}
+exports.push_now = async () => {
+
+}
 
 
 /*
@@ -63,3 +85,25 @@ exports.differ_exp("test", 33).then((res) => {
     });
 });
 */
+const run = async () => {
+    const client = new MongoClient(connstr, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    });
+    try {
+        await client.connect();
+        const db = client.db("test1");
+        await db.collection("coltest").updateMany([
+            {id: 1, x: 22},
+            {id: 2, x: 224},
+            {id: 3, x: 26},
+            {id: 4, x: 28},
+        ]);
+    } catch (err) {
+        console.error(err);
+    } finally {
+        // Ensures that the client will close when you finish/error
+        await client.close();
+    }
+}
+//run().catch(console.log);
