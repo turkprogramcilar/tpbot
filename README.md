@@ -28,8 +28,8 @@ Yukarıda örneği verilen token karşısında bulunan 2 modül aynı bot içeri
     "ODUxMD23ODMzNOD8MzM4NzUy.YL2hxw.4pDP6SkxQShBgHvqKQP9Cfl4Ryg": ["ataturk"],
     "ODUxMD23ODMzNOD8MzM4NzUy.YL2hxw.oVDhBnPxTLqYZh81KIwvZybDQy4": ["arena"],
 }
-Yukarıda örneği verilen farkli tokenlar karşısında bulunan modüler ayrı botlar içerisinde çalıştırılır.
 ```
+Yukarıda örneği verilen farkli tokenlar karşısında bulunan modüler ayrı botlar içerisinde çalıştırılır.
 
 # Türk Programcılar Discord Sunucusu
 
