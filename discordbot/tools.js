@@ -27,3 +27,18 @@ exports.hsv2rgbh = (h,s,v) => {
             +(a.g).toString(16).padStart(2,'0')
             +(a.b).toString(16).padStart(2,'0');
 }
+
+let toggler_states = {}
+let toggler_timers = {}
+exports.toggler = (f, k, fq) => {
+    if (toggler_timers[k]) {
+        f();
+        toggler_states[k] = false;
+        toggler_timers[k] = setTimeout(() => {
+            toggler_timers[k] = null;
+            if (toggler_states[k]) exports.toggler(f, k, fq);
+        }, fq);
+    } else {
+        toggler_states[k] = true;
+    }
+}

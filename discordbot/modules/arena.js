@@ -68,8 +68,6 @@ exports.on_event = async (evt, args) => {
 const display_hits = 20;
 let alive = [];
 let purge_list = [];
-let purge_timer = null;
-let update_timer = null;
 let toggle = true;
 let spawn_rate = .1/3;
 
@@ -83,24 +81,16 @@ const getdmg = (xp) => Math.log(1*xp/200000+1);
 
 need_update = false;
 const toggle_update = (f) => {
-    if (!update_timer) {
-        f();
-        need_update = false;
-        update_timer = setTimeout(() => {
-            update_timer = null;
-            if (need_update) toggle_update(f);
-        }, frequency*1000);
-    } else {
-        need_update = true;
-    }
+    tools.toggler(f, "arena_update", frequency*1000);
 }
-const toggle_purge = msg => {
-    purge_list.push(msg);
-    if (!purge_timer) purge_timer = setTimeout(() => {
+const toggle_purge = (msg=null) => {
+    if (msg) purge_list.push(msg);
+    tools.toggler(() => {
         const del = purge_list.splice(0,100);
         msg.channel.bulkDelete(del);
-        purge_timer = null;
-    }, frequency*1000);
+        // keep going until list is empty, even if not toggled by a message yet
+        if (purge_list.length!=0) toggle_purge();
+    }, "arena_delete", frequency*1000);
 }
 const create = (msg, name, id, hp) => {
     if (alive.length>0) return null;

@@ -44,6 +44,7 @@ caid = {
     tpbot         : "823470264025088020",
     yayin         : "698972054740795455",
     muzikses      : "826154162638946355",
+    loglar        : "850078444418498596",
 }
 
 // msg constants
@@ -67,5 +68,6 @@ exps_by_category[caid.kodlama] = 5
 exps_by_category[caid.tpbot] = 1
 exps_by_category[caid.yayin] = 2
 exps_by_category[caid.muzikses] = 1
+exps_by_category[caid.loglar] = 0
 
 module.exports = {};
