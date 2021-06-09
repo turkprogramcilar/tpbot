@@ -14,6 +14,9 @@ eid_kekt = "823934807724785664";
 eid_keky = "824702674712526879";
 
 // user ids
+uid={
+    disboard: "302050872383242240",
+};
 uid_ockis = "824573651390562325";
 uid_tpbot = "802911540273348638";
 
@@ -31,6 +34,7 @@ cid = {
     hergunogren : "844643095923654667",
     ogreticisey : "836490628249550878",
     makale      : "811268737939669063",
+    bumperado   : "782742548052574239",
 }
 
 
@@ -58,11 +62,15 @@ msg_status   = consts.env.debug ? ["_","¯"].map(x=>x+consts.env.debug+x) : [
 ];
 
 // exp system
+exps={
+    bump: 500,
+    default: 1,
+}
 exps_by_channel={};
 exps_by_channel[cid.ozelestri] = 1000;
 exps_by_channel[cid.hergunogren] = 1000;
 exps_by_channel[cid.ogreticisey] = 10;
-exps_by_channel[cid.ogreticimakale] = 15;
+exps_by_channel[cid.makale] = 15;
 
 exps_by_category={};
 exps_by_category[caid.sorusor] = 5
