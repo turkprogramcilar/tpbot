@@ -1,9 +1,11 @@
 // env import
 consts = {
     env: {
-        phphost: process.env.DCBOT_PHPHOST,
-        noarena: process.env.DCBOT_NOARENA,
-        prefix : process.env.DCBOT_PREFIX,
+        phphost   : process.env.DCBOT_PHPHOST,
+        noarena   : process.env.DCBOT_NOARENA,
+        prefix    : process.env.DCBOT_PREFIX,
+        debug     : process.env.DCBOT_DEBUG,
+        dbconnstr : process.env.DCBOT_DBCONNSTR
     }
 };
 
@@ -24,7 +26,7 @@ uid_admins = [
 cid = {
     p2p         : "824685500686008350",
     wschannel   : "825713784848252938",
-    arena       : "850465092537286656",
+    arena       : consts.env.debug ? "852230553536167956": "850465092537286656",
     ozelestiri  : "782947118062764033",
     hergunogren : "844643095923654667",
     ogreticisey : "836490628249550878",
@@ -49,18 +51,20 @@ caid = {
 
 // msg constants
 msg_testmode = "Bakımdan dolayı sadece yetkililer komut çalıştırabilir.";
-msg_status   = process.env.DCBOT_DEBUGGING ? ["_","¯"].map(x=>x+process.env.DCBOT_DEBUGGING+x) : [
+msg_status   = consts.env.debug ? ["_","¯"].map(x=>x+consts.env.debug+x) : [
     "Türk Programcılar discord sunucusuna hoşgeldin!",
     "Programlama öğrenmek için harika bir gün!",
     "Hemen programlamaya başla"
 ];
 
 // exp system
+exps_by_channel={};
 exps_by_channel[cid.ozelestri] = 1000;
 exps_by_channel[cid.hergunogren] = 1000;
 exps_by_channel[cid.ogreticisey] = 10;
 exps_by_channel[cid.ogreticimakale] = 15;
 
+exps_by_category={};
 exps_by_category[caid.sorusor] = 5
 exps_by_category[caid.etkinlikler] = 3
 exps_by_category[caid.paylasimlar] = 5

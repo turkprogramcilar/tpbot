@@ -1,7 +1,8 @@
+require("./constants.js");
 const { MongoClient } = require("mongodb");
 const dbname = "mongodb_tp"
 const exptb = "users_exp"
-const connstr = process.env.DCBOT_DBCONNSTR;
+const connstr = consts.env.dbconnstr;
 
 const db_do = async (f) => {
     const client = new MongoClient(connstr, {
