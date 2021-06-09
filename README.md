@@ -21,6 +21,7 @@ Tanımladığınız herhangi rastgele değer ihmal edilecektir.
 {
     "ODUxMD23ODMzNOD8MzM4NzUy.YL2hxw.U9iB6Sk5XSwpgHvqKQP9Cfl4Ryg": ["ataturk","arena"],
 }
+```
 Yukarıda örneği verilen token karşısında bulunan 2 modül aynı bot içerisinde çalıştırılır.
 ```json
 {
