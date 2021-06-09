@@ -1,11 +1,16 @@
 # Türk Programcılar Bot
 Türk Programcılar Discord sunucusu tarafından geliştirilen bot
 
+`Özellikler: (liste tam değildir)`
+- Mega emoji kolezyum (arena)
+- WebSockets sunucusu ile kanal yayını (şu an için geliştirilmesi devam etmiyor)
+- Exp sistemi
+
 `Environment variable` tanımlamaları
 ```
 DCBOT_JSON             discord bot tokenların modüllere ayrıldığı JSON yapısı (örnek aşağıdadır)
 DCBOT_PHPHOST          exp php host sunucu adı (örn: google.com formatında, http/s ve www koymayın)
-DCBOT_DEBUGGING        Şu anda sadece status mesajını farklı göstermede yarıyor (tanımlı olması yeter)
+DCBOT_DEBUG            Status mesajını farklı gösterir ve arena kanalı olarak test kanalını kullanır (tanımlı olması yeter)
 DCBOT_NOARENA          Emoji bulunan mesajlarda arenada otomatik mega yaratma 
                        özelliğin kapatır (tanımlı olması yeter)
 DCBOT_PREFIX           komut öntakısı (bulunmazsa % varsayılan)
