@@ -19,8 +19,7 @@ exports.on_event = async (evt, args) => {
                     msg.channel.send("..."),
                     db.get_item(id)
                 ]);
-                console.log("OK");
-                await m.edit(parse.tqs(JSON.stringify(i)));
+                await m.edit(parse.tqs(JSON.stringify(i, null, '\t'),'json'));
             });
         }
 
