@@ -5,19 +5,21 @@ exports.is = (msg, cmd) => {
     }
     return false;
 }
-exports.regex_arg = (msg, f, f_else, fr, regex) => {
+exports.regex_arg = (msg, f, f_else, fr, regex, ri=0) => {
     r = msg.content.trimStart().match(regex); if (r) {
         msg.content = msg.content.trimStart().slice(r[0].length);
-        f(fr.call(null, r[0]));
+        f(fr.call(null, r[ri]));
     } else {
         f_else();
     }
 }
+exports.json_pretty = (str) => exports.tqs(JSON.stringify(str,null,'\t'), 'json');
 // wrap with triple quote
 exports.tq =  (str,format='') => { return '```'+format+'\n'+str+'```'; }
 // wrap with triple quote + safe (2000 char limit)
-exports.tqs = (str,format='') => { return exports.tq((str?.toString() ?? "").substr(0,2000-1-6),format); }
+exports.tqs = (str,format='') => { return exports.tq((str?.toString() ?? "").substr(0,2000-1-6-format.length-1),format); }
 
+exports.mention = (msg, f, fe=()=>{}) => { exports.regex_arg(msg, f, fe, x=>x, /^<@!?([0-9]+)>/, 1); }
 exports.r_arg = (msg, regex, f, fe=()=>{}) => { exports.regex_arg(msg, f, fe, x=>x, regex); }
 exports.u_arg = (msg, f, fe=()=>{}) => { exports.regex_arg(msg, f, fe, parseInt, /^[0-9]+/); }
 exports.i_arg = (msg, f, fe=()=>{}) => { exports.regex_arg(msg, f, fe, parseInt, /^[+-]?[0-9]+/); }

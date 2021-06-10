@@ -11,7 +11,7 @@ exports.on_event = async (evt, args) => {
             && msg.channel.id == cid.bumperado
             && msg.embeds?.length > 0
             && msg.embeds[0].image) {
-            const r = msg.embeds[0].description?.match(/^<@([0-9]+)>/);
+            const r = msg.embeds[0].description?.match(/^<@!?([0-9]+)>/);
             if (r) await db.differ_exp(r[1], exps.bump);
         }
         else if (Object.keys(exps_by_channel).includes(msg.channel.id)) {

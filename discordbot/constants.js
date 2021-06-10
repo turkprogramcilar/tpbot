@@ -18,7 +18,6 @@ uid={
     disboard: "302050872383242240",
     ockis2  : "824573651390562325",
 };
-
 // user groups
 groups = {
     admins: [uid.ockis2],
