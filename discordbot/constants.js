@@ -16,14 +16,18 @@ eid_keky = "824702674712526879";
 // user ids
 uid={
     disboard: "302050872383242240",
+    ockis2  : "824573651390562325",
 };
-uid_ockis = "824573651390562325";
-uid_tpbot = "802911540273348638";
 
 // user groups
 groups = {
-    admins: [uid_ockis],
+    admins: [uid.ockis2],
 };
+
+// roles
+rid = {
+    botlar: "782738487921213461",
+}
 
 // channel ids
 cid = {
