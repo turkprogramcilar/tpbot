@@ -21,9 +21,9 @@ uid_ockis = "824573651390562325";
 uid_tpbot = "802911540273348638";
 
 // user groups
-uid_admins = [
-    uid_ockis,
-];
+groups = {
+    admins: [uid_ockis],
+};
 
 // channel ids
 cid = {

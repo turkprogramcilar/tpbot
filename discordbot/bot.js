@@ -62,7 +62,7 @@ exports.init = (state, token, mods = []) => {
 
         // beyond is administrative or feature previews only, 
         // if not admin return
-        if (uid_admins.includes(msg.author.id) == false)
+        if (groups.admins.includes(msg.author.id) == false)
             return;
 
         if (parse.is(msg, "test ")) {

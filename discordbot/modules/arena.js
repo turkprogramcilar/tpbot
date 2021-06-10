@@ -32,7 +32,7 @@ exports.on_event = async (evt, args) => {
             }
         }
         // if not admin return
-        if (uid_admins.includes(msg.author.id) == false)
+        if (groups.admins.includes(msg.author.id) == false)
             return;
 
         // gamemaster commands for arena
