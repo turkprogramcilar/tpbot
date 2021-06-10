@@ -18,14 +18,14 @@ const send_embed_item = async (msg, id) => {
     const title = (i?.strName??"Item not found");
     const price = i?.BuyPrice??0;
     let embedded = new Discord.MessageEmbed()
-        //.setTitle(i?.strName??"Item not found")
         .setThumbnail(`attachment://icon.png`)
         .addField('`'+title+'`', (i?.strDesc) ? parse.tqs(i.strDesc) : "-");
         
+    // cleanup values with 0 and already shown values
     if (i) {
-        delete i["_id"]; delete i["id"];
+        delete i["_id"];     delete i["id"];
         delete i["strName"]; delete i["strDesc"];
-        delete i["IconID"]; delete i["BuyPrice"];
+        delete i["IconID"];  delete i["BuyPrice"];
         for (const k of Object.keys(i)) {
             if (!i[k] || i[k].toString()=='0')
                 delete i[k];
