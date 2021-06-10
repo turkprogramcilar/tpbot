@@ -34,7 +34,7 @@ exports.init = (state, token, mods = []) => {
             m.on_event('messageReactionAdd', {reaction: reaction, user: user});
     });
     client.on('message', async msg => {
-        if (msg.author == client.user)
+        if (msg.author == client.user || msg.author.bot || msg.member.roles.cache.map(x=>x.id).includes(rid.botlar))
             return;
 
         const content = msg.content;
