@@ -4,9 +4,10 @@ const tools = require("./tools.js");
 const fs    = require('fs').promises;
 
 const dbname  = "mongodb_tp"
-const exptb   = "users_exp"
+const userstb = "users"
 const itemstb = "items"
 const levelstb= "levels"
+const alltb   = [itemstb, levelstb, userstb]
 const connstr = consts.env.dbconnstr;
 const push_fq = 60*1000; // push frequency
 
@@ -35,15 +36,15 @@ const db_install_table = (tb) => async(db) => {
     else return {"i": 0, "e": installed};
 };
 const db_install_keys = () => async(db) => {
-    await db.collection(exptb).createIndex({"id": "hashed"});
+    await db.collection(userstb).createIndex({"id": "hashed"});
 };
 const db_exp_manyget = (ids) => async (db) => {
     const ids = Object.keys(ids);
     if (ids.length == 0) return {};
-    return await db.collection(exptb).find({"id": { $in: ids } });
+    return await db.collection(userstb).find({"id": { $in: ids } });
 }
 const db_exp_manyset = (idexps) => async (db) => {
-    await db.collection(exptb).updateMany()
+    await db.collection(userstb).updateMany()
 }
 const db_get = (tb, id) => async (db) => {
     const rest = await db.collection(tb).find({"id": id}).limit(1).toArray();
@@ -54,8 +55,8 @@ const db_get_all = (tb) => async (db) => {
     return rest;
 }
 const db_exp_differ = (id, diff) => async (db) => {
-    const e = (await db_get(exptb, id)(db)).exp ?? 0;
-    await db.collection(exptb).updateOne(
+    const e = (await db_get(userstb, id)(db)).exp ?? 0;
+    await db.collection(userstb).updateOne(
         { "id": id.toString() },
         { $set: { exp: e+diff } },
         { upsert: true }
@@ -76,7 +77,7 @@ const db_exp_differ = (id, diff) => async (db) => {
 
 exports.get_levels = async () => db_do(db_get_all(levelstb));
 exports.get_item = async (id) => db_do(db_get(itemstb, id));
-exports.get_exp = async (id) => db_do(db_get(exptb, id));
+exports.get_exp = async (id) => db_do(db_get(userstb, id));
 exports.differ_exp = async (id, diff) => db_do(db_exp_differ(id, diff));
 
 // ====================
@@ -95,7 +96,7 @@ exports.push_now = async () => {
 exports.install_db = async() => db_do(async (db) => {
 
     let res = [];
-    for (const tb of [itemstb, levelstb]) {
+    for (const tb of alltb) {
         const r = await db_install_table(tb)(db);
         res.push({"table": tb, "inserts": r.i, "exists": r.e});
     }
