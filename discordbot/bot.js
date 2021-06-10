@@ -1,6 +1,7 @@
 require("./constants.js");
 
 const db      = require("./mongodb.js");
+const php     = require("./php.js");
 const parse   = require("./cmdparser.js");
 const status  = require("./marquee_status.js");
 const Discord = require('discord.js');
@@ -11,6 +12,11 @@ exports.init = (state, token, mods = []) => {
     state = {
         prefix: consts.env.prefix ?? "%",
         ws: {},
+        cache: {
+            table: {
+
+            }
+        },
     };
     const client  = new Discord.Client();
 
@@ -73,7 +79,7 @@ exports.init = (state, token, mods = []) => {
             const exp  = await db.get_exp(msg.content);
             await sent.edit(exp);
         }
-        /*else if (parse.is(msg, "testexpall")) {
+        else if (parse.is(msg, "testexpall")) {
             
             const Guild = msg.guild;
             const Members = Guild.members.cache.map(member => member.id); // Getting the members and mapping them by ID.
@@ -96,7 +102,7 @@ exports.init = (state, token, mods = []) => {
             });
             (await process_msg).edit("Tamamlandi... Mesaj linki (kim ugrascak yapmaya atti iste asagida).");
             return
-        }*/
+        }
         // beyond is admin + fix prefix,
         if (!parse.is(msg, "sudo "))
             return;
