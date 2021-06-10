@@ -25,10 +25,13 @@ const db_do = async (f) => {
         await client.close();
     }
 }
-const db_install_data_items = () => async(db) => {
-    const file = await fs.readFile("./discordbot/data/items.json");
+const db_install_table = (tb) => async(db) => {
+    const file = await fs.readFile("./discordbot/data/"+tb+".json");
     const json = JSON.parse(file);
-    await db.collection(itemstb).insertMany(json);
+    const collections = (await db.listCollections().toArray()).map(x=>x.name);
+    const installed = collections.includes(tb);
+    if (!installed) return {"i": (await db.collection(tb).insertMany(json))?.result?.n ?? 0, "e": installed};
+    else return {"i": 0, "e": installed};
 };
 const db_install_keys = () => async(db) => {
     await db.collection(exptb).createIndex({"id": "hashed"});
@@ -77,7 +80,15 @@ exports.push_differ_exp = (id, diff) => {
 exports.push_now = async () => {
 
 }
-exports.install_items = async() => db_do(db_install_data_items());
+exports.install_db = async() => db_do(async (db) => {
+
+    let res = [];
+    for (const tb of ["items", "levels"]) {
+        const r = await db_install_table(tb)(db);
+        res.push({"table": tb, "inserts": r.i, "exists": r.e});
+    }
+    return res;
+});
 
 
 /*

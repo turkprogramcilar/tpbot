@@ -34,7 +34,7 @@ exports.init = (state, token, mods = []) => {
             m.on_event('messageReactionAdd', {reaction: reaction, user: user});
     });
     client.on('message', async msg => {
-        if (msg.author == client.user || msg.author.bot || msg.member.roles.cache.map(x=>x.id).includes(rid.botlar))
+        if (msg.author == client.user)
             return;
 
         const content = msg.content;
@@ -42,6 +42,9 @@ exports.init = (state, token, mods = []) => {
             m.on_event('message', {msg: msg});
             msg.content = content;
         }
+
+        if (msg.author.bot || msg.member.roles.cache.map(x=>x.id).includes(rid.botlar))
+            return;
             
         // beyond is only commands with prefixes, if not return immediately
         if (!parse.is(msg, state.prefix)) {        
@@ -95,11 +98,12 @@ exports.init = (state, token, mods = []) => {
             return
         }*/
         // beyond is admin + fix prefix,
-        if (!parse.is(msg, "fix"))
+        if (!parse.is(msg, "sudo "))
             return;
 
-        if (parse.is(msg, "items")) {
-            db.install_items();
+        if (parse.is(msg, "install")) {
+            const res_arr = await db.install_db();
+            msg.channel.send(parse.json_pretty(res_arr));
             return;
         }
 
