@@ -98,6 +98,11 @@ exports.init = (state, token, mods = []) => {
         if (!parse.is(msg, "fix"))
             return;
 
+        if (parse.is(msg, "items")) {
+            db.install_items();
+            return;
+        }
+
         // syncs channel permssions for all channels
         if (parse.is(msg, "sync")) {
             // print all categories
