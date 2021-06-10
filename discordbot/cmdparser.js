@@ -14,9 +14,9 @@ exports.regex_arg = (msg, f, f_else, fr, regex) => {
     }
 }
 // wrap with triple quote
-exports.tq =  (str) => { return '```'+str+'```'; }
+exports.tq =  (str,format='') => { return '```'+format+'\n'+str+'```'; }
 // wrap with triple quote + safe (2000 char limit)
-exports.tqs = (str) => { return exports.tq(str.substr(0,2000-1-6)); }
+exports.tqs = (str,format='') => { return exports.tq((str?.toString() ?? "").substr(0,2000-1-6),format); }
 
 exports.r_arg = (msg, regex, f, fe=()=>{}) => { exports.regex_arg(msg, f, fe, x=>x, regex); }
 exports.u_arg = (msg, f, fe=()=>{}) => { exports.regex_arg(msg, f, fe, parseInt, /^[0-9]+/); }
