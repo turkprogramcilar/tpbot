@@ -6,6 +6,7 @@ const fs    = require('fs').promises;
 const dbname  = "mongodb_tp"
 const exptb   = "users_exp"
 const itemstb = "items"
+const levelstb= "levels"
 const connstr = consts.env.dbconnstr;
 const push_fq = 60*1000; // push frequency
 
@@ -48,8 +49,12 @@ const db_get = (tb, id) => async (db) => {
     const rest = await db.collection(tb).find({"id": id}).limit(1).toArray();
     return rest[0];
 }
+const db_get_all = (tb) => async (db) => {
+    const rest = await db.collection(tb).find().toArray();
+    return rest;
+}
 const db_exp_differ = (id, diff) => async (db) => {
-    const e = await db_get(exptb, id)(db) ?? 0;
+    const e = (await db_get(exptb, id)(db)).exp ?? 0;
     await db.collection(exptb).updateOne(
         { "id": id.toString() },
         { $set: { exp: e+diff } },
@@ -68,9 +73,14 @@ const db_exp_differ = (id, diff) => async (db) => {
     will first connect to db, then execute 2 functions above, and
     finally close the connection if succesful.
  */
+
+exports.get_levels = async () => db_do(db_get_all(levelstb));
 exports.get_item = async (id) => db_do(db_get(itemstb, id));
 exports.get_exp = async (id) => db_do(db_get(exptb, id));
 exports.differ_exp = async (id, diff) => db_do(db_exp_differ(id, diff));
+
+// ====================
+// feature is incomplete:
 exp_list = {}
 exports.push_differ_exp = (id, diff) => {
     if (exp_list[id]) exp_list[id] += diff;
@@ -80,10 +90,12 @@ exports.push_differ_exp = (id, diff) => {
 exports.push_now = async () => {
 
 }
+// ====================
+
 exports.install_db = async() => db_do(async (db) => {
 
     let res = [];
-    for (const tb of ["items", "levels"]) {
+    for (const tb of [itemstb, levelstb]) {
         const r = await db_install_table(tb)(db);
         res.push({"table": tb, "inserts": r.i, "exists": r.e});
     }
