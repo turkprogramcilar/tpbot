@@ -19,7 +19,7 @@ exports.tq =  (str,format='') => { return '```'+format+'\n'+str+'```'; }
 // wrap with triple quote + safe (2000 char limit)
 exports.tqs = (str,format='') => { return exports.tq((str?.toString() ?? "").substr(0,2000-1-6-format.length-1),format); }
 exports.send_tqswarn = async (msg, str) => await send_tqs_custom(msg, str, "fix", "warning");
-exports.send_uwarn = async (msg, str) => await send_tqs_custom(msg, str, "CSS", "uyarı");
+exports.send_uwarn = async (msg, str) => await send_tqs_custom(msg, str, "diff", "! uyarı");
 const send_tqs_custom = async (msg, str, format, title) => await msg.channel.send(exports.tqs(title+": "+str,format));
 exports.mention = (msg, f, fe=()=>{}) => { exports.regex_arg(msg, f, fe, x=>x, /^<@!?([0-9]+)>/, 1); }
 exports.mention_else_self = (msg, f) => { exports.mention(msg, f, ()=>f(msg.author.id))}
