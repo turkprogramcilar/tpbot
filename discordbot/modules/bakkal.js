@@ -64,7 +64,7 @@ exports.on_event = async (evt, args) => {
         if (msg.channel.id == cid.botkomutlari) {
             if (parse.is(msg, "bk ")) {
                 // id ile item bilgisi sorgulama
-                parse.i_arg(msg, i => await send_embed_item(msg, i));
+                parse.i_arg(msg, i => send_embed_item(msg, i));
     
                 // beyond is admin
                 if (!groups.admins.includes(msg.author.id))
