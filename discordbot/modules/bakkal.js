@@ -4,15 +4,19 @@ const parser = require("./../cmdparser.js");
 const fs    = require("fs").promises;
 
 const Discord = require('discord.js');
+const { parse } = require("path");
 
 const iconpath = './discordbot/icons';
+
+const read_icon = async (id) => 
+    await fs.readFile(`${iconpath}/${id}.png`)
+        .catch(async ()=> fs.readFile(`${iconpath}/undefined.png`))
+        //.catch() buda yoksa coksun bot napalim.
 
 const send_embed_item = async (msg, id) => {
     const [is, p] = await Promise.all([
         ensure(itemstb, db.get_items),
-        fs.readFile(`${iconpath}/${id}.png`)
-            .catch(async ()=> fs.readFile(`${iconpath}/undefined.png`))
-            //.catch() buda yoksa coksun bot napalim.
+        read_icon(id)
     ]);
     const i = is.find(x=>x["Num"]==id.toString());
     const title = (i?.strName??"Item not found").replace(/\(\+[0-9]+\)/, '').trim();
@@ -45,6 +49,12 @@ const ensure = async (tb, cachef) => {
     if (!state.cache.table[tb]) state.cache.table[tb] = await cachef();
     return state.cache.table[tb];
 }
+// get random item id
+const get_riid = async () => {
+    const items = await ensure(itemstb, db.get_items);
+    const rid = (i=>i[Math.floor(Math.random()*i.length)])(items.map(x=>x["Num"]));
+    return rid;
+}
 let state = undefined;
 exports.init = (refState) => state = refState;
 exports.on_event = async (evt, args) => {
@@ -53,9 +63,7 @@ exports.on_event = async (evt, args) => {
 
         if (parser.cooldown_global(state, "bakkal_merak", 10)
             && msg.content.includes("merak")) {
-
-            const items = await ensure(itemstb, db.get_items);
-            const rid = (i=>i[Math.floor(Math.random()*i.length)])(items.map(x=>x["Num"]));
+            const rid = await get_riid();
             await send_embed_item(msg, rid);
         }
 
@@ -110,6 +118,12 @@ exports.on_event = async (evt, args) => {
                     send_embed_item(msg, 38904700),
                     send_embed_item(msg, 11111000),
                 ]);
+            }
+            else if (parser.is(msg, "torpil")) {
+                const do_f = async iid => {
+                    await db.give_item(msg.author.id, iid);
+                };
+                parser.i_arg(msg, do_f, async ()=> await do_f(await get_riid()));
             }
         }
 
