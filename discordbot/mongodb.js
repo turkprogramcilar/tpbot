@@ -51,13 +51,17 @@ const db_get_all = (tb, after_find=x=>x) => async (db) => {
     const promise = await after_find(db.collection(tb).find()).toArray();
     return promise;
 }
-const db_exp_differ = (id, diff) => async (db) => {
-    const e = (await db_get(userstb, id)(db))?.exp ?? 0;
-    await db.collection(userstb).updateOne(
-        { "id": id.toString() },
-        { $set: { exp: e+diff } },
+const db_set = (tb, id, doc, key="id") => async (db) => {
+    let filter = {};
+    filter[key]=id;
+    await db.collection(tb).updateOne(filter,
+        { $set: doc },
         { upsert: true }
     );
+}
+const db_exp_differ = (id, diff) => async (db) => {
+    const e = (await db_get(userstb, id)(db))?.exp ?? 0;
+    await db_set(userstb, id.toString(), { exp: e+diff})(db);
 };
 /*
     `db_` functions returns functions that accepts db parameter
@@ -76,7 +80,7 @@ exports.get_levels = async () => db_do(db_get_all(levelstb,x=>x.sort({ lvl : 1 }
 exports.get_item = async (id) => db_do(db_get(itemstb, id, "Num"));
 exports.get_exp = async (id) => db_do(db_get(userstb, id));
 exports.differ_exp = async (id, diff) => db_do(db_exp_differ(id, diff));
-
+exports.give_item = async (uid, iid) => db_do
 // ====================
 // feature is incomplete:
 exp_list = {}
