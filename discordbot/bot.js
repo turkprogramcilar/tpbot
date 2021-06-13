@@ -5,7 +5,9 @@ const php     = require("./php.js");
 const tools   = require("./tools.js");
 const parser  = require("./cmdparser.js");
 const status  = require("./marquee_status.js");
+
 const Discord = require('discord.js');
+const htmlp   = require('node-html-parser');
 
 const mpath = "./modules/";
 
@@ -124,8 +126,13 @@ exports.init = (state, token, mods = []) => {
                 await parser.send_tqswarn(msg, "regex didn't match the get response body");
                 return;
             }
+
+            const desc = htmlp.parse(res)
+                .querySelector('.commit-title.markdown-title')
+                .textContent.trim();
             
             await msg.channel.send(new Discord.MessageEmbed()
+                .setDescription(parser.tqs(desc))
                 .setAuthor("Türk Programcılar", client.guilds.cache.get(sid.tpdc).iconURL(), url)
                 .addField("`commit date`", parser.tqs(new Date(r[1])))
                 .addField(`\`commit sha1\``, parser.tqs(`${sha1}`))
