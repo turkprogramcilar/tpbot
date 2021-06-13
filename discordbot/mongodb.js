@@ -41,8 +41,8 @@ const db_exp_manyget = (ids) => async (db) => {
 const db_exp_manyset = (idexps) => async (db) => {
     await db.collection(userstb).updateMany()
 }
-const db_get = (tb, id) => async (db) => {
-    const rest = await db.collection(tb).find({"id": id}).limit(1).toArray();
+const db_get = (tb, id, key="id") => async (db) => {
+    const rest = await db.collection(tb).find({key: id}).limit(1).toArray();
     return rest[0];
 }
 const db_get_all = (tb) => async (db) => {
@@ -71,7 +71,7 @@ const db_exp_differ = (id, diff) => async (db) => {
  */
 exports.get_items = async () => db_do(db_get_all(itemstb));
 exports.get_levels = async () => db_do(db_get_all(levelstb));
-exports.get_item = async (id) => db_do(db_get(itemstb, id));
+exports.get_item = async (id) => db_do(db_get(itemstb, id, "Num"));
 exports.get_exp = async (id) => db_do(db_get(userstb, id));
 exports.differ_exp = async (id, diff) => db_do(db_exp_differ(id, diff));
 

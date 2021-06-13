@@ -92,6 +92,6 @@ dbname  = "mongodb_tp"
 userstb = "users"
 itemstb = "items"
 levelstb= "levels"
-alltb   = [itemstb, levelstb, userstb]
+alltb   = [itemstb, levelstb]
 
 module.exports = {};
