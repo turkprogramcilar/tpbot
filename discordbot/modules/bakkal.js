@@ -8,14 +8,14 @@ const Discord = require('discord.js');
 const iconpath = './discordbot/icons';
 
 const send_embed_item = async (msg, id) => {
-    const [i, p] = await Promise.all([
-        db.get_item(id),
+    const [is, p] = await Promise.all([
+        ensure(itemstb, db.get_items),
         fs.readFile(`${iconpath}/${id}.png`)
             .catch(async ()=> fs.readFile(`${iconpath}/undefined.png`))
             //.catch() buda yoksa coksun bot napalim.
     ]);
-    
-    const title = (i?.strName??"Item not found");
+    const i = is.find(x=>x["Num"]==id.toString());
+    const title = (i?.strName??"Item not found").replace(/\(\+[0-9]+\)/, '').trim();
     const price = i?.BuyPrice??0;
     let embedded = new Discord.MessageEmbed()
         .setThumbnail(`attachment://icon.png`)
@@ -41,9 +41,10 @@ const send_embed_item = async (msg, id) => {
             .addField(`Buy price: ${price}`, parse.tqs(JSON.stringify(i??{},null,'\t'),'json'))
     });
 };
-const ensure = async (cache, f) => {
-    if (!cache) cache = await f();
-    return cache;
+const ensure = async (tb, f) => {
+
+    if (!state.cache.table[tb]) state.cache.table[tb] = await f();
+    return state.cache.table[tb];
 }
 let state = undefined;
 exports.init = (refState) => state = refState;
@@ -52,7 +53,9 @@ exports.on_event = async (evt, args) => {
         case "message": const msg = args.msg;
 
         if (msg.content.includes("merak")) {
-            
+            const items = await ensure(itemstb, db.get_items);
+            const rid = (i=>i[Math.floor(Math.random()*i.length)])(items.map(x=>x["Num"]));
+            await send_embed_item(msg, rid);
         }
 
         if (!parse.is(msg, state.prefix))
@@ -61,7 +64,7 @@ exports.on_event = async (evt, args) => {
         if (msg.channel.id == cid.botkomutlari) {
             if (parse.is(msg, "bk ")) {
                 // id ile item bilgisi sorgulama
-                parse.i_arg(msg, i => send_embed_item(msg, i));
+                parse.i_arg(msg, i => await send_embed_item(msg, i));
     
                 // beyond is admin
                 if (!groups.admins.includes(msg.author.id))
@@ -69,12 +72,11 @@ exports.on_event = async (evt, args) => {
     
                 if (parse.is(msg, "test")) await Promise.all([
                     send_embed_item(msg, 38904700),
-                    send_embed_item(msg, 111110000),
-                    send_embed_item(msg, 389047000),
+                    send_embed_item(msg, 11111000),
                 ]);
             }
             else if (parse.is(msg, "seviyeler")) {
-                let out = await ensure(state.cache.table.level, db.get_levels).reduce((a,c)=>a+=`${c.lvl}:${c.exp}\n`,'');
+                let out = await ensure(levelstb, db.get_levels).reduce((a,c)=>a+=`${c.lvl}:${c.exp}\n`,'');
                 msg.channel.send(parse.tqs(out));
             }
             else if (parse.is(msg, "profil ")) {
@@ -82,7 +84,7 @@ exports.on_event = async (evt, args) => {
                     const user = msg.mentions.users.first();
                     const uexp = (await db.get_exp(id)).exp;
                     let lvl = 1;
-                    for (const level of await ensure(state.cache.table.level, db.get_levels))
+                    for (const level of await ensure(levelstb, db.get_levels))
                         if (uexp < level.exp) break;
                         else lvl ++;
                     msg.channel.send(new Discord.MessageEmbed()
