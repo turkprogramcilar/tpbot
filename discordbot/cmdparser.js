@@ -36,3 +36,20 @@ exports.set_arg = (msg, cmd, setF, channel_msg=null) => {
         return false;
     }
 }
+exports.cooldown_global_debug_print = (state, key, cds) => {
+    const msS = 1000; const now = new Date();
+    const b4r = state.cooldown.global[key];
+    const ret = undefined==b4r || new Date(b4r.getTime()+cds*msS) <= now;
+    console.log({"b4r": b4r, "now": now, "diff": new Date(b4r.getTime()+cds*msS).getSeconds(), "ret": ret});
+}
+exports.cooldown_global = (state, key, cds=5, fdo=()=>{}, felse=()=>{}) => {
+    const msS = 1000; const now = new Date();
+    const b4r = state.cooldown.global[key];
+    const ret = undefined==b4r || new Date(b4r.getTime()+cds*msS) <= now;
+    if (ret) {
+        state.cooldown.global[key] = now;
+        fdo(state, key, cds);
+    }
+    else felse(state, key, cds);
+    return ret;
+}

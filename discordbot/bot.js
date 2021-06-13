@@ -12,6 +12,9 @@ exports.init = (state, token, mods = []) => {
     state = {
         prefix: consts.env.prefix ?? "%",
         ws: {},
+        cooldown: {
+            global: {},
+        },
         cache: {
             table: {
 
@@ -58,7 +61,9 @@ exports.init = (state, token, mods = []) => {
         }
 
         // basic commands to test if bot is running
-        if (parse.is(msg, "echo ")) {
+
+        if (parse.cooldown_global(state, "gcd_echo", 5, parse.cooldown_global_debug_print, parse.cooldown_global_debug_print)
+         && parse.is(msg, "echo ")) {
             if (msg.content.length>0)
                 msg.channel.send(msg.content);
             return;
