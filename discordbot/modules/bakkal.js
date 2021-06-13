@@ -79,6 +79,7 @@ exports.on_event = async (evt, args) => {
                 msg.channel.send(parser.tqs(out));
             }
             else if (parser.is(msg, "profil")) {
+                const premium = parser.is(msg,'p');
                 if (!parser.cooldown_user(state, msg.author.id, "bakkal_profil", 10)) {
                     parser.send_uwarn(msg, "komutu tekrar kullanabilmek icin lutfen bekleyin");
                     return;
@@ -91,7 +92,7 @@ exports.on_event = async (evt, args) => {
                         if (uexp < level.exp) break;
                         else lvl ++;
 
-                    const iname = `inventory.png`;
+                    const iname = `inventory${(premium ? '_premium' : '')}.png`;
                     const image = await fs.readFile(`${iconpath}/${iname}`);
  
                     msg.channel.send({
