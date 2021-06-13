@@ -1,7 +1,7 @@
 const { json } = require("express");
 
 const webserver =
-    process.env.WEBSERVER != undefined && process.env.WEBSERVER != 'false'
+    process.env.DCBOT_WEBSERVER != undefined && process.env.DCBOT_WEBSERVER != 'false'
     ? require("./webserver/server.js")
     : undefined;
 
