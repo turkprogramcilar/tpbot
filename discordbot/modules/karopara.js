@@ -1,5 +1,5 @@
 require("./../constants.js");
-const parse = require("./../cmdparser.js");
+const parser = require("./../cmdparser.js");
 
 let state = undefined;
 exports.init = (refState) => state = refState;
@@ -8,7 +8,7 @@ exports.on_event = async (evt, args) => {
         case "message": const msg = args.msg;
 
         if (msg.channel.id == cid.botkomutlari
-            && parse.is("kp")) {
+            && parser.is("kp")) {
             if 
         }
 

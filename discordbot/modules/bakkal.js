@@ -1,6 +1,6 @@
 require("./../constants.js");
 const db    = require("./../mongodb.js");
-const parse = require("./../cmdparser.js");
+const parser = require("./../cmdparser.js");
 const fs    = require("fs").promises;
 
 const Discord = require('discord.js');
@@ -19,7 +19,7 @@ const send_embed_item = async (msg, id) => {
     const price = i?.BuyPrice??0;
     let embedded = new Discord.MessageEmbed()
         .setThumbnail(`attachment://icon.png`)
-        .addField('`'+title+'`', (i?.strDesc) ? parse.tqs(i.strDesc) : "-");
+        .addField('`'+title+'`', (i?.strDesc) ? parser.tqs(i.strDesc) : "-");
         
     // cleanup values with 0 and already shown values
     if (i) {
@@ -38,7 +38,7 @@ const send_embed_item = async (msg, id) => {
             name:'icon.png'
         }],
         embed: embedded
-            .addField(`Buy price: ${price}`, parse.tqs(JSON.stringify(i??{},null,'\t'),'json'))
+            .addField(`Buy price: ${price}`, parser.tqs(JSON.stringify(i??{},null,'\t'),'json'))
     });
 };
 const ensure = async (tb, f) => {
@@ -58,29 +58,29 @@ exports.on_event = async (evt, args) => {
             await send_embed_item(msg, rid);
         }
 
-        if (!parse.is(msg, state.prefix))
+        if (!parser.is(msg, state.prefix))
             return;
 
         if (msg.channel.id == cid.botkomutlari) {
-            if (parse.is(msg, "bk ")) {
+            if (parser.is(msg, "bk ")) {
                 // id ile item bilgisi sorgulama
-                parse.i_arg(msg, i => send_embed_item(msg, i));
+                parser.i_arg(msg, i => send_embed_item(msg, i));
     
                 // beyond is admin
                 if (!groups.admins.includes(msg.author.id))
                     return;
     
-                if (parse.is(msg, "test")) await Promise.all([
+                if (parser.is(msg, "test")) await Promise.all([
                     send_embed_item(msg, 38904700),
                     send_embed_item(msg, 11111000),
                 ]);
             }
-            else if (parse.is(msg, "seviyeler")) {
+            else if (parser.is(msg, "seviyeler")) {
                 let out = await ensure(levelstb, db.get_levels).reduce((a,c)=>a+=`${c.lvl}:${c.exp}\n`,'');
-                msg.channel.send(parse.tqs(out));
+                msg.channel.send(parser.tqs(out));
             }
-            else if (parse.is(msg, "profil ")) {
-                parse.mention(msg, async id => {
+            else if (parser.is(msg, "profil ")) {
+                parser.mention(msg, async id => {
                     const user = msg.mentions.users.first();
                     const uexp = (await db.get_exp(id)).exp;
                     let lvl = 1;
@@ -89,7 +89,7 @@ exports.on_event = async (evt, args) => {
                         else lvl ++;
                     msg.channel.send(new Discord.MessageEmbed()
                         .setTitle("`"+user.username+"`")
-                        .setDescription(parse.tqs(`Exp: ${uexp} Lvl: ${lvl}`))
+                        .setDescription(parser.tqs(`Exp: ${uexp} Lvl: ${lvl}`))
                         .setThumbnail(user.avatarURL())
                     );
                 })

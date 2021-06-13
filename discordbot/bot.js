@@ -2,7 +2,7 @@ require("./constants.js");
 
 const db      = require("./mongodb.js");
 const php     = require("./php.js");
-const parse   = require("./cmdparser.js");
+const parser   = require("./cmdparser.js");
 const status  = require("./marquee_status.js");
 const Discord = require('discord.js');
 
@@ -56,21 +56,21 @@ exports.init = (state, token, mods = []) => {
             return;
             
         // beyond is only commands with prefixes, if not return immediately
-        if (!parse.is(msg, state.prefix)) {        
+        if (!parser.is(msg, state.prefix)) {        
             return;
         }
 
         // basic commands to test if bot is running
 
-        if (parse.cooldown_global(state, "gcd_echo", 5, parse.cooldown_global_debug_print, parse.cooldown_global_debug_print)
-         && parse.is(msg, "echo ")) {
+        if (parser.cooldown_global(state, "gcd_echo", 5, parser.cooldown_global_debug_print, parser.cooldown_global_debug_print)
+         && parser.is(msg, "echo ")) {
             if (msg.content.length>0)
                 msg.channel.send(msg.content);
             return;
         }
-        if (parse.is(msg, "echoq ")) {
+        if (parser.is(msg, "echoq ")) {
             if (msg.content.length>0)
-                msg.channel.send(parse.tqs(msg.content));
+                msg.channel.send(parser.tqs(msg.content));
             return;
         }
 
@@ -79,12 +79,12 @@ exports.init = (state, token, mods = []) => {
         if (groups.admins.includes(msg.author.id) == false)
             return;
 
-        if (parse.is(msg, "test ")) {
+        if (parser.is(msg, "test ")) {
             const sent = await msg.channel.send("...");
             const exp  = await db.get_exp(msg.content);
             await sent.edit(exp);
         }
-        else if (parse.is(msg, "testexpall")) {
+        else if (parser.is(msg, "testexpall")) {
             
             const Guild = msg.guild;
             const Members = Guild.members.cache.map(member => member.id); // Getting the members and mapping them by ID.
@@ -109,17 +109,17 @@ exports.init = (state, token, mods = []) => {
             return
         }
         // beyond is admin + fix prefix,
-        if (!parse.is(msg, "sudo "))
+        if (!parser.is(msg, "sudo "))
             return;
 
-        if (parse.is(msg, "install")) {
+        if (parser.is(msg, "install")) {
             const res_arr = await db.install_db();
-            msg.channel.send(parse.json_pretty(res_arr));
+            msg.channel.send(parser.json_pretty(res_arr));
             return;
         }
 
         // syncs channel permssions for all channels
-        if (parse.is(msg, "sync")) {
+        if (parser.is(msg, "sync")) {
             // print all categories
             msg.guild.channels.cache.each(x=>{
                 if (x.type == "text" && x.parent) {

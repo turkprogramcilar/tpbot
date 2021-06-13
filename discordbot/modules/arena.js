@@ -1,5 +1,5 @@
 const tools = require("../tools.js");
-const parse = require("./../cmdparser.js");
+const parser = require("./../cmdparser.js");
 
 const Discord = require("discord.js");
 
@@ -21,12 +21,12 @@ exports.on_event = async (evt, args) => {
         if (msg.channel.id == cid.arena && delete_messages) toggle_purge(msg);
 
         // if not command anywhere, return
-        if (!parse.is(msg, state.prefix)) {        
+        if (!parser.is(msg, state.prefix)) {        
             return;
         }
         // command send on arena
         if (msg.channel.id == cid.arena) {
-            if (parse.is(msg, "vur")) {
+            if (parser.is(msg, "vur")) {
                 hit(msg);
                 return;
             }
@@ -36,16 +36,16 @@ exports.on_event = async (evt, args) => {
             return;
 
         // gamemaster commands for arena
-        if (!parse.is(msg, "gm_")) return;
-        if (parse.is(msg, "arena")) {
+        if (!parser.is(msg, "gm_")) return;
+        if (parser.is(msg, "arena")) {
             delete_messages = !delete_messages;
             msg.channel.send(`Arenaya atilan tum mesajlari sil: ${delete_messages}`);
         }
-        else if (parse.set_arg(msg, "buff",    f => buff = f,       "Arena hasar oranını düzenle"));
-        else if (parse.set_arg(msg, "sans",    f => spawn_rate = f, "Arena emoji çıkma şansını düzenle"));
-        else if (parse.set_arg(msg, "frekans", f => frequency = f,  "Arena güncelleme sıklığı (sn)"));
-        else if (parse.set_arg(msg, "vur",     f => hit(msg, true, f)));
-        else if (parse.is(msg, "yarat ")) {
+        else if (parser.set_arg(msg, "buff",    f => buff = f,       "Arena hasar oranını düzenle"));
+        else if (parser.set_arg(msg, "sans",    f => spawn_rate = f, "Arena emoji çıkma şansını düzenle"));
+        else if (parser.set_arg(msg, "frekans", f => frequency = f,  "Arena güncelleme sıklığı (sn)"));
+        else if (parser.set_arg(msg, "vur",     f => hit(msg, true, f)));
+        else if (parser.is(msg, "yarat ")) {
             r = msg.content.match(/^<:([A-z]+):([0-9]+)>\s*([0-9]+)/)
             if (r) {
                 id=r[2]; nm=r[1]; hp=parseInt(r[3]);
@@ -53,7 +53,7 @@ exports.on_event = async (evt, args) => {
                 create(msg, nm, id, hp)
             }
         }
-        /*else if (parse.is(msg, "dmg ")) r_arg(msg, /^[0-9]+/, async n => {
+        /*else if (parser.is(msg, "dmg ")) r_arg(msg, /^[0-9]+/, async n => {
             xp = await php.get_exp(n);
             msg.channel.send(`Exp: ${xp} | Dmg: ${dmg(xp)}`);
         })*/
