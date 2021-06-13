@@ -3,11 +3,6 @@ const { MongoClient } = require("mongodb");
 const tools = require("./tools.js");
 const fs    = require('fs').promises;
 
-const dbname  = "mongodb_tp"
-const userstb = "users"
-const itemstb = "items"
-const levelstb= "levels"
-const alltb   = [itemstb, levelstb, userstb]
 const connstr = consts.env.dbconnstr;
 const push_fq = 60*1000; // push frequency
 
@@ -74,7 +69,7 @@ const db_exp_differ = (id, diff) => async (db) => {
     will first connect to db, then execute 2 functions above, and
     finally close the connection if succesful.
  */
-
+exports.get_items = async () => db_do(db_get_all(itemstb));
 exports.get_levels = async () => db_do(db_get_all(levelstb));
 exports.get_item = async (id) => db_do(db_get(itemstb, id));
 exports.get_exp = async (id) => db_do(db_get(userstb, id));

@@ -86,4 +86,12 @@ exps_by_category[caid.yayin] = 2
 exps_by_category[caid.muzikses] = 1
 exps_by_category[caid.loglar] = 0
 
+// db consts
+
+dbname  = "mongodb_tp"
+userstb = "users"
+itemstb = "items"
+levelstb= "levels"
+alltb   = [itemstb, levelstb, userstb]
+
 module.exports = {};
