@@ -15,6 +15,7 @@ exports.init = (state, token, mods = []) => {
         ws: {},
         cooldown: {
             global: {},
+            users: {},
         },
         cache: {
             table: {

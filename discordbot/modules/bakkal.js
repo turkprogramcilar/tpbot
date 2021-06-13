@@ -68,6 +68,10 @@ exports.on_event = async (evt, args) => {
                 msg.channel.send(parser.tqs(out));
             }
             else if (parser.is(msg, "profil")) {
+                if (!parser.cooldown_user(state, msg.author.id, "bakkal_profil", 10)) {
+                    parser.send_uwarn(msg, "komutu tekrar kullanabilmek icin lutfen bekleyin");
+                    return;
+                }
                 parser.mention_else_self(msg, async id => {
                     const user = msg.guild.members.cache.get(id).user;
                     const uexp = (await db.get_exp(id)).exp;
