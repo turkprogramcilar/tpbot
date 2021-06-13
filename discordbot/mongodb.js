@@ -89,6 +89,7 @@ exports.get_item = async (id) => db_do(db_get(itemstb, id, "Num"));
 exports.get_exp = async (id) => db_do(db_get(userstb, id));
 exports.differ_exp = async (id, diff) => db_do(db_exp_differ(id, diff));
 exports.give_item = async (uid, iid) => db_do(db_push(userstb, uid, {inventory: iid}))
+exports.get_inventory = async (uid) => (await db_do(db_get(userstb, uid)))?.inventory;
 //
 exports.install_db = async() => db_do(async (db) => {
 

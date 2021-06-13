@@ -1,13 +1,25 @@
 require("./../constants.js");
-const db    = require("./../mongodb.js");
+const db     = require("./../mongodb.js");
 const parser = require("./../cmdparser.js");
-const fs    = require("fs").promises;
 
-const Discord = require('discord.js');
+const fs        = require("fs").promises;
+const fsC       = require("fs")
+const Discord   = require('discord.js');
 const { parse } = require("path");
+const Jimp      = require("jimp");
 
 const iconpath = './discordbot/icons';
 
+const fs_exists = async file =>
+    fs.access(file, fsC.constants.F_OK)
+        .then(() => true)
+        .catch(() => false)
+
+const guard_iconpath = async (id) =>
+    (await fs_exists(`${iconpath}/${id}.png`))
+     ? `${iconpath}/${id}.png`
+     : `${iconpath}/undefined.png`
+     ;
 const read_icon = async (id) => 
     await fs.readFile(`${iconpath}/${id}.png`)
         .catch(async ()=> fs.readFile(`${iconpath}/undefined.png`))
@@ -58,6 +70,21 @@ const get_riid = async () => {
     const rid = (i=>i[Math.floor(Math.random()*i.length)])(items.map(x=>x["Num"]));
     return rid;
 }
+const render_inventory = async (inventory, iconspath, bgfile) => {
+    // l= length, oix= offset inventory x, ogx= offset gear x, iw= inventory width,
+    // ih= inventory height, gw= gear width, gh= gear height
+    const l=45, oix=0, oiy=1, ogx=7, ogy=0, iw=7, ih=4, gw=3, gh=5, LIMIT=iw*ih;
+    const bg = await Jimp.read(iconspath+'/'+bgfile);
+    const icons = await Promise.all(inventory.slice(0,LIMIT).map(async (id,i) => {
+        let im = await Jimp.read(await guard_iconpath(id));
+        return { "i": i, "im": im };
+    }));
+    for (const {i, im} of icons) {
+        const x=i%iw, y=(i/iw)|0;
+        bg.composite(im, l*(oix+x), l*(oiy+y));
+    }
+    return await bg.getBufferAsync(Jimp.MIME_PNG);
+}
 let state = undefined;
 exports.init = (refState) => state = refState;
 exports.on_event = async (evt, args) => {
@@ -86,16 +113,25 @@ exports.on_event = async (evt, args) => {
                 }
                 parser.mention_else_self(msg, async id => {
                     const user = msg.guild.members.cache.get(id).user;
-                    const uexp = (await db.get_exp(id)).exp;
-                    let lvl = 1;
-                    for (const level of await ensure(levelstb, db.get_levels))
-                        if (uexp < level.exp) break;
-                        else lvl ++;
-
                     const iname = `inventory${(premium ? '_premium' : '')}.png`;
-                    const image = await fs.readFile(`${iconpath}/${iname}`);
- 
-                    msg.channel.send({
+                    // we have 2 different tasks that can be executed in parallel
+                    // use promise all to execute them in paralel and wait for them.
+                    const [explvl, image] = await Promise.all([
+                        (async () => {
+                            let l = 1;
+                            const uexp = (await db.get_exp(id)).exp;
+                            for (const level of await ensure(levelstb, db.get_levels))
+                                if (uexp < level.exp) break;
+                                else l++;
+                            return [uexp, l];
+                        })(),
+                        (async () => {
+                            const inventory = await db.get_inventory(id);
+                            return await render_inventory(inventory, iconpath, iname);
+                        })()
+                    ]);
+                    const lvl=explvl[1], uexp=explvl[0];
+                    await msg.channel.send({
                         files: [{
                             attachment: image,
                             name: iname
