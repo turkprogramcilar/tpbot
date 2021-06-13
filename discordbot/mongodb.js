@@ -42,7 +42,9 @@ const db_exp_manyset = (idexps) => async (db) => {
     await db.collection(userstb).updateMany()
 }
 const db_get = (tb, id, key="id") => async (db) => {
-    const rest = await db.collection(tb).find({key: id}).limit(1).toArray();
+    let doc = {}
+    doc[key]=id;
+    const rest = await db.collection(tb).find(doc).limit(1).toArray();
     return rest[0];
 }
 const db_get_all = (tb) => async (db) => {
@@ -50,7 +52,7 @@ const db_get_all = (tb) => async (db) => {
     return rest;
 }
 const db_exp_differ = (id, diff) => async (db) => {
-    const e = (await db_get(userstb, id)(db)).exp ?? 0;
+    const e = (await db_get(userstb, id)(db))?.exp ?? 0;
     await db.collection(userstb).updateOne(
         { "id": id.toString() },
         { $set: { exp: e+diff } },
