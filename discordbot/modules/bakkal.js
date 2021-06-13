@@ -41,9 +41,8 @@ const send_embed_item = async (msg, id) => {
             .addField(`Buy price: ${price}`, parser.tqs(JSON.stringify(i??{},null,'\t'),'json'))
     });
 };
-const ensure = async (tb, f) => {
-
-    if (!state.cache.table[tb]) state.cache.table[tb] = await f();
+const ensure = async (tb, cachef) => {
+    if (!state.cache.table[tb]) state.cache.table[tb] = await cachef();
     return state.cache.table[tb];
 }
 let state = undefined;
@@ -64,37 +63,49 @@ exports.on_event = async (evt, args) => {
             return;
 
         if (msg.channel.id == cid.botkomutlari) {
-            if (parser.is(msg, "bk ")) {
-                // id ile item bilgisi sorgulama
-                parser.i_arg(msg, i => send_embed_item(msg, i));
-    
-                // beyond is admin
-                if (!groups.admins.includes(msg.author.id))
-                    return;
-    
-                if (parser.is(msg, "test")) await Promise.all([
-                    send_embed_item(msg, 38904700),
-                    send_embed_item(msg, 11111000),
-                ]);
-            }
-            else if (parser.is(msg, "seviyeler")) {
+            if (parser.is(msg, "seviyeler")) {
                 let out = (await ensure(levelstb, db.get_levels)).reduce((a,c)=>a+=`${c.lvl}:${c.exp}\n`,'');
                 msg.channel.send(parser.tqs(out));
             }
-            else if (parser.is(msg, "profil ")) {
-                parser.mention(msg, async id => {
-                    const user = msg.mentions.users.first();
+            else if (parser.is(msg, "profil")) {
+                parser.mention_else_self(msg, async id => {
+                    const user = msg.guild.members.cache.get(id).user;
                     const uexp = (await db.get_exp(id)).exp;
                     let lvl = 1;
                     for (const level of await ensure(levelstb, db.get_levels))
                         if (uexp < level.exp) break;
                         else lvl ++;
-                    msg.channel.send(new Discord.MessageEmbed()
-                        .setTitle("`"+user.username+"`")
-                        .setDescription(parser.tqs(`Exp: ${uexp} Lvl: ${lvl}`))
-                        .setThumbnail(user.avatarURL())
-                    );
+
+                    const iname = `inventory.png`;
+                    const image = await fs.readFile(`${iconpath}/${iname}`);
+ 
+                    msg.channel.send({
+                        files: [{
+                            attachment: image,
+                            name: iname
+                        }],
+                        embed: new Discord.MessageEmbed()
+                            .setTitle("`"+user.username+"`")
+                            .setDescription(parser.tqs(`Exp: ${uexp} Lvl: ${lvl}`))
+                            .setThumbnail(user.avatarURL())
+                            .setImage(`attachment://${iname}`)
+                    });
                 })
+            }
+            
+            // beyond is admin
+            if (!groups.admins.includes(msg.author.id))
+                return;
+
+            if (parser.is(msg, "item ")) {
+                // id ile item bilgisi sorgulama
+                parser.i_arg(msg, i => send_embed_item(msg, i));
+    
+    
+                if (parser.is(msg, "test")) await Promise.all([
+                    send_embed_item(msg, 38904700),
+                    send_embed_item(msg, 11111000),
+                ]);
             }
         }
 

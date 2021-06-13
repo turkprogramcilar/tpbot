@@ -20,6 +20,7 @@ exports.tq =  (str,format='') => { return '```'+format+'\n'+str+'```'; }
 exports.tqs = (str,format='') => { return exports.tq((str?.toString() ?? "").substr(0,2000-1-6-format.length-1),format); }
 exports.send_tqswarn = async (msg, str) => await msg.channel.send(exports.tqs("warning: "+str,"fix"));
 exports.mention = (msg, f, fe=()=>{}) => { exports.regex_arg(msg, f, fe, x=>x, /^<@!?([0-9]+)>/, 1); }
+exports.mention_else_self = (msg, f) => { exports.mention(msg, f, ()=>f(msg.author.id))}
 exports.r_arg = (msg, regex, f, fe=()=>{}) => { exports.regex_arg(msg, f, fe, x=>x, regex); }
 exports.u_arg = (msg, f, fe=()=>{}) => { exports.regex_arg(msg, f, fe, parseInt, /^[0-9]+/); }
 exports.i_arg = (msg, f, fe=()=>{}) => { exports.regex_arg(msg, f, fe, parseInt, /^[+-]?[0-9]+/); }
