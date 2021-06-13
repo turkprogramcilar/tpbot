@@ -1,5 +1,5 @@
-require("./../constants.js");
-const db = require("./../mongodb.js");
+require("../constants.js");
+const db = require("../mongodb.js");
 let state = undefined;
 exports.init = (refState) => state = refState;
 exports.on_event = async (evt, args) => {
