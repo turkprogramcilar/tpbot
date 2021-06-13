@@ -62,7 +62,7 @@ const db_set = (tb, id, doc, key="id") => async (db) => {
 const db_push = (tb, id, doc, key="id") => async (db) => {
     let filter = {};
     filter[key]=id;
-    await db.collection(tb).update(filter,
+    await db.collection(tb).updateOne(filter,
         { $push: doc },
         { upsert: true }
     );
