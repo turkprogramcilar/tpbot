@@ -13,6 +13,10 @@ consts = {
 eid_kekt = "823934807724785664";
 eid_keky = "824702674712526879";
 
+// server ids
+sid={
+    tpdc: "698972054740795453",
+}
 // user ids
 uid={
     disboard: "302050872383242240",

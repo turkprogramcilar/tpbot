@@ -2,7 +2,8 @@ require("./constants.js");
 
 const db      = require("./mongodb.js");
 const php     = require("./php.js");
-const parser   = require("./cmdparser.js");
+const tools   = require("./tools.js");
+const parser  = require("./cmdparser.js");
 const status  = require("./marquee_status.js");
 const Discord = require('discord.js');
 
@@ -60,10 +61,7 @@ exports.init = (state, token, mods = []) => {
             return;
         }
 
-        // basic commands to test if bot is running
-
-        if (parser.cooldown_global(state, "gcd_echo", 5, parser.cooldown_global_debug_print, parser.cooldown_global_debug_print)
-         && parser.is(msg, "echo ")) {
+        if (parser.is(msg, "echo ")) {
             if (msg.content.length>0)
                 msg.channel.send(msg.content);
             return;
@@ -73,7 +71,6 @@ exports.init = (state, token, mods = []) => {
                 msg.channel.send(parser.tqs(msg.content));
             return;
         }
-
         // beyond is administrative or feature previews only, 
         // if not admin return
         if (groups.admins.includes(msg.author.id) == false)
@@ -111,6 +108,24 @@ exports.init = (state, token, mods = []) => {
         // beyond is admin + fix prefix,
         if (!parser.is(msg, "sudo "))
             return;
+
+            
+        if (parser.is(msg, "version")) {
+            const sha1="50782c456006569b9e46c25d6afc29215dab15bf";
+            const url = `https://github.com/turkprogramcilar/turk-programcilar-bot/commit/${sha1}`;
+            const res = await tools.https_get(url);
+            const r = res.match(/relative-time\s+datetime\=\"(.*?)\"/);
+            if (r && r.length >= 1) {
+                await msg.channel.send(new Discord.MessageEmbed()
+                    .setAuthor("Türk Programcılar", client.guilds.cache.get(sid.tpdc).iconURL(), url)
+                    .addField("`commit date`", parser.tqs(new Date(r[1])))
+                    .addField(`\`commit sha1\``, parser.tqs(`${sha1}`))
+                    .setThumbnail(client.user.avatarURL())
+                );
+            } else {
+                console.log("warning: sudo version command is broken");
+            }
+        }
 
         if (parser.is(msg, "install")) {
             const res_arr = await db.install_db();

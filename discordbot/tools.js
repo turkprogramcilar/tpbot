@@ -1,3 +1,19 @@
+require("./constants.js")
+const https = require('https');
+exports.https_get = async url => new Promise(resolve => {
+    https.get(new URL(url), async res => {
+        try {
+            let body = '';
+            res.setEncoding('utf-8');
+            for await (const chunk of res) {
+                body += chunk;
+            }
+            resolve(body);
+        } catch (e) {
+            console.log('ERROR', e);
+        }
+    });
+});
 // input: h,s,v in [0,1] - output: r,g,b in [0,1]
 exports.hsv2rgb = (h,s,v) => { 
     
