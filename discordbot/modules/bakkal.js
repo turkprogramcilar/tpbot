@@ -52,7 +52,9 @@ exports.on_event = async (evt, args) => {
     switch (evt) {
         case "message": const msg = args.msg;
 
-        if (msg.content.includes("merak")) {
+        if (parser.cooldown_global(state, "bakkal_merak", 10)
+            && msg.content.includes("merak")) {
+                
             const items = await ensure(itemstb, db.get_items);
             const rid = (i=>i[Math.floor(Math.random()*i.length)])(items.map(x=>x["Num"]));
             await send_embed_item(msg, rid);
