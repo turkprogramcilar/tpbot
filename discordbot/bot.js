@@ -111,20 +111,26 @@ exports.init = (state, token, mods = []) => {
 
             
         if (parser.is(msg, "version")) {
-            const sha1="50782c456006569b9e46c25d6afc29215dab15bf";
+            const sha1=consts.env.version;
+            if (!sha1) {
+                await parser.send_tqswarn(msg, "commit sha1 for version is undefined");
+                return;
+            }
             const url = `https://github.com/turkprogramcilar/turk-programcilar-bot/commit/${sha1}`;
             const res = await tools.https_get(url);
             const r = res.match(/relative-time\s+datetime\=\"(.*?)\"/);
-            if (r && r.length >= 1) {
-                await msg.channel.send(new Discord.MessageEmbed()
-                    .setAuthor("Türk Programcılar", client.guilds.cache.get(sid.tpdc).iconURL(), url)
-                    .addField("`commit date`", parser.tqs(new Date(r[1])))
-                    .addField(`\`commit sha1\``, parser.tqs(`${sha1}`))
-                    .setThumbnail(client.user.avatarURL())
-                );
-            } else {
-                console.log("warning: sudo version command is broken");
+            if (!r || r.length < 1) {
+                await parser.send_tqswarn(msg, "regex didn't match the get response body");
+                return;
             }
+            
+            await msg.channel.send(new Discord.MessageEmbed()
+                .setAuthor("Türk Programcılar", client.guilds.cache.get(sid.tpdc).iconURL(), url)
+                .addField("`commit date`", parser.tqs(new Date(r[1])))
+                .addField(`\`commit sha1\``, parser.tqs(`${sha1}`))
+                .setThumbnail(client.user.avatarURL())
+            );
+            return;
         }
 
         if (parser.is(msg, "install")) {
