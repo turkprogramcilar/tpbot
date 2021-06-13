@@ -21,15 +21,18 @@ const send_embed_item = async (msg, id) => {
     const i = is.find(x=>x["Num"]==id.toString());
     const title = (i?.strName??"Item not found").replace(/\(\+[0-9]+\)/, '').trim();
     const price = i?.BuyPrice??0;
+    const num   = i?.Num;
     let embedded = new Discord.MessageEmbed()
         .setThumbnail(`attachment://icon.png`)
-        .addField('`'+title+'`', (i?.strDesc) ? parser.tqs(i.strDesc) : "-");
+        .setFooter(`\`${num}\``)
+        ;
+        //.addField('`'+title+'`', (i?.strDesc) ? parser.tqs(i.strDesc) : "-");
         
     // cleanup values with 0 and already shown values
     if (i) {
         delete i["_id"];     delete i["Num"];
-        delete i["strName"]; delete i["strDesc"];
-        delete i["IconID"];  delete i["BuyPrice"];
+        delete i["strName"]; //delete i["strDesc"];
+        //delete i["IconID"];  //delete i["BuyPrice"];
         for (const k of Object.keys(i)) {
             if (!i[k] || i[k].toString()=='0')
                 delete i[k];
@@ -42,7 +45,7 @@ const send_embed_item = async (msg, id) => {
             name:'icon.png'
         }],
         embed: embedded
-            .addField(`Buy price: ${price}`, parser.tqs(JSON.stringify(i??{},null,'\t'),'json'))
+            .addField('`'+title+'`', parser.tqs(JSON.stringify(i??{},null,'\t'),'json'))
     });
 };
 const ensure = async (tb, cachef) => {
