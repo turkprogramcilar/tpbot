@@ -23,7 +23,7 @@ const send_embed_item = async (msg, id) => {
         
     // cleanup values with 0 and already shown values
     if (i) {
-        delete i["_id"];     delete i["id"];
+        delete i["_id"];     delete i["Num"];
         delete i["strName"]; delete i["strDesc"];
         delete i["IconID"];  delete i["BuyPrice"];
         for (const k of Object.keys(i)) {
@@ -54,7 +54,7 @@ exports.on_event = async (evt, args) => {
 
         if (parser.cooldown_global(state, "bakkal_merak", 10)
             && msg.content.includes("merak")) {
-                
+
             const items = await ensure(itemstb, db.get_items);
             const rid = (i=>i[Math.floor(Math.random()*i.length)])(items.map(x=>x["Num"]));
             await send_embed_item(msg, rid);
@@ -78,7 +78,7 @@ exports.on_event = async (evt, args) => {
                 ]);
             }
             else if (parser.is(msg, "seviyeler")) {
-                let out = await ensure(levelstb, db.get_levels).reduce((a,c)=>a+=`${c.lvl}:${c.exp}\n`,'');
+                let out = (await ensure(levelstb, db.get_levels)).reduce((a,c)=>a+=`${c.lvl}:${c.exp}\n`,'');
                 msg.channel.send(parser.tqs(out));
             }
             else if (parser.is(msg, "profil ")) {

@@ -47,9 +47,9 @@ const db_get = (tb, id, key="id") => async (db) => {
     const rest = await db.collection(tb).find(doc).limit(1).toArray();
     return rest[0];
 }
-const db_get_all = (tb) => async (db) => {
-    const rest = await db.collection(tb).find().toArray();
-    return rest;
+const db_get_all = (tb, after_find=x=>x) => async (db) => {
+    const promise = await after_find(db.collection(tb).find()).toArray();
+    return promise;
 }
 const db_exp_differ = (id, diff) => async (db) => {
     const e = (await db_get(userstb, id)(db))?.exp ?? 0;
@@ -72,7 +72,7 @@ const db_exp_differ = (id, diff) => async (db) => {
     finally close the connection if succesful.
  */
 exports.get_items = async () => db_do(db_get_all(itemstb));
-exports.get_levels = async () => db_do(db_get_all(levelstb));
+exports.get_levels = async () => db_do(db_get_all(levelstb,x=>x.sort({ lvl : 1 })));
 exports.get_item = async (id) => db_do(db_get(itemstb, id, "Num"));
 exports.get_exp = async (id) => db_do(db_get(userstb, id));
 exports.differ_exp = async (id, diff) => db_do(db_exp_differ(id, diff));
