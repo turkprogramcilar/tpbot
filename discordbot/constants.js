@@ -5,7 +5,11 @@ consts = {
         noarena   : process.env.DCBOT_NOARENA,
         prefix    : process.env.DCBOT_PREFIX,
         debug     : process.env.DCBOT_DEBUG,
-        dbconnstr : process.env.DCBOT_DBCONNSTR
+        dbconnstr : process.env.DCBOT_DBCONNSTR,
+        // following env variable is set by heroku buildpack:
+        // https://github.com/ianpurvis/heroku-buildpack-version
+        // and used by version command
+        version   : process.env.SOURCE_VERSION,
     }
 };
 
