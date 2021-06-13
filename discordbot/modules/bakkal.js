@@ -41,12 +41,19 @@ const send_embed_item = async (msg, id) => {
             .addField(`Buy price: ${price}`, parse.tqs(JSON.stringify(i??{},null,'\t'),'json'))
     });
 };
-
+const ensure = async (cache, f) => {
+    if (!cache) cache = await f();
+    return cache;
+}
 let state = undefined;
 exports.init = (refState) => state = refState;
 exports.on_event = async (evt, args) => {
     switch (evt) {
         case "message": const msg = args.msg;
+
+        if (msg.content.includes("merak")) {
+            
+        }
 
         if (!parse.is(msg, state.prefix))
             return;
@@ -67,18 +74,15 @@ exports.on_event = async (evt, args) => {
                 ]);
             }
             else if (parse.is(msg, "seviyeler")) {
-                if (!state.cache.table.level) state.cache.table.level = await db.get_levels();
-                let out = state.cache.table.level.reduce((a,c)=>a+=`${c.lvl}:${c.exp}\n`,'');
+                let out = await ensure(state.cache.table.level, db.get_levels).reduce((a,c)=>a+=`${c.lvl}:${c.exp}\n`,'');
                 msg.channel.send(parse.tqs(out));
             }
             else if (parse.is(msg, "profil ")) {
                 parse.mention(msg, async id => {
-                    if (!state.cache.table.level)
-                        state.cache.table.level = await db.get_levels();
                     const user = msg.mentions.users.first();
                     const uexp = (await db.get_exp(id)).exp;
                     let lvl = 1;
-                    for (const level of state.cache.table.level)
+                    for (const level of await ensure(state.cache.table.level, db.get_levels))
                         if (uexp < level.exp) break;
                         else lvl ++;
                     msg.channel.send(new Discord.MessageEmbed()
