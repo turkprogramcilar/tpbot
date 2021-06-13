@@ -139,6 +139,10 @@ exports.init = (state, token, mods = []) => {
             msg.channel.send(parser.json_pretty(res_arr));
             return;
         }
+        /*else if (parser.is(msg, "fixids")) {
+            await db.convert_id(itemstb, "Num");
+            return;
+        }*/
 
         // syncs channel permssions for all channels
         if (parser.is(msg, "sync")) {

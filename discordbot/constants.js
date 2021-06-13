@@ -101,5 +101,5 @@ userstb = "users"
 itemstb = "items"
 levelstb= "levels"
 alltb   = [itemstb, levelstb]
-
+//dbname = "test1"
 module.exports = {};
