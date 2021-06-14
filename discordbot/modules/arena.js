@@ -51,7 +51,7 @@ exports.on_event = async (evt, args) => {
 
         // gamemaster commands for arena
         if (!parser.is(msg, "gm_")) return;
-        if (fetch_start) parser.send_tqswarn(msg, "alive array is still being fetched. "
+        if (fetch_start) parser.send_awarn(msg, "alive array is still being fetched. "
             + `(start=${fetch_start}, now=${new Date()}`);
 
         if (parser.is(msg, "arena")) {

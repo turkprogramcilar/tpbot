@@ -118,14 +118,14 @@ exports.init = (state, token, mods = []) => {
         if (parser.is(msg, "version")) {
             const sha1=consts.env.version;
             if (!sha1) {
-                await parser.send_tqswarn(msg, "commit sha1 for version is undefined");
+                await parser.send_awarn(msg, "commit sha1 for version is undefined");
                 return;
             }
             const url = `https://github.com/turkprogramcilar/turk-programcilar-bot/commit/${sha1}`;
             const res = await tools.https_get(url);
             const r = res.match(/relative-time\s+datetime\=\"(.*?)\"/);
             if (!r || r.length < 1) {
-                await parser.send_tqswarn(msg, "regex didn't match the get response body");
+                await parser.send_awarn(msg, "regex didn't match the get response body");
                 return;
             }
 
