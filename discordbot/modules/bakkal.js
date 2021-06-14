@@ -12,7 +12,7 @@ const Jimp      = require("jimp");
 
 const send_embed_item = async (msg, id) => {
     const [is, p] = await Promise.all([
-        ensure(itemstb, db.get_items),
+        tools.ensure(state, itemstb, db.get_items),
         tools.read_icon(id)
     ]);
     const i = is.find(x=>x["Num"]==id.toString());
@@ -45,16 +45,6 @@ const send_embed_item = async (msg, id) => {
             .addField('`'+title+'`', parser.tqs(JSON.stringify(i??{},null,'\t'),'json'))
     });
 };
-const ensure = async (tb, cachef) => {
-    if (!state.cache.table[tb]) state.cache.table[tb] = await cachef();
-    return state.cache.table[tb];
-}
-// get random item id
-const get_riid = async () => {
-    const items = await ensure(itemstb, db.get_items);
-    const rid = (i=>i[Math.floor(Math.random()*i.length)])(items.map(x=>x["Num"]));
-    return rid;
-}
 const render_inventory = async (inventory, iconspath, bgfile) => {
     // l= length, oix= offset inventory x, ogx= offset gear x, iw= inventory width,
     // ih= inventory height, gw= gear width, gh= gear height
@@ -78,7 +68,7 @@ exports.on_event = async (evt, args) => {
 
         if (parser.cooldown_global(state, "bakkal_merak", 10)
             && msg.content.includes("merak")) {
-            const rid = await get_riid();
+            const rid = await tools.get_riid(state);
             await send_embed_item(msg, rid);
         }
 
@@ -87,7 +77,7 @@ exports.on_event = async (evt, args) => {
 
         if (msg.channel.id == cid.botkomutlari) {
             if (parser.is(msg, "seviyeler")) {
-                let out = (await ensure(levelstb, db.get_levels)).reduce((a,c)=>a+=`${c.lvl}:${c.exp}\n`,'');
+                let out = (await tools.ensure(state, levelstb, db.get_levels)).reduce((a,c)=>a+=`${c.lvl}:${c.exp}\n`,'');
                 msg.channel.send(parser.tqs(out));
             }
             else if (parser.is(msg, "profil")) {
@@ -105,7 +95,7 @@ exports.on_event = async (evt, args) => {
                         (async () => {
                             let l = 1;
                             const uexp = (await db.get_exp(id)).exp;
-                            for (const level of await ensure(levelstb, db.get_levels))
+                            for (const level of await tools.ensure(state, levelstb, db.get_levels))
                                 if (uexp < level.exp) break;
                                 else l++;
                             return [uexp, l];
@@ -148,7 +138,7 @@ exports.on_event = async (evt, args) => {
                 const do_f = async iid => {
                     await db.give_item(msg.author.id, iid);
                 };
-                parser.i_arg(msg, do_f, async ()=> await do_f(await get_riid()));
+                parser.i_arg(msg, do_f, async ()=> await do_f(await tools.get_riid(state)));
             }
         }
 

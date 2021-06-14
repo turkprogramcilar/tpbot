@@ -90,3 +90,15 @@ exports.read_icon = async (id) =>
     await fs.readFile(`${iconpath}/${id}.png`)
         .catch(async ()=> fs.readFile(`${iconpath}/undefined.png`))
         //.catch() buda yoksa coksun bot napalim.
+
+
+exports.ensure = async (state, tb, cachef) => {
+    if (!state.cache.table[tb]) state.cache.table[tb] = await cachef();
+    return state.cache.table[tb];
+}
+// get random item id
+exports.get_riid = async (state) => {
+    const items = await exports.ensure(state, itemstb, db.get_items);
+    const rid = (i=>i[Math.floor(Math.random()*i.length)])(items.map(x=>x["Num"]));
+    return rid;
+}
