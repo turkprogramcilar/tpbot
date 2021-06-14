@@ -72,3 +72,21 @@ exports.toggler_async = async (f, k, fq) => {
         togglera_states[k] = true;
     }
 }
+
+
+const fs        = require("fs").promises;
+const fsC       = require("fs")
+exports.fs_exists = async file =>
+    fs.access(file, fsC.constants.F_OK)
+        .then(() => true)
+        .catch(() => false)
+
+exports.guard_iconpath = async (id) =>
+    (await exports.fs_exists(`${iconpath}/${id}.png`))
+     ? `${iconpath}/${id}.png`
+     : `${iconpath}/undefined.png`
+     ;
+exports.read_icon = async (id) => 
+    await fs.readFile(`${iconpath}/${id}.png`)
+        .catch(async ()=> fs.readFile(`${iconpath}/undefined.png`))
+        //.catch() buda yoksa coksun bot napalim.

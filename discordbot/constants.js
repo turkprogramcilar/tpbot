@@ -104,4 +104,17 @@ arenatb = "arena"
 // tbs that have static data (mostly game data)
 alltb   = [itemstb, levelstb]
 //dbname = "test1"
+
+iconpath = './discordbot/icons';
+uipath   = "./discordbot/ui";
+
+
+
+
+
+
+
+
+
+
 module.exports = {};

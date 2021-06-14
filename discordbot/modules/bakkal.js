@@ -1,6 +1,7 @@
 require("./../constants.js");
 const db     = require("./../mongodb.js");
 const parser = require("./../cmdparser.js");
+const tools  = require("../tools.js");
 
 const fs        = require("fs").promises;
 const fsC       = require("fs")
@@ -8,27 +9,11 @@ const Discord   = require('discord.js');
 const { parse } = require("path");
 const Jimp      = require("jimp");
 
-const iconpath = './discordbot/icons';
-
-const fs_exists = async file =>
-    fs.access(file, fsC.constants.F_OK)
-        .then(() => true)
-        .catch(() => false)
-
-const guard_iconpath = async (id) =>
-    (await fs_exists(`${iconpath}/${id}.png`))
-     ? `${iconpath}/${id}.png`
-     : `${iconpath}/undefined.png`
-     ;
-const read_icon = async (id) => 
-    await fs.readFile(`${iconpath}/${id}.png`)
-        .catch(async ()=> fs.readFile(`${iconpath}/undefined.png`))
-        //.catch() buda yoksa coksun bot napalim.
 
 const send_embed_item = async (msg, id) => {
     const [is, p] = await Promise.all([
         ensure(itemstb, db.get_items),
-        read_icon(id)
+        tools.read_icon(id)
     ]);
     const i = is.find(x=>x["Num"]==id.toString());
     const title = (i?.strName??"Item not found").replace(/\(\+[0-9]+\)/, '').trim();
@@ -76,7 +61,7 @@ const render_inventory = async (inventory, iconspath, bgfile) => {
     const l=45, oix=0, oiy=1, ogx=7, ogy=0, iw=7, ih=4, gw=3, gh=5, LIMIT=iw*ih;
     const bg = await Jimp.read(iconspath+'/'+bgfile);
     const icons = await Promise.all(inventory.slice(0,LIMIT).map(async (id,i) => {
-        let im = await Jimp.read(await guard_iconpath(id));
+        let im = await Jimp.read(await tools.guard_iconpath(id));
         return { "i": i, "im": im };
     }));
     for (const {i, im} of icons) {
