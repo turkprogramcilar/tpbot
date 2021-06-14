@@ -82,13 +82,13 @@ need_update = false;
 const toggle_update = (f) => {
     tools.toggler(f, "arena_update", frequency*1000);
 }
-const toggle_purge = (msg=null) => {
+const toggle_purge = (msg) => {
     if (msg) purge_list.push(msg);
-    tools.toggler(() => {
+    tools.toggler(async () => {
         const del = purge_list.splice(0,100);
-        msg.channel.bulkDelete(del);
+        await msg.channel.bulkDelete(del);
         // keep going until list is empty, even if not toggled by a message yet
-        if (purge_list.length!=0) toggle_purge();
+        if (purge_list.length!=0) toggle_purge(msg);
     }, "arena_delete", frequency*1000);
 }
 const create = (msg, name, id, hp) => {
