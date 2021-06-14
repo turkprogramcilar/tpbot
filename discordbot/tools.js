@@ -74,8 +74,10 @@ exports.toggler_async = async (f, k, fq) => {
 }
 
 
-const fs        = require("fs").promises;
-const fsC       = require("fs")
+const fs  = require("fs").promises;
+const fsC = require("fs")
+const db  = require("./mongodb.js");
+
 exports.fs_exists = async file =>
     fs.access(file, fsC.constants.F_OK)
         .then(() => true)

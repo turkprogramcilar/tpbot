@@ -2,7 +2,22 @@ const tools  = require("../tools.js");
 const parser = require("./../cmdparser.js");
 const db     = require("./../mongodb.js");
 
+const Jimp    = require("jimp");
+const fs      = require("fs").promises;
 const Discord = require("discord.js");
+
+const render_drop = async (items, path, bgfile) => {
+    const bg = await Jimp.read(path+'/'+bgfile);
+    const icons = await Promise.all(items.map(async (id,i) => {
+        let im = await Jimp.read(await tools.guard_iconpath(id));
+        return { "i": i, "im": im };
+    }));
+    const ox=90, oy=13, s=22, l=45;
+    for (const {i, im} of icons) {
+        bg.composite(im, ox+i*(l+s), oy);
+    }
+    return await bg.getBufferAsync(Jimp.MIME_PNG);
+}
 
 let fetch_start = new Date();
 let state = undefined;
@@ -28,7 +43,7 @@ exports.on_event = async (evt, args) => {
         if ((match = msg.content.match(/<:([A-z]+):([0-9]+)>/))
         && Math.random() < spawn_rate
             ) {
-            create(msg, match[1], match[2], 10000);
+            await create(msg, match[1], match[2], 10000);
         }
         // messages send on arena (command or not, doesn't matter)
         if (msg.channel.id == cid.arena && delete_messages) toggle_purge(msg);
@@ -67,7 +82,7 @@ exports.on_event = async (evt, args) => {
             if (r) {
                 id=r[2]; nm=r[1]; hp=parseInt(r[3]);
                 if (!msg.guild.emojis.cache.get(id)) return;
-                create(msg, nm, id, hp)
+                await create(msg, nm, id, hp)
             }
         }
         /*else if (parser.is(msg, "dmg ")) r_arg(msg, /^[0-9]+/, async n => {
@@ -116,10 +131,10 @@ const toggle_purge = (msg) => {
         if (purge_list.length!=0) toggle_purge(msg);
     }, "arena_delete", frequency*1000);
 }
-const create = (msg, name, eid, hp) => {
+const create = async (msg, name, eid, hp) => {
     if (alive) return null;
     ch = msg.guild.channels.cache.get(cid.arena);
-    if (ch) ch.send(embed(name, eid, hp, hp)).then((msg) => {
+    if (ch) ch.send(await embed_boss(name, eid, hp, hp)).then((msg) => {
         alive = {
             name: name, eid: eid, msg: msg, mhp: hp, hp: hp, dmgdone: {}, lasthits: [],
         };
@@ -148,23 +163,28 @@ const hit = async (msg, gm=false,gmdmg=0) => {
     toggle_update(async ()=> {
         //update
         sorted=Object.entries(m.dmgdone).sort((a,b)=>b[1]-a[1]);
-        const newmsg=embed(m.name,m.eid,m.hp,m.mhp,m.lasthits,sorted.splice(0,3),sorted.splice(-1,1)[0]);
-        const mmsg = (await state.client.channels.cache.get(m.msg.channelID).messages.fetch(m.msg.id));
-        if (mmsg.deleted) m.msg = await msg.guild.channels.cache.get(cid.arena).send(newmsg);
-        else mmsg.edit(newmsg);
+        const newmsg=await embed_boss(m.name,m.eid,m.hp,m.mhp,m.lasthits,sorted.splice(0,3),sorted.splice(-1,1)[0]);
+        const channel = (await state.client.channels.fetch(m.msg.channelID ?? m.msg.channel.id));
+        const mmsg = await channel.messages.fetch(m.msg.id);
+        if (mmsg.deleted) m.msg = await channel.send(newmsg);
+        else {
+            if (m.hp <= 0) {
+                await mmsg.delete();
+                await channel.send(newmsg);
+            }
+            else mmsg.edit(newmsg);
+        }
     })
     if (alive.hp <= 0) alive=undefined;
     syncdb_alive();
 }
-const embed = (name, eid, hp, mhp, lasthits=[], top=[], last='') => {
+const embed_boss = async (name, eid, hp, mhp, lasthits=[], top=[], last='') => {
 
     // boyle yapmayinca bir sebepten dolayi calismiyordu belki de simdi t1..t4
     // yerine karsiliklarini yazinca calisabilir.
     t1=top[0]??"-"; t2=top[1]??"-"; t3=top[2]??"-"; t4=last??"-";
 
-    return {
-        content: ''+lasthits.reduce((a,c)=>a+=c+' ',''),
-        embed: new Discord.MessageEmbed()
+    let embed = new Discord.MessageEmbed()
         .setColor('#'+tools.hsv2rgbh(hp/mhp/3,1,1))
         .setTitle(title(name, hp,mhp))
         .setDescription(`\`\`\`diff\n+ ${hp}/${mhp} (%${(hp/mhp*100)|0})\`\`\``)
@@ -175,7 +195,24 @@ const embed = (name, eid, hp, mhp, lasthits=[], top=[], last='') => {
         .setThumbnail(`https://cdn.discordapp.com/emojis/${eid}.png`)
         .setTimestamp()
         .setFooter('%vur komutu ile düşmana saldır.')// Daha fazla hasar vermek için saldırını emojiler ile desteklendir!');
+    ;
+    
+    msg = {
+        content: ''+lasthits.reduce((a,c)=>a+=c+' ',''),
+        embed: embed
     };
+
+    if (hp==0 || true) {
+        const fname = "arenadrop.png";
+        msg.files = [{
+            attachment: (hp==0 
+                ? await render_drop(await Promise.all([1,2,3].map(x=>tools.get_riid(state))),uipath,fname)
+                : await fs.readFile(uipath+"/"+fname)),
+            name: fname
+        }]
+        msg.embed = msg.embed.setImage("attachment://"+fname);
+    }
+    return msg;
 }
 
 const title = (name, hp, mhp) => {
