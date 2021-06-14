@@ -12,7 +12,10 @@ const htmlp   = require('node-html-parser');
 const mpath = "./modules/";
 
 exports.init = (state, token, mods = []) => {
+    
+    const client  = new Discord.Client();
     state = {
+        client: client,
         prefix: consts.env.prefix ?? "%",
         ws: {},
         cooldown: {
@@ -25,7 +28,6 @@ exports.init = (state, token, mods = []) => {
             }
         },
     };
-    const client  = new Discord.Client();
 
     let modules = [];
 

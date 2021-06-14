@@ -83,6 +83,9 @@ const db_exp_differ = (id, diff) => async (db) => {
     will first connect to db, then execute 2 functions above, and
     finally close the connection if succesful.
  */
+exports.set_arena = async (mob) => db_do(db_set(arenatb, "alive", { alive: mob }));
+exports.get_arena = async () => db_do(db_get(arenatb, "alive"));
+//
 exports.get_items = async () => db_do(db_get_all(itemstb));
 exports.get_levels = async () => db_do(db_get_all(levelstb,x=>x.sort({ lvl : 1 })));
 exports.get_item = async (id) => db_do(db_get(itemstb, id, "Num"));

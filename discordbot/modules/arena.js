@@ -1,19 +1,32 @@
-const tools = require("../tools.js");
+const tools  = require("../tools.js");
 const parser = require("./../cmdparser.js");
+const db     = require("./../mongodb.js");
 
 const Discord = require("discord.js");
 
+let fetch_start = new Date();
 let state = undefined;
-exports.init = (refState) => state = refState;
+exports.init = async (refState) => {
+    state = refState;
+    fetch_start = new Date();
+    try {
+        const json = (await db.get_arena()).alive;
+        alive = JSON.parse(json);
+    } catch {
+        alive = undefined;
+    } finally {
+        fetch_start = undefined;
+    }
+}
 exports.on_event = async (evt, args) => {
     switch (evt) {
 
     case 'message':
         const msg = args.msg;
-
+        
         // test if this message contains emoji and spawns mega emoji
         if ((match = msg.content.match(/<:([A-z]+):([0-9]+)>/))
-          && Math.random() < spawn_rate
+        && Math.random() < spawn_rate
             ) {
             create(msg, match[1], match[2], 10000);
         }
@@ -31,12 +44,16 @@ exports.on_event = async (evt, args) => {
                 return;
             }
         }
+
         // if not admin return
         if (groups.admins.includes(msg.author.id) == false)
             return;
 
         // gamemaster commands for arena
         if (!parser.is(msg, "gm_")) return;
+        if (fetch_start) parser.send_tqswarn(msg, "alive array is still being fetched. "
+            + `(start=${fetch_start}, now=${new Date()}`);
+
         if (parser.is(msg, "arena")) {
             delete_messages = !delete_messages;
             msg.channel.send(`Arenaya atilan tum mesajlari sil: ${delete_messages}`);
@@ -65,7 +82,7 @@ exports.on_event = async (evt, args) => {
 
 
 const display_hits = 20;
-let alive = [];
+let alive = undefined;
 let purge_list = [];
 let delete_messages = true;
 let spawn_rate = .01;
@@ -73,10 +90,18 @@ let spawn_rate = .01;
 
 
 let buff = 1;
-let frequency = 5;
+let frequency = 3;
 // Anlik sunucuda en fazla exp 148k, yaklasik 0.6~ + 1 -> 1.6 kat fazla
 // damage veriyor bu formul
 const getdmg = (xp) => Math.log(1*xp/200000+1);
+
+// following method is called everywhere where `alive` 
+// variable is updated, basically updates the db in case
+// any accidental shutdowns bot on heroku, whenever bot gets
+// live, fetches the recent state of arena from db
+const syncdb_alive = async () => {
+    tools.toggler_async(async () => db.set_arena(JSON.stringify(alive)), "syncdb_alive", frequency*1000);
+}
 
 need_update = false;
 const toggle_update = (f) => {
@@ -91,43 +116,47 @@ const toggle_purge = (msg) => {
         if (purge_list.length!=0) toggle_purge(msg);
     }, "arena_delete", frequency*1000);
 }
-const create = (msg, name, id, hp) => {
-    if (alive.length>0) return null;
+const create = (msg, name, eid, hp) => {
+    if (alive) return null;
     ch = msg.guild.channels.cache.get(cid.arena);
-    if (ch) ch.send(embed(name, id, hp, hp)).then((msg) => {
-        alive.push({
-            name: name, id: id, msg: msg, mhp: hp, hp: hp, dmgdone: {}, lasthits: [],
-        });
-    });
+    if (ch) ch.send(embed(name, eid, hp, hp)).then((msg) => {
+        alive = {
+            name: name, eid: eid, msg: msg, mhp: hp, hp: hp, dmgdone: {}, lasthits: [],
+        };
+        syncdb_alive();
+    })
+    else throw "die";
 }
 const hit = async (msg, gm=false,gmdmg=0) => {
-    if (alive.length==0) return;
+    if (!alive) return;
     dmg=(.3+Math.random()*.7)*400*buff|0;
     if (gm) dmg=gmdmg|0;
-    monster=alive[0];
     uname=msg.author.username;
-    if (monster.dmgdone[uname])
-        monster.dmgdone[uname] += dmg;
+    if (alive.dmgdone[uname])
+        alive.dmgdone[uname] += dmg;
     else
-        monster.dmgdone[uname] = dmg;
-    monster.hp-=dmg;
-    if (monster.hp <= 0) {
-        monster.timestamp=0;
-        alive=[];
+        alive.dmgdone[uname] = dmg;
+    alive.hp-=dmg;
+    if (alive.hp <= 0) {
+        alive.hp = 0;
+        alive.timestamp=0;
     }
-    if (monster.lasthits.length==display_hits)
-        monster.lasthits.shift();
-    monster.lasthits.push('`'+uname+': '+dmg+'`');
+    if (alive.lasthits.length==display_hits)
+        alive.lasthits.shift();
+    alive.lasthits.push('`'+uname+': '+dmg+'`');
+    const m=alive;
     toggle_update(async ()=> {
         //update
-        sorted=Object.entries(monster.dmgdone).sort((a,b)=>b[1]-a[1])
-        m=monster;
-        const newmsg=embed(m.name,m.id,m.hp,m.mhp,m.lasthits,sorted.splice(0,3),sorted.splice(-1,1)[0]);
-        if (m.msg.deleted) m.msg = await msg.guild.channels.cache.get(cid.arena).send(newmsg);
-        else m.msg.edit(newmsg);
+        sorted=Object.entries(m.dmgdone).sort((a,b)=>b[1]-a[1]);
+        const newmsg=embed(m.name,m.eid,m.hp,m.mhp,m.lasthits,sorted.splice(0,3),sorted.splice(-1,1)[0]);
+        const mmsg = (await state.client.channels.cache.get(m.msg.channelID).messages.fetch(m.msg.id));
+        if (mmsg.deleted) m.msg = await msg.guild.channels.cache.get(cid.arena).send(newmsg);
+        else mmsg.edit(newmsg);
     })
+    if (alive.hp <= 0) alive=undefined;
+    syncdb_alive();
 }
-const embed = (name, id, hp, mhp, lasthits=[], top=[], last='') => {
+const embed = (name, eid, hp, mhp, lasthits=[], top=[], last='') => {
 
     // boyle yapmayinca bir sebepten dolayi calismiyordu belki de simdi t1..t4
     // yerine karsiliklarini yazinca calisabilir.
@@ -143,7 +172,7 @@ const embed = (name, id, hp, mhp, lasthits=[], top=[], last='') => {
         .addField('`İkinci`',  t2[0]+(top[1]?`\`\`\`md\n# ${t2[1]} (%${(t2[1]/mhp*100)|0})\`\`\``:''), true)
         .addField('`Üçüncü`',  t3[0]+(top[2]?`\`\`\`md\n# ${t3[1]} (%${(t3[1]/mhp*100)|0})\`\`\``:''), true)
         //.addField('Sonuncu', t4, true) bu calismiyor anlamadim.
-        .setThumbnail(`https://cdn.discordapp.com/emojis/${id}.png`)
+        .setThumbnail(`https://cdn.discordapp.com/emojis/${eid}.png`)
         .setTimestamp()
         .setFooter('%vur komutu ile düşmana saldır.')// Daha fazla hasar vermek için saldırını emojiler ile desteklendir!');
     };
