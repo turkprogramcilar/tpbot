@@ -50,7 +50,7 @@ const render_inventory = async (inventory, iconspath, bgfile) => {
     // ih= inventory height, gw= gear width, gh= gear height
     const l=45, oix=0, oiy=1, ogx=7, ogy=0, iw=7, ih=4, gw=3, gh=5, LIMIT=iw*ih;
     const bg = await Jimp.read(iconspath+'/'+bgfile);
-    const icons = await Promise.all(inventory.slice(0,LIMIT).map(async (id,i) => {
+    const icons = await Promise.all(inventory ?? [].slice(0,LIMIT).map(async (id,i) => {
         let im = await Jimp.read(await tools.guard_iconpath(id));
         return { "i": i, "im": im };
     }));
