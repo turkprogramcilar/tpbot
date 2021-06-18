@@ -6,7 +6,7 @@ const fs    = require('fs').promises;
 const connstr = consts.env.dbconnstr;
 const push_fq = 60*1000; // push frequency
 
-const db_do = async (f) => {
+const db_do = async (f, getf=x=>x) => {
     const client = new MongoClient(connstr, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
@@ -14,7 +14,7 @@ const db_do = async (f) => {
     try {
         await client.connect();
         const db = client.db(dbname);
-        return await f(db);
+        return getf(await f(db));
     } catch (err) {
         console.error(err);
     } finally {
@@ -83,8 +83,8 @@ const db_exp_differ = (id, diff) => async (db) => {
     will first connect to db, then execute 2 functions above, and
     finally close the connection if succesful.
  */
-exports.set_arena = async (mob) => db_do(db_set(arenatb, "alive", { alive: mob }));
-exports.get_arena = async () => db_do(db_get(arenatb, "alive"));
+exports.set_module_state = async (module, json) => db_do(db_set(moduletb, module, { module: json }));
+exports.get_module_state = async (module) => db_do(db_get(moduletb, module), x=>x.json);
 //
 exports.get_items = async () => db_do(db_get_all(itemstb));
 exports.get_levels = async () => db_do(db_get_all(levelstb,x=>x.sort({ lvl : 1 })));

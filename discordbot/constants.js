@@ -100,7 +100,7 @@ dbname  = "mongodb_tp"
 userstb = "users"
 itemstb = "items"
 levelstb= "levels"
-arenatb = "arena"
+moduletb= "module_states"
 // tbs that have static data (mostly game data)
 alltb   = [itemstb, levelstb]
 //dbname = "test1"

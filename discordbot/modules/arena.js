@@ -25,7 +25,7 @@ exports.init = async (refState) => {
     state = refState;
     fetch_start = new Date();
     try {
-        const json = (await db.get_arena()).alive;
+        const json = (await db.get_module_state("arena"));
         alive = JSON.parse(json);
     } catch {
         alive = undefined;
@@ -115,7 +115,7 @@ const getdmg = (xp) => Math.log(1*xp/200000+1);
 // any accidental shutdowns bot on heroku, whenever bot gets
 // live, fetches the recent state of arena from db
 const syncdb_alive = async () => {
-    tools.toggler_async(async () => db.set_arena(JSON.stringify(alive)), "syncdb_alive", frequency*1000);
+    tools.toggler_async(async () => db.set_module_state("arena", JSON.stringify(alive)), "syncdb_alive", frequency*1000);
 }
 
 need_update = false;
