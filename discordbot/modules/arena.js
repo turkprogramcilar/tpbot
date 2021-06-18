@@ -120,7 +120,7 @@ const getdmg = (xp) => Math.log(1*xp/200000+1);
 // any accidental shutdowns bot on heroku, whenever bot gets
 // live, fetches the recent state of arena from db
 const syncdb_alive = async () => {
-    tools.sync_module("arena", alive, frequency*1000);
+    tools.sync_module("arena", ()=>alive, frequency*1000);
 }
 
 need_update = false;

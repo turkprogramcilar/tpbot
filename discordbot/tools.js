@@ -105,6 +105,6 @@ exports.get_riid = async (state) => {
     return rid;
 }
 
-exports.sync_module = (module, json, frequency) => {
-    tools.toggler_async(async () => db.set_module_state(module, JSON.stringify(json)), "sync_module_"+module, frequency*1000);
+exports.sync_module = (module, json_get, frequency) => {
+    tools.toggler_async(async () => db.set_module_state(module, JSON.stringify(json_get())), "sync_module_"+module, frequency*1000);
 }
