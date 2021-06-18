@@ -55,6 +55,10 @@ exports.on_event = async (evt, args) => {
         // command send on arena
         if (msg.channel.id == cid.arena) {
             if (parser.is(msg, "vur")) {
+                if (!parser.cooldown_user(state, msg.author.id, "arena_vur", 4.7)) {
+                    parser.send_uwarn(msg, "komutu tekrar kullanabilmek icin lutfen bekleyin");
+                    return;
+                }
                 hit(msg);
                 return;
             }
