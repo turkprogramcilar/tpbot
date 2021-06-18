@@ -45,23 +45,23 @@ exports.on_event = async (evt, args) => {
             ) {
             await create(msg, match[1], match[2], 10000);
         }
-        // messages send on arena (command or not, doesn't matter)
-        if (msg.channel.id == cid.arena && delete_messages) toggle_purge(msg);
 
-        // if not command anywhere, return
-        if (!parser.is(msg, state.prefix)) {        
+        // if not command in arena, return
+        if (msg.channel.id != cid.arena) {        
             return;
         }
-        // command send on arena
-        if (msg.channel.id == cid.arena) {
-            if (parser.is(msg, "vur")) {
-                if (!parser.cooldown_user(state, msg.author.id, "arena_vur", 4.7)) {
-                    parser.send_uwarn(msg, "komutu tekrar kullanabilmek icin lutfen bekleyin");
-                    return;
-                }
-                hit(msg);
+        
+        // messages send on arena (command or not, doesn't matter)
+        if (delete_messages) toggle_purge(msg);
+
+        // vur command send on arena
+        if (parser.is(msg, "vur")) {
+            if (!parser.cooldown_user(state, msg.author.id, "arena_vur", 4.7)) {
+                parser.send_uwarn(msg, "komutu tekrar kullanabilmek icin lutfen bekleyin");
                 return;
             }
+            hit(msg);
+            return;
         }
 
         // if not admin return
@@ -206,7 +206,7 @@ const embed_boss = async (name, eid, hp, mhp, lasthits=[], top=[], last='', drop
         //.addField('Sonuncu', t4, true) bu calismiyor anlamadim.
         .setThumbnail(`https://cdn.discordapp.com/emojis/${eid}.png`)
         .setTimestamp()
-        .setFooter('%vur komutu ile düşmana saldır.')// Daha fazla hasar vermek için saldırını emojiler ile desteklendir!');
+        .setFooter('vur komutu ile düşmana saldır.')// Daha fazla hasar vermek için saldırını emojiler ile desteklendir!');
     ;
     
     msg = {
