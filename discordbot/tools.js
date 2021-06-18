@@ -104,3 +104,7 @@ exports.get_riid = async (state) => {
     const rid = (i=>i[Math.floor(Math.random()*i.length)])(items.map(x=>x["Num"]));
     return rid;
 }
+
+exports.sync_module = (module, json, frequency) => {
+    tools.toggler_async(async () => db.set_module_state(module, JSON.stringify(json)), "sync_module_"+module, frequency*1000);
+}
