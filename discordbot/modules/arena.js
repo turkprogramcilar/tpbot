@@ -147,10 +147,11 @@ const hit = async (msg, gm=false,gmdmg=0) => {
     dmg=(.3+Math.random()*.7)*400*buff|0;
     if (gm) dmg=gmdmg|0;
     uname=msg.author.username;
-    if (alive.dmgdone[uname])
-        alive.dmgdone[uname] += dmg;
+    uid=msg.author.id;
+    if (alive.dmgdone[uid])
+        alive.dmgdone[uid].dmg += dmg;
     else
-        alive.dmgdone[uname] = dmg;
+        alive.dmgdone[uid] = {name: uname, "dmg": dmg};
     alive.hp-=dmg;
     if (alive.hp <= 0) {
         alive.hp = 0;
@@ -162,15 +163,22 @@ const hit = async (msg, gm=false,gmdmg=0) => {
     const m=alive;
     toggle_update(async ()=> {
         //update
-        sorted=Object.entries(m.dmgdone).sort((a,b)=>b[1]-a[1]);
-        const newmsg=await embed_boss(m.name,m.eid,m.hp,m.mhp,m.lasthits,sorted.splice(0,3),sorted.splice(-1,1)[0]);
+        const sorted  = Object.entries(m.dmgdone).sort((a,b)=>b[1].dmg-a[1].dmg);
+        const top3    = sorted.splice(0,3);
+        const drops   = m.hp > 0 ? [] : await Promise.all(top3.map(x=>tools.get_riid(state)));
+        const newmsg  = await embed_boss(m.name,m.eid,m.hp,m.mhp,
+                                         m.lasthits,top3,sorted.splice(-1,1)[0],
+                                         drops);
         const channel = (await state.client.channels.fetch(m.msg.channelID ?? m.msg.channel.id));
-        const mmsg = await channel.messages.fetch(m.msg.id);
-        if (mmsg.deleted) m.msg = await channel.send(newmsg);
+        const mmsg    =  await channel.messages.fetch(m.msg.id);
+        if (mmsg.deleted && m.hp > 0) m.msg = await channel.send(newmsg);
         else {
             if (m.hp <= 0) {
                 await mmsg.delete();
-                await channel.send(newmsg);
+                const sendmsg = channel.send(newmsg);
+                let promises = top3.map((x,i)=>db.give_item(x[0], drops[i]));
+                promises.push(sendmsg);
+                await Promise.all(promises);
             }
             else mmsg.edit(newmsg);
         }
@@ -178,19 +186,19 @@ const hit = async (msg, gm=false,gmdmg=0) => {
     if (alive.hp <= 0) alive=undefined;
     syncdb_alive();
 }
-const embed_boss = async (name, eid, hp, mhp, lasthits=[], top=[], last='') => {
+const embed_boss = async (name, eid, hp, mhp, lasthits=[], top=[], last='', drops=[]) => {
 
     // boyle yapmayinca bir sebepten dolayi calismiyordu belki de simdi t1..t4
     // yerine karsiliklarini yazinca calisabilir.
-    t1=top[0]??"-"; t2=top[1]??"-"; t3=top[2]??"-"; t4=last??"-";
+    t1=top[0]; t2=top[1]; t3=top[2]; t4=last;
 
     let embed = new Discord.MessageEmbed()
         .setColor('#'+tools.hsv2rgbh(hp/mhp/3,1,1))
         .setTitle(title(name, hp,mhp))
         .setDescription(`\`\`\`diff\n+ ${hp}/${mhp} (%${(hp/mhp*100)|0})\`\`\``)
-        .addField('`Birinci`', t1[0]+(top[0]?`\`\`\`md\n# ${t1[1]} (%${(t1[1]/mhp*100)|0})\`\`\``:''), true)
-        .addField('`İkinci`',  t2[0]+(top[1]?`\`\`\`md\n# ${t2[1]} (%${(t2[1]/mhp*100)|0})\`\`\``:''), true)
-        .addField('`Üçüncü`',  t3[0]+(top[2]?`\`\`\`md\n# ${t3[1]} (%${(t3[1]/mhp*100)|0})\`\`\``:''), true)
+        .addField('`Birinci`', !t1?"-":t1[1]?.name+(`\`\`\`md\n# ${t1[1].dmg} (%${(t1[1].dmg/mhp*100)|0})\`\`\``), true)
+        .addField('`İkinci`',  !t2?"-":t2[1]?.name+(`\`\`\`md\n# ${t2[1].dmg} (%${(t2[1].dmg/mhp*100)|0})\`\`\``), true)
+        .addField('`Üçüncü`',  !t3?"-":t3[1]?.name+(`\`\`\`md\n# ${t3[1].dmg} (%${(t3[1].dmg/mhp*100)|0})\`\`\``), true)
         //.addField('Sonuncu', t4, true) bu calismiyor anlamadim.
         .setThumbnail(`https://cdn.discordapp.com/emojis/${eid}.png`)
         .setTimestamp()
@@ -205,8 +213,8 @@ const embed_boss = async (name, eid, hp, mhp, lasthits=[], top=[], last='') => {
     if (hp==0 || true) {
         const fname = "arenadrop.png";
         msg.files = [{
-            attachment: (hp==0 
-                ? await render_drop(await Promise.all([1,2,3].map(x=>tools.get_riid(state))),uipath,fname)
+            attachment: (hp<=0 
+                ? await render_drop(drops,uipath,fname)
                 : await fs.readFile(uipath+"/"+fname)),
             name: fname
         }]

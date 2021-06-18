@@ -100,7 +100,7 @@ dbname  = "mongodb_tp"
 userstb = "users"
 itemstb = "items"
 levelstb= "levels"
-moduletb= "module_states"
+moduletb= "module_states" + (consts.env.debug ? "_debug" : "");
 // tbs that have static data (mostly game data)
 alltb   = [itemstb, levelstb]
 //dbname = "test1"

@@ -83,7 +83,7 @@ const db_exp_differ = (id, diff) => async (db) => {
     will first connect to db, then execute 2 functions above, and
     finally close the connection if succesful.
  */
-exports.set_module_state = async (module, json) => db_do(db_set(moduletb, module, { module: json }));
+exports.set_module_state = async (module, json) => db_do(db_set(moduletb, module, { "json": json }));
 exports.get_module_state = async (module) => db_do(db_get(moduletb, module), x=>x.json);
 //
 exports.get_items = async () => db_do(db_get_all(itemstb));
