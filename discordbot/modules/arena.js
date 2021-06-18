@@ -57,7 +57,8 @@ exports.on_event = async (evt, args) => {
         // vur command send on arena
         if (parser.is(msg, "vur")) {
             if (!parser.cooldown_user(state, msg.author.id, "arena_vur", 4.7)) {
-                parser.send_uwarn(msg, "komutu tekrar kullanabilmek icin lutfen bekleyin");
+                const reply = await parser.send_uwarn(msg, "komutu tekrar kullanabilmek icin lutfen bekleyin", 2);
+                toggle_purge(reply);
                 return;
             }
             hit(msg);
