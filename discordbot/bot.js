@@ -65,23 +65,22 @@ exports.init = (state, token, mods = []) => {
         if (!parser.is(msg, state.prefix)) {        
             return;
         }
+        // beyond is administrative or feature previews only, 
+        // if not admin return
+        if (groups.admins.includes(msg.author.id) == false)
+            return;
 
         if (parser.is(msg, "echo ")) {
             if (msg.content.length>0)
                 msg.channel.send(msg.content);
             return;
         }
-        if (parser.is(msg, "echoq ")) {
+        else if (parser.is(msg, "echoq ")) {
             if (msg.content.length>0)
                 msg.channel.send(parser.tqs(msg.content));
             return;
         }
-        // beyond is administrative or feature previews only, 
-        // if not admin return
-        if (groups.admins.includes(msg.author.id) == false)
-            return;
-
-        if (parser.is(msg, "test ")) {
+        else if (parser.is(msg, "test ")) {
             const sent = await msg.channel.send("...");
             const exp  = await db.get_exp(msg.content);
             await sent.edit(exp);
@@ -109,13 +108,8 @@ exports.init = (state, token, mods = []) => {
             });
             (await process_msg).edit("Tamamlandi... Mesaj linki (kim ugrascak yapmaya atti iste asagida).");
             return
-        }
-        // beyond is admin + fix prefix,
-        if (!parser.is(msg, "sudo "))
-            return;
-
-            
-        if (parser.is(msg, "version")) {
+        }            
+        else if (parser.is(msg, "version")) {
             const sha1=consts.env.version;
             if (!sha1) {
                 await parser.send_awarn(msg, "commit sha1 for version is undefined");
@@ -142,19 +136,13 @@ exports.init = (state, token, mods = []) => {
             );
             return;
         }
-
-        if (parser.is(msg, "install")) {
+        else if (parser.is(msg, "install")) {
             const res_arr = await db.install_db();
             msg.channel.send(parser.json_pretty(res_arr));
             return;
         }
-        /*else if (parser.is(msg, "fixids")) {
-            await db.convert_id(itemstb, "Num");
-            return;
-        }*/
-
         // syncs channel permssions for all channels
-        if (parser.is(msg, "sync")) {
+        else if (parser.is(msg, "sync")) {
             // print all categories
             msg.guild.channels.cache.each(x=>{
                 if (x.type == "text" && x.parent) {
