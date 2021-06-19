@@ -100,9 +100,10 @@ dbname  = "mongodb_tp"
 userstb = "users"
 itemstb = "items"
 levelstb= "levels"
+cardstb = "cards"
 moduletb= "module_states" + (consts.env.debug ? "_debug" : "");
-// tbs that have static data (mostly game data)
-alltb   = [itemstb, levelstb]
+// tbs that have static data (mostly game data) to be installed
+alltb   = [itemstb, levelstb, cardstb]
 //dbname = "test1"
 
 iconpath = './discordbot/icons';
