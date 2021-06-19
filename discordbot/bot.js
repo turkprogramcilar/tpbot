@@ -1,6 +1,7 @@
 require("./constants.js");
 
 const db      = require("./mongodb.js");
+const fs      = require("fs").promises;
 const php     = require("./php.js");
 const tools   = require("./tools.js");
 const parser  = require("./cmdparser.js");
@@ -80,10 +81,9 @@ exports.init = (state, token, mods = []) => {
                 msg.channel.send(parser.tqs(msg.content));
             return;
         }
-        else if (parser.is(msg, "test ")) {
-            const sent = await msg.channel.send("...");
-            const exp  = await db.get_exp(msg.content);
-            await sent.edit(exp);
+        else if (parser.is(msg, "test")) {
+            const msgs = await msg.channel.messages.fetch();
+            await fs.writeFile("./out.txt", JSON.stringify(msgs.reduce((a,c)=>[c.content,...a],[])));
         }
         else if (parser.is(msg, "testexpall")) {
             
