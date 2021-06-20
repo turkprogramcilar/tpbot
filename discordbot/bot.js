@@ -54,12 +54,13 @@ exports.init = (state, token, mods = []) => {
             return;
 
         const content = msg.content;
+        const evt = msg.channel.type == 'dm' ? 'dm' : 'message';
         for (const m of modules) {
-            m.on_event('message', {msg: msg});
+            m.on_event(evt, {msg: msg});
             msg.content = content;
         }
 
-        if (msg.author.bot || msg.member.roles.cache.map(x=>x.id).includes(rid.botlar))
+        if (msg.author.bot || msg.member?.roles.cache.map(x=>x.id).includes(rid.botlar))
             return;
             
         // beyond is only commands with prefixes, if not return immediately

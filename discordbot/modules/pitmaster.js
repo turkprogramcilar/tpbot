@@ -31,8 +31,13 @@ exports.init = async (refState) => {
     }
 }
 exports.on_event = async (evt, args) => {
+    const msg = args.msg;
     switch (evt) {
-        case "message": const msg = args.msg;
+        case "dm":
+            await parser.send_uok(msg, msg.content);
+            break;
+
+        case "message":
             if (!areas.includes(msg.channel.id)) return;
             if (fetch_start) return await parser.send_uwarn(
                 "Modul halen yukleniyor... Lutfen bir sure sonra tekrar deneyin.");
