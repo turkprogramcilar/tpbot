@@ -11,9 +11,34 @@ const { default: parse } = require("node-html-parser");
 const parser = require("../cmdparser.js");
 const tools  = require("../tools.js");
 const db     = require("../mongodb.js");
+const Discord = require("discord.js");
+
+// @TODO: move into db? perhaps?
+const rarity = {
+    1: "Yaygın",
+    2: "Güzide",
+    3: "Esrarengiz",
+    4: "Destansı",
+    5: "Destansı",
+}
+const rarity_colors = {
+    1: "586e75",
+    2: "839496",
+    3: "2aa198",
+    4: "b58900",
+    5: "cb4b16"
+}
+const rarity_formats = {
+    1: "brainfuck",
+    2: "",
+    3: "yaml",
+    4: "fix",
+    5: "css"
+}
 
 let fetch_start = new Date();
 let state = undefined;
+// ms: module state
 let ms = {
     waiting: {},
     pairing: {},
@@ -38,13 +63,32 @@ exports.on_event = async (evt, args) => {
             break;
 
         case "message":
+
+            const slowmode = 1;
+            if (parser.is(msg, state.prefix+"kart ") 
+            && parser.cooldown_user(state, msg.author.id, "pitmaster_kart", slowmode)) 
+                parser.u_arg(msg, async id => {
+                //hardcoded card limitation: @TODO fix this
+                if (id > 0 && id <= 16) {
+                    const cards = await tools.ensure(state, cardstb, db.get_cards);
+                    const card  = cards.filter(x=>x.id==id)[0];
+                    await msg.channel.send(new Discord.MessageEmbed()
+                        .setThumbnail(card.link)
+                        .setTitle(`\`${card.title}\``)
+                        .setDescription(parser.tqs(`[${card.description}]`, rarity_formats[card.rarity]))
+                        .addField(`\`Kart cinsi: ${rarity[card.rarity]}\``, `No: ${card.id}`)
+                        .setColor(rarity_colors[card.rarity])
+                    ); 
+                }
+            });
+
+            // only lobby and game channels
             if (!areas.includes(msg.channel.id)) return;
             if (fetch_start) return await parser.send_uwarn(
                 "Modul halen yukleniyor... Lutfen bir sure sonra tekrar deneyin.");
 
             if (!parser.is(msg, state.prefix)) return;
 
-            const slowmode = 1;
             if (!parser.cooldown_user(state, msg.author.id, "pitmaster_oyun", slowmode))
                 return await parser.send_uwarn(msg, `komut kullanabilmek icin lutfen ${slowmode} saniye bekleyin`);
         
@@ -52,7 +96,7 @@ exports.on_event = async (evt, args) => {
             const aid = msg.author.id;
             const aname = msg.author.username;
             if (parser.is(msg, "kaybet")) {
-                // op= other player, ap= author player (msg author)
+                // op= other player, ap= author player (msg author), gid= game id (also the room id = channel id)
                 let gid, ap, op;
                 for (const [g, p] of Object.entries(ms.games)) {
                     if (p.p1 == aid) {
@@ -152,13 +196,14 @@ const try_start_game = async (p1, p2, msg) => {
         const room = free[0];
         try { 
             await add_roles(rooms[room].rid, [p1, p2], msg.guild);
-            ms.games[room] = { p1: p1, p2: p2 };
+            ms.games[room] = { p1: p1, p2: p2, guid: msg.guild.id };
             delete ms.pairing[p1];
             // at this point two users should have reacted so their info must
             // be availabe in cache...
             const p1name = msg.guild.members.cache.get(p1).user.username;
             const p2name = msg.guild.members.cache.get(p2).user.username;
             await parser.send_uok(msg, `[${p1name}] vs [${p2name}] ... `+"Oyun basliyor!");
+            await init_game(room);
         } catch(err) {
             console.error(err)
             await del_roles(rooms[room].rid, [p1, p2], msg.guild);
@@ -169,6 +214,23 @@ const try_start_game = async (p1, p2, msg) => {
     else {
         return false;
     }
+}
+const get_user = async (guid, pid) => 
+    (await (await state.client.guilds.fetch(guid)).members.fetch(pid)).user;
+const send_msg = async (guid, gid, content) => {
+    const guild = await state.client.guilds.fetch(guid);
+    const channel = await guild.channels.cache.get(gid);
+    return await parser.send_uok(new Discord.Message(state.client, null, channel), content);
+}
+
+const init_game = async (gid) => {
+
+    const g = ms.games[gid];
+    const un1 = (await get_user(g.guid, g.p1)).username;
+    const un2 = (await get_user(g.guid, g.p2)).username;
+    g.un1 = un1; g.un2 = un2;
+    await send_msg(g.guid, gid, "Mucadele basliyor. Round 1 "+`${un1} vs ${un2}`);
+
 }
 const finish_game = async (gid, rid, ps, msg, notice) => {
     
@@ -182,4 +244,4 @@ const finish_game = async (gid, rid, ps, msg, notice) => {
     }
     sync_module();
 }
-const sync_module = async () => tools.sync_module("pitmaster", ()=>ms, 5);
+const sync_module = async () => tools.sync_module("pitmaster", ()=>ms, 1);

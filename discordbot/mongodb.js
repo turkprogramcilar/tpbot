@@ -86,6 +86,7 @@ const db_exp_differ = (id, diff) => async (db) => {
 exports.set_module_state = async (module, json) => db_do(db_set(moduletb, module, { "json": json }));
 exports.get_module_state = async (module) => db_do(db_get(moduletb, module), x=>x.json);
 //
+exports.get_cards = async () => db_do(db_get_all(cardstb));
 exports.get_items = async () => db_do(db_get_all(itemstb));
 exports.get_levels = async () => db_do(db_get_all(levelstb,x=>x.sort({ lvl : 1 })));
 exports.get_item = async (id) => db_do(db_get(itemstb, id, "Num"));
