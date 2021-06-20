@@ -35,6 +35,7 @@ const rarity_formats = {
     4: "fix",
     5: "css"
 }
+const slowmode = 1; //@TODO -> 5
 
 let fetch_start = new Date();
 let state = undefined;
@@ -59,35 +60,19 @@ exports.on_event = async (evt, args) => {
     const msg = args.msg;
     switch (evt) {
         case "dm":
-            await parser.send_uok(msg, msg.content);
+            if (parser.is(msg, "kart ")) return await cmd_kart(msg);
             break;
 
         case "message":
 
-            const slowmode = 1;
-            if (parser.is(msg, state.prefix+"kart ") 
-            && parser.cooldown_user(state, msg.author.id, "pitmaster_kart", slowmode)) 
-                parser.u_arg(msg, async id => {
-                //hardcoded card limitation: @TODO fix this
-                if (id > 0 && id <= 16) {
-                    const cards = await tools.ensure(state, cardstb, db.get_cards);
-                    const card  = cards.filter(x=>x.id==id)[0];
-                    await msg.channel.send(new Discord.MessageEmbed()
-                        .setThumbnail(card.link)
-                        .setTitle(`\`${card.title}\``)
-                        .setDescription(parser.tqs(`[${card.description}]`, rarity_formats[card.rarity]))
-                        .addField(`\`Kart cinsi: ${rarity[card.rarity]}\``, `No: ${card.id}`)
-                        .setColor(rarity_colors[card.rarity])
-                    ); 
-                }
-            });
+            if (!parser.is(msg, state.prefix)) return;
 
-            // only lobby and game channels
-            if (!areas.includes(msg.channel.id)) return;
             if (fetch_start) return await parser.send_uwarn(
                 "Modul halen yukleniyor... Lutfen bir sure sonra tekrar deneyin.");
 
-            if (!parser.is(msg, state.prefix)) return;
+            if (parser.is(msg, "kart ")) return await cmd_kart(msg);
+
+            if (!areas.includes(msg.channel.id)) return;
 
             if (!parser.cooldown_user(state, msg.author.id, "pitmaster_oyun", slowmode))
                 return await parser.send_uwarn(msg, `komut kullanabilmek icin lutfen ${slowmode} saniye bekleyin`);
@@ -180,6 +165,24 @@ exports.on_event = async (evt, args) => {
         break;
     }
 }
+const cmd_kart = async (msg) => {
+    if (parser.cooldown_user(state, msg.author.id, "pitmaster_kart", slowmode)) parser.u_arg(msg, async id => {
+        //hardcoded card limitation: @TODO fix this
+        if (id > 0 && id <= 16) {
+            await msg.channel.send(await card_embed(id)); 
+        }
+    });
+}
+const card_embed = async (id) => {
+    const cards = await tools.ensure(state, cardstb, db.get_cards);
+    const card  = cards.filter(x=>x.id==id)[0];
+    return new Discord.MessageEmbed()
+    .setThumbnail(card.link)
+    .setTitle(`\`${card.title}\``)
+    .setDescription(parser.tqs(`[${card.description}]`, rarity_formats[card.rarity]))
+    .addField(`\`Kart cinsi: ${rarity[card.rarity]}\``, `No: ${card.id}`)
+    .setColor(rarity_colors[card.rarity]);
+}
 const add_roles = async (rid, ps, guild) => {
     const role = guild.roles.cache.get(rid);
     for (const p of ps) (await guild.members.fetch(p)).roles.add(role);
@@ -222,6 +225,10 @@ const send_msg = async (guid, gid, content) => {
     const channel = await guild.channels.cache.get(gid);
     return await parser.send_uok(new Discord.Message(state.client, null, channel), content);
 }
+const send_dm = async (uid, content) => {
+    const user = await state.client.users.fetch(uid);
+    await user.send(content);
+}
 
 const init_game = async (gid) => {
 
@@ -231,6 +238,20 @@ const init_game = async (gid) => {
     g.un1 = un1; g.un2 = un2;
     await send_msg(g.guid, gid, "Mucadele basliyor. Round 1 "+`${un1} vs ${un2}`);
 
+    const cardslen = 16; // @TODO hardcoded length
+    const first = 5;
+    const players = [g.p1, g.p2];
+    let promises = [];
+    g.players = [];
+    for (const p of players) {
+        const len = g.players.push({
+            pid: p,
+            hand: [...Array(first).keys()].map(x=>(Math.random()*cardslen|0)+1)
+        });
+        const handp = Promise.all(g.players[len-1].hand.map(async id => await send_dm(p, await card_embed(id))));
+        promises.push(handp);
+    }
+    await Promise.all(promises);
 }
 const finish_game = async (gid, rid, ps, msg, notice) => {
     
