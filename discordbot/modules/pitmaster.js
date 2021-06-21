@@ -82,17 +82,8 @@ exports.on_event = async (evt, args) => {
             const aname = msg.author.username;
             if (parser.is(msg, "kaybet")) {
                 // op= other player, ap= author player (msg author), gid= game id (also the room id = channel id)
-                let gid, ap, op;
-                for (const [g, p] of Object.entries(ms.games)) {
-                    if (p.p1 == aid) {
-                        gid = g; ap = p.p1; op = p.p2;
-                        break;
-                    }
-                    else if (p.p2 == aid) {
-                        gid = g; ap = p.p2; op = p.p1;
-                        break;
-                    }
-                }
+                const {gid, ap, op} = find_game(aid);
+                
                 if (gid) {
                     const oname = (await msg.guild.members.fetch(op)).user.username;
                     await finish_game(gid, rooms[gid].rid, [ap, op], msg, `${aname}, rakibi ${oname} karsisinda pes etti.`);
@@ -103,65 +94,71 @@ exports.on_event = async (evt, args) => {
                 return;
             } 
             
-            if (msg.channel.id == local) {
-                if (parser.is(msg, "oyun")) parser.mention(msg, async oid => {
-                    if (false && aid==oid)
-                        return await parser.send_uwarn(msg, "Kendi kendine oyun oynamaya son! Yanlizliga son! Artik bu sunucuda bir cok Turk programci ile arkadas olabilirsin. Onlarla oyun oynamaya ne dersin?");
-                    const session = ms.pairing[aid];
-                    if (session) return await parser.send_uwarn(msg, 
-                        `${(await msg.guild.members.fetch(session.oid)).user.username}, oyun teklifinizi degerlendirmedi. Baskasi ile yeni oyun baslatmak icin once iptal etmeniz gerekiyor. (%iptal)`);
-                    else {
-                        const game = Object.entries(ms.games).filter(x=>x[1].p1==aid||x[1].p2==aid)[0];
-                        if (game) {
-                            const oid = game[1].p1 == aid ? game[1].p2 : game[1].p1;
-                            const oname = (await msg.guild.members.fetch(oid)).user.username;
-                            await parser.send_uwarn(msg, `${oname} oyuncusu ile halen surmekte olan oyununuz mevcut.`);
-                        }
-                        else {
-                            let m = "";
-                            ms.pairing[aid]={
-                                oid: oid
-                            }; sync_module();
-                            m = "Rakibinizin oyun teklifinizi kabul etmesi bekleniyor. (Uyari: Kullanicilari rahatsiz etmek ve gereksiz etiketlemek kurallara aykiridir)";
-                            await parser.send_uok(msg, m);
-                        }
-                    }
-                })
-                else if (parser.is(msg, "iptal")) {
-                    if (!ms.pairing[aid]) await parser.send_uwarn(msg, 
-                        "Oyun talebiniz bulunmamaktadir.");
-                    else {
-                        const oname = (await msg.guild.members.fetch(ms.pairing[aid].oid)).user.username;
-                        delete ms.pairing[aid]; sync_module();
-                        await parser.send_uok(msg, `${oname} ile olan oyun iptal edildi.`);
-                    }
+            if (msg.channel.id != local) return;
+            
+            if (parser.is(msg, "oyun")) return parser.mention(msg, async oid => {
+                if (false && aid==oid) // @TODO
+                    return await parser.send_uwarn(msg, "Kendi kendine oyun oynamaya son! Yanlizliga son! Artik bu sunucuda bir cok Turk programci ile arkadas olabilirsin. Onlarla oyun oynamaya ne dersin?");
+                
+                var {ap, op} = find_pairing(aid);
+                if (ap) {
+                    const oname = (await msg.guild.members.fetch(op)).user.username;
+
+                    const m = ap == aid
+                        ? `${oname}, oyun teklifinizi degerlendirmedi. Baskasi ile yeni oyun baslatmak icin once iptal etmeniz gerekiyor. (%iptal)`
+                        : `${oname} tarafindan size gonderilmis olan bir oyun istegi mevcut. Lutfen %kabul edin veya %red komutuyla reddedin.`
+                        ;
+                    return await parser.send_uwarn(msg, m);
                 }
-                else {
-                    const result = Object.entries(ms.pairing).filter(x=>x[1].oid==aid)[0];
-                    if (parser.is(msg, "red")) {
-                        if (!result) await parser.send_uwarn(msg, 
-                            "Oyun teklifiniz bulunmamaktadir.");
-                        else {
-                            const oname = (await msg.guild.members.fetch(result[0])).user.username;
-                            delete ms.pairing[result[0]]; sync_module();
-                            await parser.send_uok(msg, `${oname} teklifi olan olan oyun iptal edildi.`);
-                        }
-                    }
-                    else if (parser.is(msg, "kabul")) {
-                        if (!result) await parser.send_uwarn(msg, 
-                            "Oyun teklifiniz bulunmamaktadir.");
-                        else {
-                            if (!(await try_start_game(result[0], aid, msg))) {
-                                ms.waiting[result[0]] = {oid: aid};
-                                m = "Rakibiniz ile birlikte uygun masa olunca bilgilendirileceksiniz.";   
-                                await parser.send_uwarn(msg, m);   
-                            }
-                        }
-                    }    
-                } 
+                
+                var {gid, ap, op} = find_game(aid);
+                if (gid) {
+                    const game = ms.games[gid];
+                    const oid = op;
+                    const oname = (await msg.guild.members.fetch(oid)).user.username;
+                    return await parser.send_uwarn(msg, `${oname} oyuncusu ile halen surmekte olan oyununuz mevcut.`);
+                }
+            
+                let m = "";
+                ms.pairing[aid]={
+                    oid: oid
+                }; sync_module();
+                m = "Rakibinizin oyun teklifinizi kabul etmesi bekleniyor. (Uyari: Kullanicilari rahatsiz etmek ve gereksiz etiketlemek kurallara aykiridir)";
+                return await parser.send_uok(msg, m);
+            })
+
+            if (parser.is(msg, "iptal")) {
+                if (!ms.pairing[aid]) return await parser.send_uwarn(msg, 
+                    "Oyun talebiniz bulunmamaktadir.");
+            
+                const oname = (await msg.guild.members.fetch(ms.pairing[aid].oid)).user.username;
+                delete ms.pairing[aid]; sync_module();
+                await parser.send_uok(msg, `${oname} ile olan oyun iptal edildi.`);
+            
                 return;
             }
 
+            const result = Object.entries(ms.pairing).filter(x=>x[1].oid==aid)[0];
+            if (parser.is(msg, "red")) {
+                if (!result) await parser.send_uwarn(msg, 
+                    "Oyun teklifiniz bulunmamaktadir.");
+                else {
+                    const oname = (await msg.guild.members.fetch(result[0])).user.username;
+                    delete ms.pairing[result[0]]; sync_module();
+                    await parser.send_uok(msg, `${oname} teklifi olan olan oyun iptal edildi.`);
+                }
+            }
+            else if (parser.is(msg, "kabul")) {
+                if (!result) await parser.send_uwarn(msg, 
+                    "Oyun teklifiniz bulunmamaktadir.");
+                else {
+                    if (!(await try_start_game(result[0], aid, msg))) {
+                        ms.waiting[result[0]] = {oid: aid};
+                        m = "Rakibiniz ile birlikte uygun masa olunca bilgilendirileceksiniz.";   
+                        await parser.send_uwarn(msg, m);   
+                    }
+                }
+            }
         break;
     }
 }
@@ -182,6 +179,38 @@ const card_embed = async (id) => {
     .setDescription(parser.tqs(`[${card.description}]`, rarity_formats[card.rarity]))
     .addField(`\`Kart cinsi: ${rarity[card.rarity]}\``, `No: ${card.id}`)
     .setColor(rarity_colors[card.rarity]);
+}
+const find_waiting = (uid) => {
+    let ap, op;
+
+    return {ap: ap, op: op};
+
+}
+const find_pairing = (uid) => {
+    let ap, op;
+    if (ms.pairing[uid]) {
+        ap = uid;
+        op = ms.pairing[ap].oid;
+    }
+    else {
+        const entry = Object.entries(ms.pairing).filter(x=>x[1].oid==uid);
+        ap = entry[0], op = entry[1];
+    }
+    return {ap: ap, op: op}
+}
+const find_game = (uid) => {
+    let gid, ap, op;
+    for (const [g, p] of Object.entries(ms.games)) {
+        if (p.p1 == uid) {
+            gid = g; ap = p.p1; op = p.p2;
+            break;
+        }
+        else if (p.p2 == uid) {
+            gid = g; ap = p.p2; op = p.p1;
+            break;
+        }
+    }
+    return {gid: gid, ap: ap, op: op};
 }
 const add_roles = async (rid, ps, guild) => {
     const role = guild.roles.cache.get(rid);
