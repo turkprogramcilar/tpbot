@@ -31,7 +31,7 @@ const send_embed_item = async (msg, id) => {
         delete i["strName"]; //delete i["strDesc"];
         //delete i["IconID"];  //delete i["BuyPrice"];
         for (const k of Object.keys(i)) {
-            if (!i[k] || i[k].toString()=='0')
+            if (!i[k] || i[k].toString()=='0') if (k!='Slot')
                 delete i[k];
         }
     }
