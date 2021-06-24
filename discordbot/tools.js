@@ -134,7 +134,8 @@ exports.send_embed_item = async (msg, id, state) => {
         exports.ensure(state, itemstb, db.get_items),
         exports.read_icon(id)
     ]);
-    const i = is.find(x=>x["Num"]==id.toString());
+    let i = is.find(x=>x["Num"]==id);
+    if (i) i = JSON.parse(JSON.stringify(i));
     const title = (i?.strName??"Item not found").replace(/\(\+[0-9]+\)/, '').trim();
     const price = i?.BuyPrice??0;
     const num   = i?.Num;
