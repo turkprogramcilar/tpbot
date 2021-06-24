@@ -9,8 +9,10 @@ exports.regex_arg = (msg, f, f_else, fr, regex, ri=0) => {
     r = msg.content.trimStart().match(regex); if (r) {
         msg.content = msg.content.trimStart().slice(r[0].length);
         f(fr.call(null, r[ri]));
+        return true;
     } else {
         f_else();
+        return false;
     }
 }
 exports.json_pretty = (str) => exports.tqs(JSON.stringify(str,null,'\t'), 'json');
@@ -24,10 +26,10 @@ exports.send_uok   = async (msg, str) => await send_tqs_custom(msg, str, "bash",
 const send_tqs_custom = async (msg, str, format, title) => await msg.channel.send(exports.tqs(title+": "+str,format));
 exports.mention = (msg, f, fe=()=>{}) => { exports.regex_arg(msg, f, fe, x=>x, /^<@!?([0-9]+)>/, 1); }
 exports.mention_else_self = (msg, f) => { exports.mention(msg, f, ()=>f(msg.author.id))}
-exports.r_arg = (msg, regex, f, fe=()=>{}) => { exports.regex_arg(msg, f, fe, x=>x, regex); }
-exports.u_arg = (msg, f, fe=()=>{}) => { exports.regex_arg(msg, f, fe, parseInt, /^[0-9]+/); }
-exports.i_arg = (msg, f, fe=()=>{}) => { exports.regex_arg(msg, f, fe, parseInt, /^[+-]?[0-9]+/); }
-exports.f_arg = (msg, f, fe=()=>{}) => { exports.regex_arg(msg, f, fe, parseFloat, /^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)/); }
+exports.r_arg = (msg, regex, f, fe=()=>{}) => { return exports.regex_arg(msg, f, fe, x=>x, regex); }
+exports.u_arg = (msg, f, fe=()=>{}) => { return exports.regex_arg(msg, f, fe, parseInt, /^[0-9]+/); }
+exports.i_arg = (msg, f, fe=()=>{}) => { return exports.regex_arg(msg, f, fe, parseInt, /^[+-]?[0-9]+/); }
+exports.f_arg = (msg, f, fe=()=>{}) => { return exports.regex_arg(msg, f, fe, parseFloat, /^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)/); }
 
 exports.set_arg = (msg, cmd, setF, channel_msg=null) => {
     if (exports.is(msg, cmd)) { 
