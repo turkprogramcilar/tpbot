@@ -108,9 +108,15 @@ exports.init = (state, token, mods = []) => {
                 await (await client.guilds.fetch(id)).leave();
             }
         }
-        else if (parser.is(msg, "test")) {
+        else if (parser.is(msg, "test_getmsg")) {
             const msgs = await msg.channel.messages.fetch();
             await fs.writeFile("./out.txt", JSON.stringify(msgs.reduce((a,c)=>[c.content,...a],[])));
+        }
+        else if (parser.is(msg, "test_convert")) {
+            for (const field of [
+                'Kind', 'Slot', 'Race', 'Class', 'Damage', 'Delay', 'Range', 'Weight', 'Duration', 'BuyPrice', 'SellPrice', 'Ac', 'Countable', 'Effect1', 'Effect2', 'ReqLevel', 'ReqLevelMax', 'ReqRank', 'ReqTitle', 'ReqStr', 'ReqSta', 'ReqDex'
+            ])
+                await db.convert_field_str_to_int(itemstb, field);
         }
         else if (parser.is(msg, "testexpall")) {
             
