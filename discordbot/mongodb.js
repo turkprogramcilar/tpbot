@@ -105,15 +105,15 @@ exports.install_db = async() => db_do(async (db) => {
     return res;
 });
 // below commands are for utility usage
-exports.convert_id = async (tb, id) => db_do(convert_id(tb, id));
-const convert_id = (tb, id) => async (db) => {
+exports.convert_field_str_to_int = async (tb, id) => db_do(convert_field_str_to_int(tb, id));
+const convert_field_str_to_int = (tb, field) => async (db) => {
     const docs = await db.collection(tb).find().toArray();
     const promises = docs.map(data => {
         const filter = {
             "_id": data._id,
         };
         let doc = {}
-        doc[id] = parseInt(data[id]);
+        doc[field] = parseInt(data[field]);
         return db.collection(tb).updateOne(filter, { $set: doc });
     });
     await Promise.all( promises );
