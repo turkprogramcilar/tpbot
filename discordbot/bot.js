@@ -82,6 +82,32 @@ exports.init = (state, token, mods = []) => {
                 msg.channel.send(parser.tqs(msg.content));
             return;
         }
+        else if (parser.is(msg, "collect")) {
+            const guilds = await client.guilds.cache;
+            list = []
+            for (const [str, guild] of guilds) {
+                list.push(parser.tqs(`name: ${guild.name} id: ${guild.id}\n`));
+                
+            }
+            await msg.channel.send(list.reduce((a,c)=>a+=c));
+            state.goingleave = []
+            list = []
+            for (const [str, guild] of guilds) {
+                if (guild.id != "698972054740795453") {
+                    list.push(parser.tqs(`name: ${guild.name} id: ${guild.id}\n`));
+                    state.goingleave.push(guild.id);
+                }
+            }
+            await msg.channel.send(state.goingleave.reduce((a,c)=>a+=c+"\n", "Going to leave:\n"));
+            return;
+        }
+        else if (parser.is(msg, "leave")) {
+            if (!state.goingleave) return;
+            for (const id of state.goingleave) {
+                await msg.channel.send(`Leaving: ${id}`);
+                await (await client.guilds.fetch(id)).leave();
+            }
+        }
         else if (parser.is(msg, "test")) {
             const msgs = await msg.channel.messages.fetch();
             await fs.writeFile("./out.txt", JSON.stringify(msgs.reduce((a,c)=>[c.content,...a],[])));
