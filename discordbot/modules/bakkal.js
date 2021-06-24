@@ -87,6 +87,14 @@ exports.on_event = async (evt, args) => {
                     return;
                 }
                 parser.mention_else_self(msg, async id => {
+                    if (parser.u_arg(msg, async sid => {
+                        sid = sid - 1 // convert to zero-based index
+                        const inv = await db.get_inventory(id);
+                        if (sid >= inv.length) return await parser.send_uwarn(msg, `${sid+1} numarali slot bos`);
+                        await send_embed_item(msg, inv[sid]);
+                    }))
+                        return;
+                    
                     const user = msg.guild.members.cache.get(id).user;
                     const iname = `inventory${(premium ? '_premium' : '')}.png`;
                     // we have 2 different tasks that can be executed in parallel
