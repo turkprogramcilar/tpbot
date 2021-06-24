@@ -10,41 +10,11 @@ const { parse } = require("path");
 const Jimp      = require("jimp");
 
 
-const send_embed_item = async (msg, id) => {
-    const [is, p] = await Promise.all([
-        tools.ensure(state, itemstb, db.get_items),
-        tools.read_icon(id)
-    ]);
-    const i = is.find(x=>x["Num"]==id.toString());
-    const title = (i?.strName??"Item not found").replace(/\(\+[0-9]+\)/, '').trim();
-    const price = i?.BuyPrice??0;
-    const num   = i?.Num;
-    let embedded = new Discord.MessageEmbed()
-        .setThumbnail(`attachment://icon.png`)
-        .setFooter(`\`${num}\``)
-        ;
-        //.addField('`'+title+'`', (i?.strDesc) ? parser.tqs(i.strDesc) : "-");
-        
-    // cleanup values with 0 and already shown values
-    if (i) {
-        delete i["_id"];     delete i["Num"];
-        delete i["strName"]; //delete i["strDesc"];
-        //delete i["IconID"];  //delete i["BuyPrice"];
-        for (const k of Object.keys(i)) {
-            if (!i[k] || i[k].toString()=='0') if (k!='Slot')
-                delete i[k];
-        }
-    }
+const wear_item = async (uid, islot, wslot) => {
     
-    await msg.channel.send({
-        files: [{
-            attachment: p,
-            name:'icon.png'
-        }],
-        embed: embedded
-            .addField('`'+title+'`', parser.tqs(JSON.stringify(i??{},null,'\t'),'json'))
-    });
-};
+}
+const send_embed_item = async (msg, id) => await tools.send_embed_item(msg, id);
+
 const render_inventory = async (inventory, iconspath, bgfile) => {
     // l= length, oix= offset inventory x, ogx= offset gear x, iw= inventory width,
     // ih= inventory height, gw= gear width, gh= gear height

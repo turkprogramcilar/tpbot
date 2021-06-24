@@ -1,5 +1,10 @@
 require("./constants.js")
-const https = require('https');
+const db     = require("./../mongodb.js");
+const parser = require("./../cmdparser.js");
+
+const https   = require('https');
+const Discord = require('discord.js');
+
 exports.https_get = async url => new Promise(resolve => {
     https.get(new URL(url), async res => {
         try {
@@ -123,3 +128,40 @@ exports.is_disboard_bumped = (msg) => {
         else undefined;
     }
 }
+
+//embeds:
+exports.send_embed_item = async (msg, id) => {
+    const [is, p] = await Promise.all([
+        exports.ensure(state, itemstb, db.get_items),
+        exports.read_icon(id)
+    ]);
+    const i = is.find(x=>x["Num"]==id.toString());
+    const title = (i?.strName??"Item not found").replace(/\(\+[0-9]+\)/, '').trim();
+    const price = i?.BuyPrice??0;
+    const num   = i?.Num;
+    let embedded = new Discord.MessageEmbed()
+        .setThumbnail(`attachment://icon.png`)
+        .setFooter(`\`${num}\``)
+        ;
+        //.addField('`'+title+'`', (i?.strDesc) ? parser.tqs(i.strDesc) : "-");
+        
+    // cleanup values with 0 and already shown values
+    if (i) {
+        delete i["_id"];     delete i["Num"];
+        delete i["strName"]; //delete i["strDesc"];
+        //delete i["IconID"];  //delete i["BuyPrice"];
+        for (const k of Object.keys(i)) {
+            if (!i[k] || i[k].toString()=='0') if (k!='Slot')
+                delete i[k];
+        }
+    }
+    
+    await msg.channel.send({
+        files: [{
+            attachment: p,
+            name:'icon.png'
+        }],
+        embed: embedded
+            .addField('`'+title+'`', parser.tqs(JSON.stringify(i??{},null,'\t'),'json'))
+    });
+};
