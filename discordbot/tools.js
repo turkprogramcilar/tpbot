@@ -1,6 +1,5 @@
 require("./constants.js")
-const db     = require("./../mongodb.js");
-const parser = require("./../cmdparser.js");
+const parser = require("./cmdparser.js");
 
 const https   = require('https');
 const Discord = require('discord.js');
@@ -130,7 +129,7 @@ exports.is_disboard_bumped = (msg) => {
 }
 
 //embeds:
-exports.send_embed_item = async (msg, id) => {
+exports.send_embed_item = async (msg, id, state) => {
     const [is, p] = await Promise.all([
         exports.ensure(state, itemstb, db.get_items),
         exports.read_icon(id)

@@ -13,8 +13,7 @@ const Jimp      = require("jimp");
 const wear_item = async (uid, islot, wslot) => {
     
 }
-const send_embed_item = async (msg, id) => await tools.send_embed_item(msg, id);
-
+const send_embed_item = async (msg, id) => await tools.send_embed_item(msg, id, state);
 const render_inventory = async (inventory, iconspath, bgfile) => {
     // l= length, oix= offset inventory x, ogx= offset gear x, iw= inventory width,
     // ih= inventory height, gw= gear width, gh= gear height

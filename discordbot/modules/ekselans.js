@@ -1,6 +1,8 @@
 require("../constants.js");
 const db = require("../mongodb.js");
 const tools = require("../tools.js");
+const Discord   = require('discord.js');
+const parser = require("./../cmdparser.js");
 let state = undefined;
 exports.init = (refState) => state = refState;
 exports.on_event = async (evt, args) => {
@@ -10,7 +12,18 @@ exports.on_event = async (evt, args) => {
         
         let uid = tools.is_disboard_bumped(msg);
         if (uid) {
-            await db.differ_exp(uid, exps.bump)
+            const client = state.client;
+            const p0 = db.differ_exp(uid, exps.bump);
+            const rid = await tools.get_riid(state);
+            const p1 = db.give_item(uid, rid);
+            const p2 = msg.channel.send(new Discord.MessageEmbed()
+                .setDescription(parser.tqs("Afferin evlat. Seni aşağıdaki ödüllerle kutsuyorum"))
+                .setAuthor(client.user.username, (await msg.guild.members.cache.get(uid)).user.avatarURL())
+                .addField("`Deneyim puanı (exp)`", parser.tqs(exps.bump))
+                .setThumbnail(client.user.avatarURL())
+            );
+            await Promise.all([p0, p1, p2]);
+            await tools.send_embed_item(msg, rid, state);
         }
         else if (Object.keys(exps_by_channel).includes(msg.channel.id)) {
             //console.log(`${msg.author.username}: +${exps_by_channel[msg.channel.id]} (on=${msg.channel.name})`);
