@@ -6,11 +6,11 @@ const webserver =
     : undefined;
 
 let bots = JSON.parse(process.env.DCBOT_JSON)
-Object.keys(bots).forEach(function(token) {
+Object.keys(bots).map(async function(token) {
     
     const modules = bots[token];
     let bot = require("./discordbot/bot.js")
-    bot.init({}, token, modules);
+    await bot.init({}, token, modules);
     if (webserver != undefined && modules.includes("wschannel"))
         bot.set_sendallF(webserver.send_all);
 })

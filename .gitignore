@@ -1,3 +1,5 @@
 **node_modules
 .vscode
 discordbot/data/users.json
+
+build/*

@@ -11,8 +11,9 @@ const Discord = require('discord.js');
 const htmlp   = require('node-html-parser');
 
 const mpath = "./modules/";
+const ts_mpath = "../build/discordbot/modules/"
 
-exports.init = (state, token, mods = []) => {
+exports.init = async (state, token, mods = []) => {
     
     const client  = new Discord.Client();
     state = {
@@ -33,8 +34,10 @@ exports.init = (state, token, mods = []) => {
     let modules = [];
 
     for (const m of mods) {
-
-        let a = modules.push(require(mpath+m))
+        const jspath = "discordbot/"+ mpath+m+".js";
+        const jsexists = (await tools.fs_exists(jspath));
+        const path = jsexists ? mpath+m : ts_mpath+m;
+        let a = modules.push(require(path))
         modules[a-1].init(state);
     }
     client.login(token);

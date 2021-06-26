@@ -4,12 +4,15 @@
   "description": "",
   "main": "main.js",
   "scripts": {
-    "start": "node main.js"
+    "start": "node main.js",
+    "build": "tsc",
+    "postinstall": "npm run build"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/node": "^15.12.4",
     "bufferutil": "^4.0.3",
     "discord.js": "^12.5.3",
     "express": "^4.17.1",
@@ -19,5 +22,8 @@
     "utf-8-validate": "^5.0.4",
     "ws": "^7.4.6",
     "xss": "^1.0.8"
+  },
+  "devDependencies": {
+    "typescript": "^4.3.4"
   }
 }
