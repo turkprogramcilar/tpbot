@@ -9,9 +9,20 @@ const Discord   = require('discord.js');
 const { parse } = require("path");
 const Jimp      = require("jimp");
 
-
-const wear_item = async (uid, islot, wslot) => {
+const wear_item = async (uid, islot) => {
+    const inv = await db.get_inventory(uid);
+    if (!inv || !inv[islot])
+        return await parser.send_uwarn("Belirtilen slotta item bulunamadı.");
     
+    const wear = db.get_wear(uid);
+    const item = db.get_item(inv[islot]);
+    if (! (await wear)) {
+        wear = {}; wear[item.Slot] = item.Num;
+        await db.set_wear(uid, wear);
+    }
+    else {
+
+    }
 }
 const send_embed_item = async (msg, id) => await tools.send_embed_item(msg, id, state);
 const render_inventory = async (inventory, iconspath, bgfile) => {
@@ -45,16 +56,19 @@ exports.on_event = async (evt, args) => {
             return;
 
         if (msg.channel.id == cid.botkomutlari) {
+
+            if (!parser.cooldown_user(state, msg.author.id, "bakkal_komut", 5)) {
+                parser.send_uwarn(msg, "komutu tekrar kullanabilmek icin lutfen bekleyin");
+                return;
+            }
+
             if (parser.is(msg, "seviyeler")) {
                 let out = (await tools.ensure(state, levelstb, db.get_levels)).reduce((a,c)=>a+=`${c.lvl}:${c.exp}\n`,'');
                 msg.channel.send(parser.tqs(out));
             }
+            else if (parser.is(msg, "giy ")) parser.u_arg(msg, async u => await wear_item(msg.author.id, u));
             else if (parser.is(msg, "profil")) {
                 const premium = parser.is(msg,'p');
-                if (!parser.cooldown_user(state, msg.author.id, "bakkal_profil", 10)) {
-                    parser.send_uwarn(msg, "komutu tekrar kullanabilmek icin lutfen bekleyin");
-                    return;
-                }
                 parser.mention_else_self(msg, async id => {
                     if (parser.u_arg(msg, async sid => {
                         sid = sid - 1 // convert to zero-based index
