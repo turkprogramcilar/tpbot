@@ -67,7 +67,7 @@ exports.on_event = async (evt, args) => {
 
             if (!parser.is(msg, state.prefix)) return;
 
-            if (fetch_start) return await parser.send_uwarn(
+            if (fetch_start) return await parser.send_uwarn(msg,
                 "Modul halen yukleniyor... Lutfen bir sure sonra tekrar deneyin.");
 
             if (parser.is(msg, "kart ")) return await cmd_kart(msg);
