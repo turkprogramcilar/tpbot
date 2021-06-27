@@ -117,5 +117,11 @@ uipath   = "./discordbot/ui";
 
 
 
+// typescript compatibility and normal javascript compatibility
+// because we've been using normal variable definitions and not
+// exports, we have to both keep the two structure and export
+// at the same time to make typescript happyy
+module.exports = {
+    groups,
 
-module.exports = {};
+};
