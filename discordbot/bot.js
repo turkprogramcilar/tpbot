@@ -25,6 +25,9 @@ exports.init = async (state, token, mods = []) => {
             users: {},
         },
         cache: {
+            module: {
+
+            },
             table: {
 
             }
@@ -32,13 +35,13 @@ exports.init = async (state, token, mods = []) => {
     };
 
     let modules = [];
-
+    const promises = [];
     for (const m of mods) {
         const jspath = "discordbot/"+ mpath+m+".js";
         const jsexists = (await tools.fs_exists(jspath));
         const path = jsexists ? mpath+m : ts_mpath+m;
         let a = modules.push(require(path))
-        modules[a-1].init(state);
+        promises.push(modules[a-1].init(state));
     }
     client.login(token);
 
@@ -189,6 +192,8 @@ exports.init = async (state, token, mods = []) => {
             });
         }
     });
+
+    await Promise.all(promises);
 }
 
 module.exports.set_sendallF = (f) => {

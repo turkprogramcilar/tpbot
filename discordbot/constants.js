@@ -22,8 +22,9 @@ sid={
     tpdc: "698972054740795453",
 }
 // user ids
-uid={
+uid = {
     disboard: "302050872383242240",
+    mee6bot : "159985870458322944",
     ockis2  : "824573651390562325",
 };
 // user groups
@@ -47,6 +48,7 @@ cid = {
     makale      : "811268737939669063",
     bumperado   : "782742548052574239",
     botkomutlari: consts.env.debug ? "852552268430966824" : "841987730551603200",
+    printfscanf : "782713536924221469",
 }
 
 
@@ -123,5 +125,6 @@ uipath   = "./discordbot/ui";
 // at the same time to make typescript happyy
 module.exports = {
     groups,
-
+    cid,
+    uid,
 };
