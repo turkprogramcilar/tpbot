@@ -175,8 +175,14 @@ const hit = async (msg, gm=false,gmdmg=0) => {
                                          m.lasthits,top3,sorted.splice(-1,1)[0],
                                          drops);
         const channel = (await state.client.channels.fetch(m.msg.channelID ?? m.msg.channel.id));
-        const mmsg    =  await channel.messages.fetch(m.msg.id);
-        if (mmsg.deleted && m.hp > 0) m.msg = await channel.send(newmsg);
+        let mmsg 
+        try {
+            mmsg = await channel.messages.fetch(m.msg.id);
+        }
+        catch {
+            mmsg = undefined;
+        }
+        if (mmsg?.deleted && m.hp > 0) m.msg = await channel.send(newmsg);
         else {
             if (m.hp <= 0) {
                 await mmsg.delete();
