@@ -18,7 +18,7 @@ const rarity = {
     1: "Yaygın",
     2: "Güzide",
     3: "Esrarengiz",
-    4: "Destansı",
+    4: "İhtişamlı",
     5: "Destansı",
 }
 const rarity_colors = {
@@ -70,9 +70,9 @@ exports.on_event = async (evt, args) => {
             if (fetch_start) return await parser.send_uwarn(msg,
                 "Modul halen yukleniyor... Lutfen bir sure sonra tekrar deneyin.");
 
-            if (parser.is(msg, "kart ")) return await cmd_kart(msg);
-
             if (!areas.includes(msg.channel.id)) return;
+
+            if (parser.is(msg, "kart ")) return await cmd_kart(msg);
 
             if (!parser.cooldown_user(state, msg.author.id, "pitmaster_oyun", slowmode))
                 return await parser.send_uwarn(msg, `komut kullanabilmek icin lutfen ${slowmode} saniye bekleyin`);
