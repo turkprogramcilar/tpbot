@@ -92,3 +92,63 @@ describe('tatar ramazan karti', () => {
     });
 
 });
+describe('korkusuz korkak karti', () => {
+
+    it("5 kere yazi gelme sonucu 100 hasar verir", () => {
+        const game = new cardgame([card_no.korkusuz_korkak], [], rng([true, true, true, true, true, true]));
+
+        const p1was = game.players[1].health;
+        const p2was = game.players[2].health;
+
+        const damage = card_db[card_no.korkusuz_korkak].flips![0].heads!.attack!.target;
+
+        // 50% sansla vur
+        game.play_card(1, card_no.korkusuz_korkak);
+        game.end_round();
+        expect(game.players[1].health).equals(p1was);
+        expect(game.players[2].health).equals(p2was - damage * 5);
+    });
+    it("0 kere yazi gelme sonucu 0 hasar verir", () => {
+        const game = new cardgame([card_no.korkusuz_korkak], [], rng([false, true, true, true, true, true]));
+
+        const p1was = game.players[1].health;
+        const p2was = game.players[2].health;
+
+        const damage = card_db[card_no.korkusuz_korkak].flips![0].heads!.attack!.target;
+
+        // 50% sansla vur
+        game.play_card(1, card_no.korkusuz_korkak);
+        game.end_round();
+        expect(game.players[1].health).equals(p1was);
+        expect(game.players[2].health).equals(p2was - damage * 0);
+    });
+    it("1 kere yazi gelme sonucu 20 hasar verir", () => {
+        const game = new cardgame([card_no.korkusuz_korkak], [], rng([true, false, true, true, true, true]));
+
+        const p1was = game.players[1].health;
+        const p2was = game.players[2].health;
+
+        const damage = card_db[card_no.korkusuz_korkak].flips![0].heads!.attack!.target;
+
+        // 50% sansla vur
+        game.play_card(1, card_no.korkusuz_korkak);
+        game.end_round();
+        expect(game.players[1].health).equals(p1was);
+        expect(game.players[2].health).equals(p2was - damage * 1);
+    });
+    it("2 kere yazi gelme sonucu 40 hasar verir", () => {
+        const game = new cardgame([card_no.korkusuz_korkak], [], rng([true, true, false, true, true, true]));
+
+        const p1was = game.players[1].health;
+        const p2was = game.players[2].health;
+
+        const damage = card_db[card_no.korkusuz_korkak].flips![0].heads!.attack!.target;
+
+        // 50% sansla vur
+        game.play_card(1, card_no.korkusuz_korkak);
+        game.end_round();
+        expect(game.players[1].health).equals(p1was);
+        expect(game.players[2].health).equals(p2was - damage * 2);
+    });
+
+});

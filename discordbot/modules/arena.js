@@ -182,7 +182,7 @@ const hit = async (msg, gm=false,gmdmg=0) => {
         catch {
             mmsg = undefined;
         }
-        if (mmsg?.deleted && m.hp > 0) m.msg = await channel.send(newmsg);
+        if (!mmsg || (mmsg.deleted && m.hp > 0)) m.msg = await channel.send(newmsg);
         else {
             if (m.hp <= 0) {
                 await mmsg.delete();

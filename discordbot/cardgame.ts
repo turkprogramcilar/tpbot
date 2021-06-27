@@ -17,6 +17,7 @@ interface effect {
 interface card {
     is_attack : boolean,
     flips? : {heads?: effect, tails?: effect}[]
+    tail_breaks? : boolean,
 }
 
 // game and round mechanic related definitions
@@ -69,8 +70,10 @@ export const card_db : { [key in card_no] : card } = {
     4: { 
         is_attack: false
     },
-    5: { 
-        is_attack: false
+    [card_no.korkusuz_korkak]: { 
+        is_attack: true,
+        flips: Array(5).fill({heads: {attack: {target: 20}}}),
+        tail_breaks: true,
     },
     6: { 
         is_attack: false
@@ -137,48 +140,53 @@ export class cardgame {
 
     // plays the given card for the player, since player can play theoritically all cards
     // in hands this method could be called more than once
-    public play_card(player : number, no : card_no) : {OK: boolean, state: game_state} {
+    public play_card(player : number, no : card_no) : {OK: boolean, state: game_state, flips?: boolean[], reason?: string} {
         if (this.turn != player) throw new Error("Illegal operation on play_card. Turn is not equal to player number");
 
         //@TODO check if player has the card?! at index probably
         
         //@TODO alpha version constraint here, remove it when its no longer needed
-        if (no!=16) throw new Error("Alpha");
+        if ([16,5].includes(no)==false) throw new Error("Alpha");
 
         // get the card object
         const card = card_db[no];
 
         // check if this is a attack card and player has already used one before
         if (card.is_attack) {
-            if (this.used_abilities[ability.attack]) return {OK: false, state: this.state()};
+            if (this.used_abilities[ability.attack]) return {OK: false, state: this.state(), reason: "Bu tur içerisinde başka saldırı kartı oynayamazsınız"};
             this.used_abilities[ability.attack] = true;
         }
 
+        const flips = [];
         // unroll the flips if any
         for (const {heads, tails} of card.flips ?? []) {
 
             let action : effect | null;
 
-            if (this.flipper() && heads != undefined)
+            const flip = this.flipper();
+            flips.push(flip);
+            if (flip && heads != undefined)
                 action = heads;
-            else  if (tails != undefined)
+            else if (tails != undefined)
                 action = tails;
             else
                 action = null;
 
-            if (action == null) break;
-            
-            // test if this effect has attack ability
-            if (action.attack) {
-                this.target_hit(action.attack.target);
-                if (action.attack.self) this.self_hit(action.attack.self);
+            if (action != null) {
+                // test if this effect has attack ability
+                if (action.attack) {
+                    this.target_hit(action.attack.target);
+                    if (action.attack.self) this.self_hit(action.attack.self);
+                }
+                // test other cases
+                //..
             }
-            // test other cases
-            //..
+            
+            if (!flip && card.tail_breaks) break;
         }
         
-        // remove the card from the deck
-        return {OK: true, state: this.state()};
+        // remove the card from the deck @TODO
+        return {OK: true, state: this.state(), flips: flips};
     }
 
     private state() : game_state {
@@ -209,6 +217,3 @@ export class cardgame {
         return player == 1 ? 2 : 1;
     }
 }
-console.log("OK");
-let game = new cardgame([16], [16]);
-console.log("OK");

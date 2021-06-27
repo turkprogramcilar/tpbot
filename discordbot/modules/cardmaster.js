@@ -13,6 +13,9 @@ const tools  = require("../tools.js");
 const db     = require("../mongodb.js");
 const Discord = require("discord.js");
 
+// typescript compiled library
+const { cardgame, game_state } = require("../../build/discordbot/cardgame");
+
 // @TODO: move into db? perhaps?
 const rarity = {
     1: "Yaygın",
@@ -28,7 +31,7 @@ const rarity_colors = {
     4: "b58900",
     5: "cb4b16"
 }
-const rarity_formats = {
+const rarity_formats =  {
     1: "brainfuck",
     2: "",
     3: "yaml",
@@ -45,6 +48,8 @@ let ms = {
     pairing: {},
     games: {},
 };
+ts_games = {},
+
 exports.init = async (refState) => {
     state = refState;
     fetch_start = new Date();
@@ -80,6 +85,49 @@ exports.on_event = async (evt, args) => {
             // oid= other user's id, aid= author's user id
             const aid = msg.author.id;
             const aname = msg.author.username;
+
+            if (msg.channel.id != local) {
+                const gid = msg.channel.id;
+                const tsg = ts_games[gid];
+                const g   = ms.games[gid];
+                const p1 = g.p1;
+                const p2 = g.p2;
+                const ap = tsg.turn == 1 ? p1 : p2;
+                const op = tsg.turn == 2 ? p1 : p2;
+                const aun = tsg.turn == 1 ? g.un1 : g.un2;
+                const oun = tsg.turn == 2 ? g.un1 : g.un2;
+                if (parser.is(msg, "oyna ")) return await parser.u_arg(msg, async card => {
+                    if ([5,16].includes(card) == false) card = 16;
+                    if (ap != aid) return await parser.send_uwarn(msg, "Sıra sizde olmadığı için hamle yapamazsınız");
+                    const res = tsg.play_card(tsg.turn, card);
+                    let header = `\`${aun} aşağıdaki kartı oynadı\``;
+                    let embed = await card_embed(card);
+                    embed = embed.addField("**-**","**-**");
+                    if (!res.OK) return await parser.send_uwarn(msg, res.reason);
+                    if (res.flips && res.flips.length>0) 
+                        embed = embed.addField(`${aun} oynadığı kart için yazı tura atıyor`, parser.tqs(res.flips.reduce((a,c,i)=>a+=`\n${i+1}. atışı: ${c?"YAZI":"TURA"}`,'')));
+                    
+                    embed = embed.addField("`Tur sonu oyuncu durumları`", parser.tqs(`${g.un1} can: ${tsg.players[1].health}\n${g.un2} can: ${tsg.players[2].health}`));
+                     
+                    if (res.state != game_state['unfinished']) {
+                        let notice;
+                        if (res.state == game_state['win_p1']) notice = `Oyunu ${g.un1} kazandı. Tebrikler`;
+                        else if (res.state == game_state['win_p2']) notice = `Oyunu ${g.un2} kazandı. Tebrikler`;
+                        else notice = `Oyun berabere bitti.`;
+                        embed = embed.addField(`\`${notice}\``, `-`);
+                        await finish_game(gid, rooms[gid].rid, [ap, op], msg);
+                    }
+                    else {
+                        tsg.end_round();
+                        embed = embed.addField(`-`,`\`${aun} hamlesini tamamladi. Sıra ${oun} oyuncusunda.\``, `-`);
+                    }
+                    await msg.channel.send({
+                        content: header,
+                        embed: embed
+                    });
+                });
+            }
+
             if (parser.is(msg, "kaybet")) {
                 // op= other player, ap= author player (msg author), gid= game id (also the room id = channel id)
                 const {gid, ap, op} = find_game(aid);
@@ -177,7 +225,7 @@ const card_embed = async (id) => {
     .setThumbnail(card.link)
     .setTitle(`\`${card.title}\``)
     .setDescription(parser.tqs(`[${card.description}]`, rarity_formats[card.rarity]))
-    .addField(`\`Kart cinsi: ${rarity[card.rarity]}\``, `No: ${card.id}`)
+    .addField(`\`Kart cinsi: ${rarity[card.rarity]}\``, `No: ${card.id}\n\n\n`)
     .setColor(rarity_colors[card.rarity]);
 }
 const find_waiting = (uid) => {
@@ -277,15 +325,18 @@ const init_game = async (gid) => {
             pid: p,
             hand: [...Array(first).keys()].map(x=>(Math.random()*cardslen|0)+1)
         });
-        const handp = Promise.all(g.players[len-1].hand.map(async id => await send_dm(p, await card_embed(id))));
-        promises.push(handp);
+        //const handp = Promise.all(g.players[len-1].hand.map(async id => await send_dm(p, await card_embed(id))));
+        //promises.push(handp);
     }
     await Promise.all(promises);
+
+    ts_games[gid] = new cardgame([16], [16]);
 }
 const finish_game = async (gid, rid, ps, msg, notice) => {
     
+    delete ts_games[gid];
     await del_roles(rid, ps, msg.guild);
-    await parser.send_uok(msg, notice);
+    if (notice) await parser.send_uok(msg, notice);
     delete ms.games[gid];
     const first = Object.keys(ms.waiting)[0];
     if (first) {
