@@ -111,9 +111,6 @@ let spawn_rate = .01;
 
 let buff = 1;
 let frequency = 3;
-// Anlik sunucuda en fazla exp 148k, yaklasik 0.6~ + 1 -> 1.6 kat fazla
-// damage veriyor bu formul
-const getdmg = (xp) => 1 + Math.log(1*xp/200000+1);
 
 // following method is called everywhere where `alive` 
 // variable is updated, basically updates the db in case
@@ -163,8 +160,8 @@ const hit = async (msg, gm=false,gmdmg=0) => {
         };
     }
     const user = alive.dmgdone[uid];
-    const maxdmg = (200 + (user?.stats?.damage ?? 0))*getdmg(user?.exp ?? 0);
-    let dmg = (.3+Math.random()*.7)*maxdmg*buff|0;
+    const maxdmg = tools.maxdmg(user?.stats?.damage ?? 0, tools.getdmg(user?.exp ?? 0));
+    let dmg = tools.getdmg(maxdmg, buff);
     if (gm) dmg=gmdmg|0;
     
     alive.dmgdone[uid].dmg += dmg;

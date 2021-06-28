@@ -227,14 +227,20 @@ exports.on_event = async (evt, args) => {
                     ]);
                     const lvl=explvl[1], uexp=explvl[0];
                     const stats = await db.get_user_value(id, "stats");
+                    const expm = tools.getexpm(uexp??0);
                     let embed = new Discord.MessageEmbed()
                     .setTitle("`"+user.username+"`")
-                    .setDescription(parser.tqs(`Exp: ${uexp} Lvl: ${lvl}`))
+                    .setDescription(parser.tqs(`Exp: {${uexp}} [Lvl: ${lvl}]\nHasar çarpanı: {${expm.toFixed(2)}}`,"css"))
                     .setThumbnail(user.avatarURL())
                     .setImage(`attachment://${iname}`);
                     for (const [k, v] of Object.entries(stats ?? {})) {
-                        embed = embed.addField(`\`${k.replace(/^\w/, c => c.toUpperCase())}\``, v, true);
+                        embed = embed.addField(`\`Item ${k.replace(/^\w/, c => c.toUpperCase())}\``, v, true);
                     }
+                    const idmg = stats?.damage ?? 0;
+                    const maxdmg = tools.maxdmg(idmg, expm);
+                    embed = embed
+                        .addField("`Minimum Hasar`", maxdmg*tools.mindmg_r|0, true)
+                        .addField("`Maksimum Hasar`", maxdmg|0, true);
                     await msg.channel.send({
                         files: [{
                             attachment: image,

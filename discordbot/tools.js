@@ -114,7 +114,15 @@ exports.sync_module = (module, json_get, frequency) => {
 }
 
 
+// calculate exp dependent damage
 
+// Anlik sunucuda en fazla exp 148k, yaklasik 0.6~ + 1 -> 1.6 kat fazla
+// damage veriyor bu formul
+exports.getexpm = (xp) => 1 + Math.log(1*xp/200000+1);
+
+exports.maxdmg = (idmg, expm) => (200 + idmg)*expm;
+exports.mindmg_r = .3;
+exports.getdmg = (maxdmg, buff) => (exports.mindmg_r+Math.random()*(1-exports.mindmg_r))*maxdmg*buff|0;
 
 // platform specific tools:
 exports.is_disboard_bumped = (msg) => {
