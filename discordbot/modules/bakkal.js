@@ -9,23 +9,50 @@ const Discord   = require('discord.js');
 const { parse } = require("path");
 const Jimp      = require("jimp");
 
-const wear_item = async (uid, islot) => {
+const burn_item = async (uid, islot) => {
+    islot--;
     const inv = await db.get_inventory(uid);
     if (!inv || !inv[islot])
-        return await parser.send_uwarn("Belirtilen slotta item bulunamadı.");
+        return await parser.send_uwarn(msg, "Belirtilen slotta item bulunamadı.");
+        
+    inv.splice(islot, 1);
+    await db.set_inventory(uid, inv);
+}
+const wear_item = async (uid, islot) => {
+    islot--;
+    const inv = await db.get_inventory(uid);
+    if (!inv || !inv[islot])
+        return await parser.send_uwarn(msg, "Belirtilen slotta item bulunamadı.");
     
-    const wear = db.get_wear(uid);
-    const item = db.get_item(inv[islot]);
-    if (! (await wear)) {
-        wear = {}; wear[item.Slot] = item.Num;
-        await db.set_wear(uid, wear);
-    }
-    else {
-
-    }
+    let wear = await db.get_wear(uid);
+    const item = await db.get_item(inv[islot]);
+    if (!wear) wear = {};
+    if (wear[item.Slot]) inv.push(wear[item.Slot]);
+    wear[item.Slot] = item.Num;
+    inv.splice(islot, 1);
+    const p1 = db.set_wear(uid, wear);
+    const p2 = db.set_inventory(uid, inv);
+    await p1; await p2;
+}
+const map_wear = {
+    /* ItemSlot1HEitherHand */  0  : 6,
+	/* ItemSlot1HRightHand */	1  : 8,
+	/* ItemSlot1HLeftHand */	2  : 6,
+	/* ItemSlot2HRightHand */	3  : 8,
+	/* ItemSlot2HLeftHand */	4  : 6,
+	/* ItemSlotPauldron */		5  : 4,
+	/* ItemSlotPads */		    6  : 10,
+	/* ItemSlotHelmet */		7  : 1,
+	/* ItemSlotGloves */		8  : 12,
+	/* ItemSlotBoots */		    9  : 13,
+	/* ItemSlotEarring */		10 : 0,
+	/* ItemSlotNecklace */		11 : 3,
+	/* ItemSlotRing */		    12 : 9,
+	/* ItemSlotShoulder */		13 : 5,
+	/* ItemSlotBelt */		    14 : 7,
 }
 const send_embed_item = async (msg, id) => await tools.send_embed_item(msg, id, state);
-const render_inventory = async (inventory, iconspath, bgfile) => {
+const render_inventory = async (inventory, iconspath, bgfile, wear) => {
     // l= length, oix= offset inventory x, ogx= offset gear x, iw= inventory width,
     // ih= inventory height, gw= gear width, gh= gear height
     const l=45, oix=0, oiy=1, ogx=7, ogy=0, iw=7, ih=4, gw=3, gh=5, LIMIT=iw*ih;
@@ -37,6 +64,16 @@ const render_inventory = async (inventory, iconspath, bgfile) => {
     for (const {i, im} of icons) {
         const x=i%iw, y=(i/iw)|0;
         bg.composite(im, l*(oix+x), l*(oiy+y));
+    }
+    const wearicons = await Promise.all(Object.entries(wear ?? {}).map(async kv => {
+        let im = await Jimp.read(await tools.guard_iconpath(kv[1]));
+        return { "slot": kv[0], "im": im };
+    }));
+    const woix=iw, woiy=0, wiw=3, wih=5;
+    for (const {slot, im} of wearicons) {
+        const s = map_wear[slot] ?? 20;
+        const x=s%wiw, y=(s/wiw)|0;
+        bg.composite(im, l*(woix+x), l*(woiy+y));
     }
     return await bg.getBufferAsync(Jimp.MIME_PNG);
 }
@@ -57,7 +94,7 @@ exports.on_event = async (evt, args) => {
 
         if (msg.channel.id == cid.botkomutlari) {
 
-            if (!parser.cooldown_user(state, msg.author.id, "bakkal_komut", 5)) {
+            if (!parser.cooldown_user(state, msg.author.id, "bakkal_komut", 3)) {
                 parser.send_uwarn(msg, "komutu tekrar kullanabilmek icin lutfen bekleyin");
                 return;
             }
@@ -67,6 +104,7 @@ exports.on_event = async (evt, args) => {
                 msg.channel.send(parser.tqs(out));
             }
             else if (parser.is(msg, "giy ")) parser.u_arg(msg, async u => await wear_item(msg.author.id, u));
+            else if (parser.is(msg, "sil ")) parser.u_arg(msg, async u => await burn_item(msg.author.id, u));
             else if (parser.is(msg, "profil")) {
                 const premium = parser.is(msg,'p');
                 parser.mention_else_self(msg, async id => {
@@ -92,8 +130,9 @@ exports.on_event = async (evt, args) => {
                             return [uexp, l];
                         })(),
                         (async () => {
-                            const inventory = await db.get_inventory(id);
-                            return await render_inventory(inventory, iconpath, iname);
+                            const inventory = db.get_inventory(id);
+                            const wear = db.get_wear(id);
+                            return await render_inventory(await inventory, iconpath, iname, await wear);
                         })()
                     ]);
                     const lvl=explvl[1], uexp=explvl[0];
