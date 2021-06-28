@@ -29,7 +29,7 @@ const burn_item = async (uid, islot) => {
     inv.splice(islot, 1);
     await db.set_inventory(uid, inv);
 }
-const wear_item = async (uid, islot) => {
+const wear_item = async (uid, islot, msg) => {
     islot--;
     const inv = await db.get_inventory(uid);
     if (!inv || !inv[islot])
@@ -42,6 +42,7 @@ const wear_item = async (uid, islot) => {
     if (!wear) wear = {};
 
     const target_slots = slot_to_wear[item.Slot];
+    if (target_slots == undefined) return await parser.send_uwarn(msg, "Belirtilen slottaki item giyilemez");
     if (target_slots.length == 1) {
         const target_first = target_slots[0];
         // if slot is occupied, put it back to the inventory first
@@ -189,7 +190,7 @@ exports.on_event = async (evt, args) => {
                 return await parser.send_uwarn(msg, "Bir onceki islem devam etmektedir. Lutfen bekleyiniz");
             set_lock(msg.author.id, true);
 
-            if (parser.is(msg, "giy ")) await parser.u_arg(msg, async u => await wear_item(msg.author.id, u));
+            if (parser.is(msg, "giy ")) await parser.u_arg(msg, async u => await wear_item(msg.author.id, u, msg));
             else if (parser.is(msg, "soyun")) await take_off_items(msg.author.id);
             else if (parser.is(msg, "sil ")) await parser.u_arg(msg, async u => await burn_item(msg.author.id, u));
             else if (parser.is(msg, "profil")) {
