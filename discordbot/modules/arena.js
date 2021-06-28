@@ -113,7 +113,7 @@ let buff = 1;
 let frequency = 3;
 // Anlik sunucuda en fazla exp 148k, yaklasik 0.6~ + 1 -> 1.6 kat fazla
 // damage veriyor bu formul
-const getdmg = (xp) => Math.log(1*xp/200000+1);
+const getdmg = (xp) => 1 + Math.log(1*xp/200000+1);
 
 // following method is called everywhere where `alive` 
 // variable is updated, basically updates the db in case
@@ -149,14 +149,26 @@ const create = async (msg, name, eid, hp) => {
 }
 const hit = async (msg, gm=false,gmdmg=0) => {
     if (!alive) return;
-    dmg=(.3+Math.random()*.7)*400*buff|0;
+
+    const uname = msg.author.username;
+    const uid   = msg.author.id;
+
+    // if stats are not fetched, fetch them first
+    if (!alive.dmgdone[uid]) {
+        alive.dmgdone[uid] = {
+            name: uname, 
+            "dmg": 0,
+            "stats": await db.get_user_value(uid, "stats"),
+            "exp": await db.get_user_value(uid, "exp")
+        };
+    }
+    const user = alive.dmgdone[uid];
+    const maxdmg = (200 + (user?.stats?.damage ?? 0))*getdmg(user?.exp ?? 0);
+    let dmg = (.3+Math.random()*.7)*maxdmg*buff|0;
     if (gm) dmg=gmdmg|0;
-    uname=msg.author.username;
-    uid=msg.author.id;
-    if (alive.dmgdone[uid])
-        alive.dmgdone[uid].dmg += dmg;
-    else
-        alive.dmgdone[uid] = {name: uname, "dmg": dmg};
+    
+    alive.dmgdone[uid].dmg += dmg;
+
     alive.hp-=dmg;
     if (alive.hp <= 0) {
         alive.hp = 0;
