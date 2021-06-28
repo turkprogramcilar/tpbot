@@ -17,7 +17,8 @@ const take_off_items = async (uid) => {
     }
     const p1 = db.set_wear(uid, {});
     const p2 = db.set_inventory(uid, inv);
-    await p1; await p2;
+    const p3 = db.set_user_value(uid, "stats", {});
+    await p1; await p2; await p3;
 }
 const burn_item = async (uid, islot) => {
     islot--;
@@ -87,7 +88,11 @@ const wear_item = async (uid, islot) => {
     inv.splice(islot, 1);
     const p1 = db.set_wear(uid, wear);
     const p2 = db.set_inventory(uid, inv);
-    await p1; await p2;
+    // calculate stats
+    const items = await Promise.all(Object.values(wear).map(iid => db.get_item(iid)));
+    const dmg = items.reduce((a, item) => a += (item["Damage"] ?? 0), 0);
+    const p3 = db.set_user_value(uid, "stats", {"Damage": dmg});
+    await p1; await p2; await p3;
 }
 const double_slots = {
     6: 8,
@@ -220,25 +225,31 @@ exports.on_event = async (evt, args) => {
                         })()
                     ]);
                     const lvl=explvl[1], uexp=explvl[0];
+                    const stats = await db.get_user_value(id, "stats");
+                    let embed = new Discord.MessageEmbed()
+                    .setTitle("`"+user.username+"`")
+                    .setDescription(parser.tqs(`Exp: ${uexp} Lvl: ${lvl}`))
+                    .setThumbnail(user.avatarURL())
+                    .setImage(`attachment://${iname}`);
+                    for (const [k, v] of Object.entries(stats)) {
+                        embed = embed.addField(`\`${k.replace(/^\w/, c => c.toUpperCase())}\``, v, true);
+                    }
                     await msg.channel.send({
                         files: [{
                             attachment: image,
                             name: iname
                         }],
-                        embed: new Discord.MessageEmbed()
-                            .setTitle("`"+user.username+"`")
-                            .setDescription(parser.tqs(`Exp: ${uexp} Lvl: ${lvl}`))
-                            .setThumbnail(user.avatarURL())
-                            .setImage(`attachment://${iname}`)
+                        embed: embed
                     });
                 });
             }
             set_lock(msg.author.id, false);
             
-            /*// beyond is admin
+            // beyond is admin
             if (!groups.admins.includes(msg.author.id))
                 return;
 
+            /*
             if (parser.is(msg, "item ")) {
                 // id ile item bilgisi sorgulama
                 parser.i_arg(msg, i => send_embed_item(msg, i));

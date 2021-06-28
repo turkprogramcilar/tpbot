@@ -97,7 +97,15 @@ exports.get_inventory = async (uid) => (await db_do(db_get(userstb, uid)))?.inve
 exports.set_inventory = async (uid, inv) => (await db_do(db_set(userstb, uid, {"inventory": inv})));
 exports.get_wear = async (uid) => (await db_do(db_get(userstb, uid)))?.wear;
 exports.set_wear = async (uid, wear) => db_do(db_set(userstb, uid, {"wear": wear}))
+// generic
+exports.get_user_value = async (uid, key) => ((await db_do(db_get(userstb, uid))) ?? {})[key];
+exports.set_user_value = async (uid, key, value) => db_do(db_set(userstb, uid, kv(key, value)));
 //
+const kv = (k, v) => {
+    r = {};
+    r[k] = v;
+    return r;
+}
 exports.install_db = async() => db_do(async (db) => {
 
     let res = [];
