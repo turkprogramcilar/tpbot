@@ -16,6 +16,7 @@ interface effect {
 }
 interface card {
     is_attack : boolean,
+    damage? : damage,
     flips? : {heads?: effect, tails?: effect}[]
     tail_breaks? : boolean,
 }
@@ -39,11 +40,14 @@ interface round_result {
     game_finished : boolean,
     game_result   : game_state,
 }
+interface buff {
+    immunity?: boolean,
+}
 interface player {
+    buffs  : buff[],
     health : number,
     cards  : card_no[],
 }
-
 // constants and fresh constants
 
 const fresh_abilities : { [key in ability] : boolean } = {
@@ -99,8 +103,15 @@ export const card_db : { [key in card_no] : card } = {
     13: { 
         is_attack: false
     },
-    14: { 
-        is_attack: false
+    [card_no.tivorlu_ismail]: { 
+        is_attack: true,
+        damage: {target: 20},
+        flips: [
+            {heads: {attack: {target: 10}}},
+            {heads: {attack: {target: 10}}},
+            {heads: {attack: {target: 10, self: 20}}}
+        ],
+        tail_breaks: true,
     },
     15: { 
         is_attack: false
@@ -124,16 +135,20 @@ export class cardgame {
     used_abilities : { [key in ability]: boolean } = {...fresh_abilities};
 
     // ctor (lol put some green text here as a place holder so it fits nicely as a single line)
-    constructor(p1cards : number[], p2cards : number[], private flipper : (() => boolean) = ()=>(Math.random()<.5)) {
+    constructor(p1cards : number[], p2cards : number[],
+        private flipper : (() => boolean) = ()=>(Math.random()<.5),
+        private logger  : (msg : string) => void = (s)=>{}) {
         const starting_health = 120;
         this.players = {
             1: {                
                 health: starting_health,
-                cards: p1cards
+                cards: p1cards,
+                buffs: [],
             },
             2: {                
                 health: starting_health,
-                cards: p2cards
+                cards: p2cards,
+                buffs: [],
             },
         }
     }
@@ -146,7 +161,7 @@ export class cardgame {
         //@TODO check if player has the card?! at index probably
         
         //@TODO alpha version constraint here, remove it when its no longer needed
-        if ([16,5].includes(no)==false) throw new Error("Alpha");
+        if ([16,5,14].includes(no)==false) throw new Error("Alpha");
 
         // get the card object
         const card = card_db[no];
@@ -155,6 +170,12 @@ export class cardgame {
         if (card.is_attack) {
             if (this.used_abilities[ability.attack]) return {OK: false, state: this.state(), reason: "Bu tur içerisinde başka saldırı kartı oynayamazsınız"};
             this.used_abilities[ability.attack] = true;
+        }
+
+        // direct damage if any
+        if (card.damage) {
+            this.target_hit(card.damage.target);
+            if (card.damage.self) this.self_hit(card.damage.self);
         }
 
         const flips = [];
@@ -204,7 +225,9 @@ export class cardgame {
     }
 
     private target_hit(damage : number) {
-        this.hit_to( this.players[this.target_of(this.turn)], damage);
+        const target = this.players[this.target_of(this.turn)];
+        
+        this.hit_to( target, damage);
     }
     private self_hit(damage : number) {
         this.hit_to(this.players[this.turn], damage);

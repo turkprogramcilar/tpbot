@@ -10,6 +10,21 @@ const rng : (states : boolean[]) => () => boolean = (states : boolean[]) => {
     return () => states[i++];
 }
 
+const card_test = (card : card_no, false_at : number, p1damage : number, p2damage : number) => () => {
+    let booleans = Array(10).fill(true);
+    booleans[false_at] = false;
+
+    const game = new cardgame([card], [], rng(booleans));
+
+    const p1was = game.players[1].health;
+    const p2was = game.players[2].health;
+
+    game.play_card(1, card);
+    game.end_round();
+    expect(game.players[1].health).equals(p1was - p1damage);
+    expect(game.players[2].health).equals(p2was - p2damage);
+};
+
 describe('kart oyunu', () => {
 
     it("oyunu birinci oyuncudan baslar", () => {
@@ -94,61 +109,16 @@ describe('tatar ramazan karti', () => {
 });
 describe('korkusuz korkak karti', () => {
 
-    it("5 kere yazi gelme sonucu 100 hasar verir", () => {
-        const game = new cardgame([card_no.korkusuz_korkak], [], rng([true, true, true, true, true, true]));
+    for (let i = 0; i <= 5; i++) 
+        it(`${i} kere yazi gelme sonucu ${i*20} hasar verir`, card_test(card_no.korkusuz_korkak, i, 0, i*20));
 
-        const p1was = game.players[1].health;
-        const p2was = game.players[2].health;
+    it(`5 kere yazi gelme sonucu sistem durur ve 100 hasar verir sistem`, card_test(card_no.korkusuz_korkak, 7, 0, 5*20));
+});
 
-        const damage = card_db[card_no.korkusuz_korkak].flips![0].heads!.attack!.target;
+describe('tivorlu ismail karti', () => {
 
-        // 50% sansla vur
-        game.play_card(1, card_no.korkusuz_korkak);
-        game.end_round();
-        expect(game.players[1].health).equals(p1was);
-        expect(game.players[2].health).equals(p2was - damage * 5);
-    });
-    it("0 kere yazi gelme sonucu 0 hasar verir", () => {
-        const game = new cardgame([card_no.korkusuz_korkak], [], rng([false, true, true, true, true, true]));
-
-        const p1was = game.players[1].health;
-        const p2was = game.players[2].health;
-
-        const damage = card_db[card_no.korkusuz_korkak].flips![0].heads!.attack!.target;
-
-        // 50% sansla vur
-        game.play_card(1, card_no.korkusuz_korkak);
-        game.end_round();
-        expect(game.players[1].health).equals(p1was);
-        expect(game.players[2].health).equals(p2was - damage * 0);
-    });
-    it("1 kere yazi gelme sonucu 20 hasar verir", () => {
-        const game = new cardgame([card_no.korkusuz_korkak], [], rng([true, false, true, true, true, true]));
-
-        const p1was = game.players[1].health;
-        const p2was = game.players[2].health;
-
-        const damage = card_db[card_no.korkusuz_korkak].flips![0].heads!.attack!.target;
-
-        // 50% sansla vur
-        game.play_card(1, card_no.korkusuz_korkak);
-        game.end_round();
-        expect(game.players[1].health).equals(p1was);
-        expect(game.players[2].health).equals(p2was - damage * 1);
-    });
-    it("2 kere yazi gelme sonucu 40 hasar verir", () => {
-        const game = new cardgame([card_no.korkusuz_korkak], [], rng([true, true, false, true, true, true]));
-
-        const p1was = game.players[1].health;
-        const p2was = game.players[2].health;
-
-        const damage = card_db[card_no.korkusuz_korkak].flips![0].heads!.attack!.target;
-
-        // 50% sansla vur
-        game.play_card(1, card_no.korkusuz_korkak);
-        game.end_round();
-        expect(game.players[1].health).equals(p1was);
-        expect(game.players[2].health).equals(p2was - damage * 2);
-    });
-
+    it("direkt olarak 20 hasar verir", card_test(card_no.tivorlu_ismail, 0, 0, 20));
+    it("1 yazida 30 hasar verir",      card_test(card_no.tivorlu_ismail, 1, 0, 30));
+    it("2 yazida 40 hasar verir",      card_test(card_no.tivorlu_ismail, 2, 0, 40));
+    it("3 yazida 50 hasar verir fakat oyuncu 20 hasar alir", card_test(card_no.tivorlu_ismail, 3, 20, 50));
 });
