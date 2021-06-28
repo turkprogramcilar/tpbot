@@ -231,7 +231,7 @@ exports.on_event = async (evt, args) => {
                     .setDescription(parser.tqs(`Exp: ${uexp} Lvl: ${lvl}`))
                     .setThumbnail(user.avatarURL())
                     .setImage(`attachment://${iname}`);
-                    for (const [k, v] of Object.entries(stats)) {
+                    for (const [k, v] of Object.entries(stats ?? {})) {
                         embed = embed.addField(`\`${k.replace(/^\w/, c => c.toUpperCase())}\``, v, true);
                     }
                     await msg.channel.send({
