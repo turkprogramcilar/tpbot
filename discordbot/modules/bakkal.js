@@ -9,6 +9,16 @@ const Discord   = require('discord.js');
 const { parse } = require("path");
 const Jimp      = require("jimp");
 
+const take_off_items = async (uid) => {
+    const wear = await db.get_wear(uid);
+    const inv  = await db.get_inventory(uid);
+    for (const [key, value] of Object.entries(wear)) {
+        inv.push(value);
+    }
+    const p1 = db.set_wear(uid, {});
+    const p2 = db.set_inventory(uid, inv);
+    await p1; await p2;
+}
 const burn_item = async (uid, islot) => {
     islot--;
     const inv = await db.get_inventory(uid);
@@ -26,30 +36,83 @@ const wear_item = async (uid, islot) => {
     
     let wear = await db.get_wear(uid);
     const item = await db.get_item(inv[islot]);
+
+    // if wear is undefined, then lets first define it for the first time.
     if (!wear) wear = {};
-    if (wear[item.Slot]) inv.push(wear[item.Slot]);
-    wear[item.Slot] = item.Num;
+
+    const target_slots = slot_to_wear[item.Slot];
+    if (target_slots.length == 1) {
+        const target_first = target_slots[0];
+        // if slot is occupied, put it back to the inventory first
+        if (wear[target_first]) {
+            inv.push(wear[target_first]);
+            // if it is a double slot and target is two handed, put the second slot
+            // back at inventory too if there's an item
+            const target_second = double_slots[target_first];
+            if (target_second && wear[target_second]) {
+                inv.push(wear[target_second]);
+                delete wear[target_second];
+            }
+        }
+        // wear the item at slot
+        wear[target_first] = item.Num;
+    }
+    else if (target_slots.length == 2) {
+        const target_first  = target_slots[0];
+        const target_second = target_slots[1];
+        // if 1st slot is occupied, look for second slot
+        if (wear[target_first]) {
+            // if 2nd slot is occupied, put it back to the inventory first
+            if (wear[target_second]) {    
+                inv.push(wear[target_second]);
+            }
+            wear[target_second] = item.Num;
+        }
+        // if 1st slot is not occupied, just simply wear it
+        else {
+            // if 2nd slot is occupied, put it back to the inventory first
+            if (wear[target_second]) {    
+                inv.push(wear[target_second]);
+                delete wear[target_second];
+            }
+            // wear the item at slot
+            wear[target_first] = item.Num;
+        }
+    }
+    else {
+        console.error(`can_wear length is not 1 or 2, it is = ${target_slots.length}`);
+        return;
+    }
+    // remove the item from inventory
     inv.splice(islot, 1);
     const p1 = db.set_wear(uid, wear);
     const p2 = db.set_inventory(uid, inv);
     await p1; await p2;
 }
-const map_wear = {
-    /* ItemSlot1HEitherHand */  0  : 6,
-	/* ItemSlot1HRightHand */	1  : 8,
-	/* ItemSlot1HLeftHand */	2  : 6,
-	/* ItemSlot2HRightHand */	3  : 8,
-	/* ItemSlot2HLeftHand */	4  : 6,
-	/* ItemSlotPauldron */		5  : 4,
-	/* ItemSlotPads */		    6  : 10,
-	/* ItemSlotHelmet */		7  : 1,
-	/* ItemSlotGloves */		8  : 12,
-	/* ItemSlotBoots */		    9  : 13,
-	/* ItemSlotEarring */		10 : 0,
-	/* ItemSlotNecklace */		11 : 3,
-	/* ItemSlotRing */		    12 : 9,
-	/* ItemSlotShoulder */		13 : 5,
-	/* ItemSlotBelt */		    14 : 7,
+const double_slots = {
+    6: 8,
+    0: 2,
+    9: 11,
+    8: 6,
+    2: 0,
+    11: 9,
+};
+const slot_to_wear = {
+    /* ItemSlot1HEitherHand */  0  : [6, 8],
+	/* ItemSlot1HRightHand */	1  : [8],
+	/* ItemSlot1HLeftHand */	2  : [6],
+	/* ItemSlot2HRightHand */	3  : [8],
+	/* ItemSlot2HLeftHand */	4  : [6],
+	/* ItemSlotPauldron */		5  : [4],
+	/* ItemSlotPads */		    6  : [10],
+	/* ItemSlotHelmet */		7  : [1],
+	/* ItemSlotGloves */		8  : [12],
+	/* ItemSlotBoots */		    9  : [13],
+	/* ItemSlotEarring */		10 : [0, 2],
+	/* ItemSlotNecklace */		11 : [3],
+	/* ItemSlotRing */		    12 : [9, 11],
+	/* ItemSlotShoulder */		13 : [5],
+	/* ItemSlotBelt */		    14 : [7],
 }
 const send_embed_item = async (msg, id) => await tools.send_embed_item(msg, id, state);
 const render_inventory = async (inventory, iconspath, bgfile, wear) => {
@@ -71,14 +134,26 @@ const render_inventory = async (inventory, iconspath, bgfile, wear) => {
     }));
     const woix=iw, woiy=0, wiw=3, wih=5;
     for (const {slot, im} of wearicons) {
-        const s = map_wear[slot] ?? 20;
+        const s = slot ?? 20;
         const x=s%wiw, y=(s/wiw)|0;
         bg.composite(im, l*(woix+x), l*(woiy+y));
     }
     return await bg.getBufferAsync(Jimp.MIME_PNG);
 }
+
+const get_lock = (uid) => {
+    return state.cache.module["bakkal"].locks[uid];
+}
+const set_lock = (uid, key) => {
+    state.cache.module["bakkal"].locks[uid] = key;
+}
 let state = undefined;
-exports.init = (refState) => state = refState;
+exports.init = (refState) => {
+    state = refState;
+    state.cache.module["bakkal"] = {
+        locks: {},
+    };
+}
 exports.on_event = async (evt, args) => {
     switch (evt) {
         case "message": const msg = args.msg;
@@ -94,7 +169,7 @@ exports.on_event = async (evt, args) => {
 
         if (msg.channel.id == cid.botkomutlari) {
 
-            if (!parser.cooldown_user(state, msg.author.id, "bakkal_komut", 3)) {
+            if (!parser.cooldown_user(state, msg.author.id, "bakkal_komut", 2)) {
                 parser.send_uwarn(msg, "komutu tekrar kullanabilmek icin lutfen bekleyin");
                 return;
             }
@@ -103,18 +178,27 @@ exports.on_event = async (evt, args) => {
                 let out = (await tools.ensure(state, levelstb, db.get_levels)).reduce((a,c)=>a+=`${c.lvl}:${c.exp}\n`,'');
                 msg.channel.send(parser.tqs(out));
             }
-            else if (parser.is(msg, "giy ")) parser.u_arg(msg, async u => await wear_item(msg.author.id, u));
-            else if (parser.is(msg, "sil ")) parser.u_arg(msg, async u => await burn_item(msg.author.id, u));
+
+            // beyond requires lock, if user's inventory is not locked, then proceed
+            if (get_lock(msg.author.id))
+                return await parser.send_uwarn(msg, "Bir onceki islem devam etmektedir. Lutfen bekleyiniz");
+            set_lock(msg.author.id, true);
+
+            if (parser.is(msg, "giy ")) await parser.u_arg(msg, async u => await wear_item(msg.author.id, u));
+            else if (parser.is(msg, "soyun")) await take_off_items(msg.author.id);
+            else if (parser.is(msg, "sil ")) await parser.u_arg(msg, async u => await burn_item(msg.author.id, u));
             else if (parser.is(msg, "profil")) {
                 const premium = parser.is(msg,'p');
-                parser.mention_else_self(msg, async id => {
-                    if (parser.u_arg(msg, async sid => {
+                await parser.mention_else_self(msg, async id => {
+
+                    // if an item at slot is requested to display
+                    if (await parser.u_arg(msg, async sid => {
                         sid = sid - 1 // convert to zero-based index
                         const inv = await db.get_inventory(id);
                         if (sid >= inv.length) return await parser.send_uwarn(msg, `${sid+1} numarali slot bos`);
                         await send_embed_item(msg, inv[sid]);
                     }))
-                        return;
+                        return set_lock(msg.author.id, false);
                     
                     const user = msg.guild.members.cache.get(id).user;
                     const iname = `inventory${(premium ? '_premium' : '')}.png`;
@@ -147,10 +231,11 @@ exports.on_event = async (evt, args) => {
                             .setThumbnail(user.avatarURL())
                             .setImage(`attachment://${iname}`)
                     });
-                })
+                });
             }
+            set_lock(msg.author.id, false);
             
-            // beyond is admin
+            /*// beyond is admin
             if (!groups.admins.includes(msg.author.id))
                 return;
 
@@ -169,7 +254,7 @@ exports.on_event = async (evt, args) => {
                     await db.give_item(msg.author.id, iid);
                 };
                 parser.i_arg(msg, do_f, async ()=> await do_f(await tools.get_riid(state)));
-            }
+            }*/
         }
 
         break;
