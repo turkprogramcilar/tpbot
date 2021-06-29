@@ -11,7 +11,7 @@ class coderstatus extends dcmodule {
         if (msg.content == "ping") await msg.channel.send("pong coderstatusW");
     }
     public async on_reaction(reaction : MessageReaction, user : User | PartialUser) {}
-    public async on_presence_update(new_p: Presence, old_p?: Presence) {
+    public async on_presence_update(old_p: Presence | undefined, new_p: Presence) {
 
         // if null or empty, defensive coding
         if (!new_p) return;
@@ -47,12 +47,10 @@ class coderstatus extends dcmodule {
         if (!guild_member) return;
 
         // give the d to the user if s/he's not given yet, or remove depending on action
-        const promise =
-            action == todo.add
-                ? guild_member.roles.add(["859338500494327810"])
-                : guild_member.roles.remove(["859338500494327810"])
-                ;
-        await promise;
+        if (action == todo.add)
+            await guild_member.roles.add(["859338500494327810"]);
+        else
+            await guild_member.roles.remove(["859338500494327810"]);
     }
 }
 
