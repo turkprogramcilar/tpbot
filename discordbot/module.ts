@@ -16,7 +16,7 @@ export class dcmodule {
     protected db_fetch_start : Date | undefined;
     protected state: any;
 
-    constructor(protected cache_module_db : boolean = false, protected module_name : string = "unnamed_module") { }
+    constructor(protected module_name : string = "unnamed_module", protected cache_module_db : boolean = false, ) { }
     
     public get_client() : Client { 
         return this.state.client; 
