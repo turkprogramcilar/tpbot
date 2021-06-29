@@ -1,5 +1,5 @@
 // package imports
-import { Message, Client, User, PartialUser, MessageReaction, Presence } from "discord.js";
+import { Message, Client, User, PartialUser, MessageReaction, Presence, GuildManager, Guild } from "discord.js";
 // local imports
 const db    = require("../../discordbot/mongodb");
 const tools = require("../../discordbot/tools");
@@ -25,6 +25,10 @@ export class dcmodule {
     public fetch_user(user_id : string) { 
         return this.get_client().users.fetch(user_id);
     }
+    public fetch_guild_member(guild : Guild, user_id : string) { 
+        return guild.members.cache.get(user_id);
+    }
+    
 
     public async on_event(evt: string, args: any) {
 
