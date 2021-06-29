@@ -51,6 +51,13 @@ exports.init = async (state, token, mods = []) => {
         status.init(client, msg_status);
     });
 
+    for (const evt of ['presenceUpdate']) {
+            
+        client.on(evt, async (a1,a2) => {
+            for (const m of modules) 
+                m.on_event(evt, [a1, a2]);
+        }); 
+    }
     client.on('messageReactionAdd', async (reaction,user) => {
         for (const m of modules) 
             m.on_event('messageReactionAdd', {reaction: reaction, user: user});
