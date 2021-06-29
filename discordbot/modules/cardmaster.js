@@ -97,7 +97,7 @@ exports.on_event = async (evt, args) => {
                 const aun = tsg.turn == 1 ? g.un1 : g.un2;
                 const oun = tsg.turn == 2 ? g.un1 : g.un2;
                 if (parser.is(msg, "oyna ")) return await parser.u_arg(msg, async card => {
-                    if ([5,16].includes(card) == false) card = 16;
+                    if ([5,14,16].includes(card) == false) card = 16;
                     if (ap != aid) return await parser.send_uwarn(msg, "Sıra sizde olmadığı için hamle yapamazsınız");
                     const res = tsg.play_card(tsg.turn, card);
                     let header = `\`${aun} aşağıdaki kartı oynadı\``;
