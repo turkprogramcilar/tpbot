@@ -13,7 +13,7 @@ const tools = require("../../discordbot/tools");
 export class dcmodule {
 
     protected async sync_module() { await tools.sync_module(this.module_name, ()=>this.state.cache.module[this.module_name], 1) };
-    protected fetch_start : Date | undefined;
+    protected db_fetch_start : Date | undefined;
     protected state: any;
 
     constructor(protected cache_module_db : boolean = false, protected module_name : string = "unnamed_module") { }
@@ -45,14 +45,14 @@ export class dcmodule {
         this.state = refState;
         const client : Client = this.state.client;
         if (!this.cache_module_db) return;
-        this.fetch_start = new Date();
+        this.db_fetch_start = new Date();
         try {
             const json = (await db.get_module_state(this.module_name));
             this.state.cache.module[this.module_name] = JSON.parse(json);
         } catch {
             this.state.cache.module[this.module_name] = {};
         } finally {
-            this.fetch_start = undefined;
+            this.db_fetch_start = undefined;
         }
         await this.after_init();
     }
