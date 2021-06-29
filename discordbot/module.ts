@@ -12,12 +12,11 @@ const tools = require("../../discordbot/tools");
 
 export class dcmodule {
 
-    protected module_name : string = "nvidia";
     protected async sync_module() { await tools.sync_module(this.module_name, ()=>this.state.cache.module[this.module_name], 1) };
     protected fetch_start : Date | undefined;
     protected state: any;
 
-    constructor(protected cache_module_db : boolean = false) { }
+    constructor(protected cache_module_db : boolean = false, protected module_name : string = "unnamed_module") { }
 
     public async on_event(evt: string, args: any) {
 
