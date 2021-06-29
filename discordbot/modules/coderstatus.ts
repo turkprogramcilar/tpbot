@@ -9,12 +9,12 @@ class coderstatus extends dcmodule {
     public async after_init(){
         // below code manually pushes the states into db
         
-        const ref = this.get_ms();
+        /*const ref = this.get_ms();
         ref.coder_apps = {
             vscode_icrawl: "383226320970055681",
             pycharm: "547843598369161278"
         }
-        await this.sync_db_ms();
+        await this.sync_db_ms();*/
     }
     public async on_reaction(reaction : MessageReaction, user : User | PartialUser) {}
     public async on_presence_update(old_p: Presence | undefined, new_p: Presence) {
