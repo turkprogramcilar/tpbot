@@ -132,7 +132,7 @@ const scroll_ids = [
     37902400,
     37902500,
 ];
-const keys_ids = [
+const key_ids = [
     91004500,
     91005100,
     38910100,
@@ -214,10 +214,48 @@ exports.on_event = async (evt, args) => {
             // beyond requires lock, if user's inventory is not locked, then proceed
             if (get_lock(msg.author.id))
                 return await parser.send_uwarn(msg, "Bir onceki islem devam etmektedir. Lutfen bekleyiniz");
+            
+            // lock the inventory operation before completion to prevent
+            // item losses or duplications
             set_lock(msg.author.id, true);
 
             if (parser.is(msg, "giy ")) await parser.u_arg(msg, async u => await wear_item(msg.author.id, u, msg));
             else if (parser.is(msg, "soyun")) await take_off_items(msg.author.id);
+            else if (parser.is(msg, "anektar ")) await parser.u_arg(msg, async islot => {
+                
+                // get client from module state
+                const client = state.client;
+
+                // get the item from the slot
+                islot--;
+                const inv = await db.get_inventory(msg.author.id);
+                if (!inv || !inv[islot])
+                    return await parser.send_uwarn(msg, "Belirtilen slotta item bulunamadı.");
+
+                if (!key_ids.includes(inv[islot]))
+                    return await parser.send_uwarn(msg, "Belirtilen item anektar değildir.");
+                    
+                // remove the key item from inventory            
+                inv.splice(islot, 1);
+
+                // pick a random item
+                const rid = await tools.get_riid(state);
+
+                // give the item to the user
+                inv.push(rid);
+                
+                const promise_update_db = db.set_inventory(msg.author.id, inv);
+
+                const user = await client.users.fetch(msg.author.id);
+                await msg.channel.send(new Discord.MessageEmbed()
+                    .setDescription(parser.tqs("Anektarını gırdındın. Ahanda rastgele çıkan item şudur:"))
+                    .setAuthor(user.username, user.avatarURL())
+                    .setThumbnail(client.user.avatarURL())
+                );
+                await tools.send_embed_item(msg, rid, state);
+
+                await promise_update_db;
+            });
             else if (parser.is(msg, "sil ")) await parser.u_arg(msg, async u => await burn_item(msg.author.id, u));
             else if (parser.is(msg, "profil")) {
                 const premium = parser.is(msg,'p');
@@ -276,6 +314,8 @@ exports.on_event = async (evt, args) => {
                     });
                 });
             }
+
+            // unlock the inventory operation after completion
             set_lock(msg.author.id, false);
             
             // beyond is admin
