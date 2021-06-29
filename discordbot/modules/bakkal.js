@@ -120,6 +120,32 @@ const slot_to_wear = {
 	/* ItemSlotShoulder */		13 : [5],
 	/* ItemSlotBelt */		    14 : [7],
 }
+const scroll_ids = [
+    37901600,
+    37901700,
+    37901800,
+    37901900,
+    37902000,
+    37902100,
+    37902200,
+    37902300,
+    37902400,
+    37902500,
+];
+const keys_ids = [
+    91004500,
+    91005100,
+    38910100,
+    38910200,
+    38910300,
+    38910400,
+    37911100,
+    37908200,
+    37908300,
+    37908400,
+    37908000,
+    37908100,
+];
 const send_embed_item = async (msg, id) => await tools.send_embed_item(msg, id, state);
 const render_inventory = async (inventory, iconspath, bgfile, wear) => {
     // l= length, oix= offset inventory x, ogx= offset gear x, iw= inventory width,
