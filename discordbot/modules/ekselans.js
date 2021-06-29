@@ -16,9 +16,10 @@ exports.on_event = async (evt, args) => {
             const p0 = db.differ_exp(uid, exps.bump);
             const rid = await tools.get_riid(state);
             const p1 = db.give_item(uid, rid);
+            const user = await client.users.fetch(uid);
             const p2 = msg.channel.send(new Discord.MessageEmbed()
                 .setDescription(parser.tqs("Afferin evlat. Seni aşağıdaki ödüllerle kutsuyorum"))
-                .setAuthor(msg.author.username, msg.author.avatarURL())
+                .setAuthor(user.username, user.avatarURL())
                 .addField("`Deneyim puanı (exp)`", parser.tqs(exps.bump))
                 .setThumbnail(client.user.avatarURL())
             );
