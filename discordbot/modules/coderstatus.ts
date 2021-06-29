@@ -6,15 +6,54 @@ class coderstatus extends dcmodule {
     
     constructor() { super(coderstatus.name, true); }
     
-    public async after_init(){
-        // below code manually pushes the states into db
+    public async after_init(){}
+    public async on_message(msg : Message) {
+
+         // assign message to the parser
+        this.set_msg(msg);
+
+        // if not a command, return
+        if (!this.is_prefixed()) return;
         
-        /*const ref = this.get_ms();
-        ref.coder_apps = {
-            vscode_icrawl: "383226320970055681",
-            pycharm: "547843598369161278"
+        // if not admin, return
+        if (!this.is_admin(msg.author.id)) return;
+
+        // add a coder app id to the database
+        if (this.is_word("coder_app")) {
+
+            const user_id = this.get_mention();
+            if (!user_id)
+                return await this.inform(`none is mentioned.`);
+
+            const app_name = this.get_word();
+            if (!app_name)
+                return await this.inform(`app name is not given.`);
+
+            // get the user
+            const user = await this.get_client().users.fetch(user_id);
+
+            // activities needs to be 1
+            if (user.presence.activities.length != 1)
+                return await this.inform(`activities length is ${user.presence.activities.length} != 1`);
+
+            const activity = user.presence.activities[0];
+
+            const app_id = activity.applicationID;
+            if (!app_id)
+                return await this.inform(`app_id is either undefined null or empty (or false kekw)`);
+            
+            // inform what's happening as the final action being taken
+            const ref = this.get_ms();
+            if (ref.coder_apps[app_name])
+                await this.inform(`app name with ${app_name} was existing before "${ref.coder_apps[app_name]}". Updating with "${app_id}"...`);
+            else
+                await this.inform(`app name with ${app_name} with id "${app_id}" is being added to the coder apps...`);
+
+            // do the updates
+            ref.coder_apps[app_name] = app_id;
+            await this.sync_db_ms();
         }
-        await this.sync_db_ms();*/
+        
     }
     public async on_reaction(reaction : MessageReaction, user : User | PartialUser) {}
     public async on_presence_update(old_p: Presence | undefined, new_p: Presence) {
