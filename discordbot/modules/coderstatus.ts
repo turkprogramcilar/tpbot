@@ -6,26 +6,34 @@ class coderstatus extends dcmodule {
     
     constructor() { super(coderstatus.name, true); }
     
-    public async after_init(){}
+    public async after_init(){
+        // below code manually pushes the states into db
+        
+        const ref = this.get_ms();
+        ref.coder_apps = {
+            vscode_icrawl: "383226320970055681",
+            pycharm: "547843598369161278"
+        }
+        await this.sync_db_ms();
+    }
     public async on_reaction(reaction : MessageReaction, user : User | PartialUser) {}
     public async on_presence_update(old_p: Presence | undefined, new_p: Presence) {
 
         // if null or empty, defensive coding
         if (!new_p) return;
 
-        // define known coder applications that broadcast status message about coding
-        enum coder_apps {
-            vscode  = "383226320970055681", 
-            pycharm = "547843598369161278",
-        };
-
         // test to see if user's new status update includes these app's in playing status
         enum todo {
             add,
             del,
         };
+
+        const coder_apps : string[]
+            = Object.values( (this.get_ms()?.coder_apps) ?? {} ) ?? []
+            ;
+
         const action : todo =
-            new_p.activities.find(x => Object.values(coder_apps).map(x=>x.toString()).includes(x.applicationID ?? ""))
+            new_p.activities.find(x => Object.values(coder_apps).includes(x.applicationID ?? ""))
                 ? todo.add
                 : todo.del
                 ;
