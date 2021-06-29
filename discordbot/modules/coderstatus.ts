@@ -4,6 +4,7 @@ import { dcmodule } from "../module";
 
 class coderstatus extends dcmodule {
     
+    constructor() { super(true, coderstatus.name)}
     
     public async after_init(){}
     public async on_message(msg : Message){
