@@ -7,10 +7,6 @@ class coderstatus extends dcmodule {
     constructor() { super(true, coderstatus.name)}
     
     public async after_init(){}
-    public async on_message(msg : Message){
-
-        if (msg.content == "ping") await msg.channel.send("pong coderstatusW");
-    }
     public async on_reaction(reaction : MessageReaction, user : User | PartialUser) {}
     public async on_presence_update(old_p: Presence | undefined, new_p: Presence) {
 
