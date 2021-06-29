@@ -9,14 +9,14 @@ const tools = require("../../discordbot/tools");
     if (fetch_start) return await parser.send_uwarn(msg,
         "Modul halen yukleniyor... Lutfen bir sure sonra tekrar deneyin.");
  */
-
+const UNNAMED_MODULE : string = "unnamed_module";
 export class dcmodule {
 
-    protected async sync_module() { await tools.sync_module(this.module_name, ()=>this.state.cache.module[this.module_name], 1) };
+
     protected db_fetch_start : Date | undefined;
     protected state: any;
 
-    constructor(protected module_name : string = "unnamed_module", protected cache_module_db : boolean = false, ) { }
+    constructor(protected module_name : string = UNNAMED_MODULE, protected cache_module_db : boolean = false, ) { }
     
     public get_client() : Client { 
         return this.state.client; 
@@ -46,10 +46,15 @@ export class dcmodule {
         }
     }
     public async init(refState: any) {
+
         this.state = refState;
-        const client : Client = this.state.client;
+        
         if (!this.cache_module_db) return;
+        if (this.module_name == UNNAMED_MODULE)
+            throw new Error("Module is UNNAMED while cache module db is enabled.");
+
         this.db_fetch_start = new Date();
+
         try {
             const json = (await db.get_module_state(this.module_name));
             this.state.cache.module[this.module_name] = JSON.parse(json);
@@ -58,7 +63,14 @@ export class dcmodule {
         } finally {
             this.db_fetch_start = undefined;
         }
+
         await this.after_init();
+    }
+    protected async sync_db_ms() {
+        await tools.sync_module(this.module_name, ()=>this.state.cache.module[this.module_name], 1) 
+    };
+    protected get_ms() : any {
+        return this.state.cache.module[this.module_name];
     }
 
     public async after_init() {}
