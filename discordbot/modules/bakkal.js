@@ -90,8 +90,8 @@ const wear_item = async (uid, islot, msg) => {
     const p1 = db.set_wear(uid, wear);
     const p2 = db.set_inventory(uid, inv);
     // calculate stats
-    const items = await Promise.all(Object.values(wear).map(iid => db.get_item(iid)));
-    const dmg = items.reduce((a, item) => a += (item["Damage"] ?? 0), 0);
+    const items = await Promise.all(Object.values(wear).map(iid => db.get_item(tools.i0(iid))));
+    const dmg = items.reduce((a, item) => a += tools.iplusdmg(iid, item["Damage"] ?? 0), 0);
     const p3 = db.set_user_value(uid, "stats", {"Damage": dmg});
     await p1; await p2; await p3;
 }
@@ -127,7 +127,7 @@ const render_inventory = async (inventory, iconspath, bgfile, wear) => {
     const l=45, oix=0, oiy=1, ogx=7, ogy=0, iw=7, ih=4, gw=3, gh=5, LIMIT=iw*ih;
     const bg = await Jimp.read(iconspath+'/'+bgfile);
     const icons = await Promise.all((inventory ?? []).slice(0,LIMIT).map(async (id,i) => {
-        let im = await Jimp.read(await tools.guard_iconpath(id));
+        let im = await Jimp.read(await tools.guard_iconpath(tools.i0(id)));
         return { "i": i, "im": im };
     }));
     for (const {i, im} of icons) {
@@ -135,7 +135,7 @@ const render_inventory = async (inventory, iconspath, bgfile, wear) => {
         bg.composite(im, l*(oix+x), l*(oiy+y));
     }
     const wearicons = await Promise.all(Object.entries(wear ?? {}).map(async kv => {
-        let im = await Jimp.read(await tools.guard_iconpath(kv[1]));
+        let im = await Jimp.read(await tools.guard_iconpath(tools.i0(kv[1])));
         return { "slot": kv[0], "im": im };
     }));
     const woix=iw, woiy=0, wiw=3, wih=5;
@@ -256,7 +256,7 @@ exports.on_event = async (evt, args) => {
             if (!groups.admins.includes(msg.author.id))
                 return;
 
-            /*
+            
             if (parser.is(msg, "item ")) {
                 // id ile item bilgisi sorgulama
                 parser.i_arg(msg, i => send_embed_item(msg, i));
@@ -267,6 +267,7 @@ exports.on_event = async (evt, args) => {
                     send_embed_item(msg, 11111000),
                 ]);
             }
+            /*
             else if (parser.is(msg, "torpil")) {
                 const do_f = async iid => {
                     await db.give_item(msg.author.id, iid);

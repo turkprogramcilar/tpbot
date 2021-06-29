@@ -138,13 +138,16 @@ exports.is_disboard_bumped = (msg) => {
 
 //embeds:
 exports.send_embed_item = async (msg, id, state) => {
+    const plus = exports.iplus(id);
+    const fullid = id;
+    id = exports.i0(id);
     const [is, p] = await Promise.all([
         exports.ensure(state, itemstb, db.get_items),
         exports.read_icon(id)
     ]);
     let i = is.find(x=>x["Num"]==id);
     if (i) i = JSON.parse(JSON.stringify(i));
-    const title = (i?.strName??"Item not found").replace(/\(\+[0-9]+\)/, '').trim();
+    const title = (i?.strName??"Item not found").replace(/\(\+[0-9]+\)/, '').trim()+(plus>0?` (+${plus})`:"");
     const price = i?.BuyPrice??0;
     const num   = i?.Num;
     let embedded = new Discord.MessageEmbed()
@@ -159,6 +162,8 @@ exports.send_embed_item = async (msg, id, state) => {
         delete i["strName"]; //delete i["strDesc"];
         //delete i["IconID"];  //delete i["BuyPrice"];
         for (const k of Object.keys(i)) {
+            if (plus > 0 && k=="Damage")
+                i[k] = exports.iplusdmg(fullid, i[k]);
             if (!i[k] || i[k].toString()=='0') if (k!='Slot')
                 delete i[k];
         }
@@ -173,3 +178,7 @@ exports.send_embed_item = async (msg, id, state) => {
             .addField('`'+title+'`', parser.tqs(JSON.stringify(i??{},null,'\t'),'json'))
     });
 };
+
+exports.i0 = (iid) => iid.toString().length == 9 ? iid/10|0 : iid;
+exports.iplus = (iid) => iid.toString().length != 9 ? 0 : parseInt(iid.toString()[8]);
+exports.iplusdmg = (iid, dmg) => dmg * Math.pow(1.11, exports.iplus(iid)) | 0;
