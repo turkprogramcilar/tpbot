@@ -17,7 +17,10 @@ class coderstatus extends dcmodule {
         if (!new_p) return;
 
         // define known coder applications that broadcast status message about coding
-        const coder_apps = ["383226320970055681"];
+        enum coder_apps {
+            vscode  = "383226320970055681", 
+            pycharm = "547843598369161278",
+        };
 
         // test to see if user's new status update includes these app's in playing status
         enum todo {
@@ -25,7 +28,7 @@ class coderstatus extends dcmodule {
             del,
         };
         const action : todo =
-            new_p.activities.find(x => coder_apps.includes(x.applicationID ?? ""))
+            new_p.activities.find(x => Object.values(coder_apps).map(x=>x.toString()).includes(x.applicationID ?? ""))
                 ? todo.add
                 : todo.del
                 ;
