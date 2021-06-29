@@ -1,8 +1,10 @@
 // package imports
 import { Message, Client, User, PartialUser, MessageReaction, Presence, GuildManager, Guild } from "discord.js";
 // local imports
-const db    = require("../../discordbot/mongodb");
-const tools = require("../../discordbot/tools");
+const db        = require("../../discordbot/mongodb");
+const tools     = require("../../discordbot/tools");
+const parser    = require("../../discordbot/cmdparser");
+const constants = require("../../discordbot/constants");
 
 /**
  * 
@@ -12,7 +14,7 @@ const tools = require("../../discordbot/tools");
 const UNNAMED_MODULE : string = "unnamed_module";
 export class dcmodule {
 
-
+    private msg : Message | undefined;
     protected db_fetch_start : Date | undefined;
     protected state: any;
 
@@ -71,6 +73,43 @@ export class dcmodule {
     };
     protected get_ms() : any {
         return this.state.cache.module[this.module_name];
+    }
+
+    // parsing
+    protected set_msg(msg : Message) {
+        this.msg = msg;
+    }
+    protected is_prefixed() : boolean {
+        return this.is_word(this.state.prefix);
+    }
+    protected is_word(word : string) : boolean {
+        return parser.is(this.msg, word);
+    }
+    // parsers with getters
+    protected get_unsigned() : number | null {
+        let u : number | null = null;
+        parser.u_arg(this.msg, (x : any) => u = x);
+        return u;
+    }
+    protected get_mention() : string | null {
+        let id : string | null = null;
+        parser.mention(this.msg, (x : any) => id = x);
+        return id;
+    }
+    protected get_word() : string | null {
+        let word : string | null = null;
+        parser.r_arg(this.msg, /^\w+/, (x : any) => word = x);
+        return word;
+    }
+
+    // controls
+    protected is_admin(user_id : string) : boolean {
+        return constants.groups.admins.includes(user_id);
+    }
+
+    // send message back
+    protected async inform(information : string) {
+        return await parser.send_uwarn(this.msg, information, true);
     }
 
     public async after_init() {}
