@@ -1,5 +1,5 @@
 // package imports
-import { Message, Client, User, PartialUser, MessageReaction } from "discord.js";
+import { Message, Client, User, PartialUser, MessageReaction, Presence } from "discord.js";
 // local imports
 const db    = require("../../discordbot/mongodb");
 const tools = require("../../discordbot/tools");
@@ -12,12 +12,12 @@ const tools = require("../../discordbot/tools");
 
 export class dcmodule {
 
-    private module_name : string = "nvidia";
-    private async sync_module() { await tools.sync_module(this.module_name, ()=>this.state.cache.module[this.module_name], 1) };
-    private fetch_start : Date | undefined;
-    private state: any;
+    protected module_name : string = "nvidia";
+    protected async sync_module() { await tools.sync_module(this.module_name, ()=>this.state.cache.module[this.module_name], 1) };
+    protected fetch_start : Date | undefined;
+    protected state: any;
 
-    constructor(private cache_module_db : boolean = false) { }
+    constructor(protected cache_module_db : boolean = false) { }
 
     public async on_event(evt: string, args: any) {
 
@@ -30,6 +30,8 @@ export class dcmodule {
                 const user : User | PartialUser = args.user;
                 await this.on_reaction(reaction, user);
             break;
+            case 'presenceUpdate':
+                await this.on_presence_update(args[0], args[1]);
         }
     }
     public async init(refState: any) {
@@ -48,9 +50,10 @@ export class dcmodule {
         await this.after_init();
     }
 
-    public async after_init(){}
-    public async on_message(msg : Message){}
-    public async on_reaction(reaction : MessageReaction, user : User | PartialUser){}
+    public async after_init() {}
+    public async on_message(msg : Message) {}
+    public async on_reaction(reaction : MessageReaction, user : User | PartialUser) {}
+    public async on_presence_update(new_p: Presence, old_p: Presence) {}
 }
 
 
