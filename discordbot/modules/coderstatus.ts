@@ -4,7 +4,7 @@ import { dcmodule } from "../module";
 
 class coderstatus extends dcmodule {
     
-    constructor() { super(true, coderstatus.name)}
+    constructor() { super(coderstatus.name, true); }
     
     public async after_init(){}
     public async on_reaction(reaction : MessageReaction, user : User | PartialUser) {}
