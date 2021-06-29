@@ -18,6 +18,7 @@ export class dcmodule {
 
     constructor(protected cache_module_db : boolean = false, protected module_name : string = "unnamed_module") { }
 
+    public get_client() : Client { return this.state.client; }
     public async on_event(evt: string, args: any) {
 
         switch(evt) {
