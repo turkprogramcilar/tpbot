@@ -1,5 +1,5 @@
 exports.is = (msg, cmd) => {
-    if (msg.content.trimStart().startsWith(cmd)) {
+    if (msg.content.trimStart().toLowerCase().startsWith(cmd.toLowerCase())) {
         msg.content = msg.content.trimStart().slice(cmd.length);
         return true;
     }
