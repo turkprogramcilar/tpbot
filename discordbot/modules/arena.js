@@ -172,19 +172,16 @@ const hit = async (msg, gm=false,gmdmg=0) => {
     const idmg = user?.stats?.Hasar ?? 0;
     const maxdmg = tools.maxdmg(idmg, expm);
     let dmg = tools.getdmg(maxdmg, buff);
-    
     const now = new Date();
-    const timediff = now-(user.timestamp ?? (now - init_diff));
-    //http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIxLygxKzVeKC14KzIpKSIsImNvbG9yIjoiIzAwMDAwMCJ9LHsidHlwZSI6MCwiZXEiOiIxIiwiY29sb3IiOiIjNTkyQTJBIn0seyJ0eXBlIjowLCJlcSI6IjEvKDErMS4zXigteCsyMCkpIiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjowLCJlcSI6IjEvKDErMS4zXigteCsyMCkpKzEvKDErNV4oLXgrMikpIiwiY29sb3IiOiIjMzlFMDFCIn0seyJ0eXBlIjoxMDAwLCJ3aW5kb3ciOlsiLTIxLjY3MDAwMDAwMDAwMDAwNSIsIjY5LjUzIiwiLTExLjEwNzI3MjcyNzI3MjcyNyIsIjExLjI5MjcyNzI3MjcyNzI3MSJdLCJzaXplIjpbNzUwLDU1MF19XQ--
-    const spam_reducer = 1/(1+Math.pow(1.3,(-timediff+20)))+1/(1+Math.pow(5,-(timediff/1000) + 2));
+    const timediff = (now-(user.timestamp ?? (now - init_diff)))/1000;
     
+    const spam_reducer = 1/(1+Math.pow(1.3,(-timediff+20)))+1/(1+Math.pow(5,-(timediff) + 2));
     dmg *= spam_reducer;
-    console.log(spam_reducer);
     user.timestamp = now;
-    if (gm) dmg=gmdmg;
+    if (gm) dmg=gmdmg|0;
     dmg |=0;
-
     user.dmg += dmg;
+
     alive.hp-=dmg;
     if (alive.hp <= 0) {
         alive.hp = 0;
