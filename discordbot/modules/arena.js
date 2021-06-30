@@ -161,7 +161,7 @@ const hit = async (msg, gm=false,gmdmg=0) => {
     }
     const user = alive.dmgdone[uid];
     const expm = tools.getexpm(user?.exp ?? 0);
-    const idmg = user?.stats?.damage ?? 0;
+    const idmg = user?.stats?.Hasar ?? 0;
     const maxdmg = tools.maxdmg(idmg, expm);
     let dmg = tools.getdmg(maxdmg, buff);
     if (gm) dmg=gmdmg|0;

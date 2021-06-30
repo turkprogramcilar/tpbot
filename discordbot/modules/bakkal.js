@@ -36,7 +36,9 @@ const wear_item = async (uid, islot, msg) => {
         return await parser.send_uwarn(msg, "Belirtilen slotta item bulunamadı.");
     
     let wear = await db.get_wear(uid);
-    const item = await db.get_item(inv[islot]);
+    const iplus = inv[islot];
+    const i0 = tools.i0(iplus);
+    const item = await db.get_item(i0);
 
     // if wear is undefined, then lets first define it for the first time.
     if (!wear) wear = {};
@@ -57,7 +59,7 @@ const wear_item = async (uid, islot, msg) => {
             }
         }
         // wear the item at slot
-        wear[target_first] = item.Num;
+        wear[target_first] = iplus;
     }
     else if (target_slots.length == 2) {
         const target_first  = target_slots[0];
@@ -68,7 +70,7 @@ const wear_item = async (uid, islot, msg) => {
             if (wear[target_second]) {    
                 inv.push(wear[target_second]);
             }
-            wear[target_second] = item.Num;
+            wear[target_second] = iplus;
         }
         // if 1st slot is not occupied, just simply wear it
         else {
@@ -78,7 +80,7 @@ const wear_item = async (uid, islot, msg) => {
                 delete wear[target_second];
             }
             // wear the item at slot
-            wear[target_first] = item.Num;
+            wear[target_first] = iplus;
         }
     }
     else {
@@ -90,9 +92,11 @@ const wear_item = async (uid, islot, msg) => {
     const p1 = db.set_wear(uid, wear);
     const p2 = db.set_inventory(uid, inv);
     // calculate stats
-    const items = await Promise.all(Object.values(wear).map(iid => db.get_item(tools.i0(iid))));
-    const dmg = items.reduce( (a, item) => a += tools.iplusdmg(item["Num"], item["Damage"] ?? 0), 0);
-    const p3 = db.set_user_value(uid, "stats", {"Damage": dmg});
+    const pluses_worn = Object.values(wear)
+    const items = await Promise.all(pluses_worn.map(iid => db.get_item(tools.i0(iid))));
+    
+    const dmg = items.reduce( (a, item, i) => a += tools.iplusdmg(pluses_worn[i], item["Damage"] ?? 0), 0);
+    const p3 = db.set_user_value(uid, "stats", {"Hasar": dmg});
     await p1; await p2; await p3;
 }
 const double_slots = {
@@ -120,6 +124,7 @@ const slot_to_wear = {
 	/* ItemSlotShoulder */		13 : [5],
 	/* ItemSlotBelt */		    14 : [7],
 }
+const is_wearable = (item_slot) => Object.keys(slot_to_wear).map(x=>parseInt(x)).includes(item_slot);
 const scroll_ids = [
     37901600,
     37901700,
@@ -132,6 +137,7 @@ const scroll_ids = [
     37902400,
     37902500,
 ];
+const trina_id = 70000200;
 const key_ids = [
     91004500,
     91005100,
@@ -146,6 +152,17 @@ const key_ids = [
     37908000,
     37908100,
 ];
+const upgrade_chance = {
+    1: 1.0,
+    2: 1.0,
+    3: 1.0,
+    4: 1.0,
+    5: 1.0,
+    6:  .8,
+    7:  .4,
+    8:  .2,
+    9:  .1,
+}
 const send_embed_item = async (msg, id) => await tools.send_embed_item(msg, id, state);
 const render_inventory = async (inventory, iconspath, bgfile, wear) => {
     // l= length, oix= offset inventory x, ogx= offset gear x, iw= inventory width,
@@ -221,6 +238,38 @@ exports.on_event = async (evt, args) => {
 
             if (parser.is(msg, "giy ")) await parser.u_arg(msg, async u => await wear_item(msg.author.id, u, msg));
             else if (parser.is(msg, "soyun")) await take_off_items(msg.author.id);
+            else if (parser.is(msg, "yukselt")) {
+
+                const str = "Kullanim: %yukselt <yükseltme kağıdı slot no> <yükselcek item slot no>";
+
+                await parser.u_arg(msg, async islot_scroll => {
+
+                    await parser.u_arg(msg, async islot_item => {
+
+                        //
+
+                        // get the item from the slot
+                        const inv = await db.get_inventory(msg.author.id);
+                        for (let islot of [islot_scroll, islot_item]) {
+                            islot--;
+                            if (!inv || !inv[islot])
+                                return await parser.send_uwarn(msg, "Belirtilen slotta item bulunamadı.");
+                        }
+                        islot_scroll--; islot_item--;
+
+                        if (!scroll_ids.includes(inv[islot_scroll]))
+                            return await parser.send_uwarn(msg, "Belirtilen item yükseltme kağıdı değildir.");
+
+                        const upgrading_item = await db.get_item(inv[islot_item]);
+                        if (!is_wearable(upgrading_item["Slot"]))
+                            return await parser.send_uwarn(msg, "Belirtilen item yükseltilebilir bir item değildir.");
+                        //
+                        console.log("OK");
+
+                    }, async () => await parser.send_uwarn(msg, str));
+
+                }, async () => await parser.send_uwarn(msg, str));
+            }
             else if (parser.is(msg, "anektar ")) await parser.u_arg(msg, async islot => {
                 
                 // get client from module state
@@ -300,7 +349,7 @@ exports.on_event = async (evt, args) => {
                     for (const [k, v] of Object.entries(stats ?? {})) {
                         embed = embed.addField(`\`Item ${k.replace(/^\w/, c => c.toUpperCase())}\``, v, true);
                     }
-                    const idmg = stats?.damage ?? 0;
+                    const idmg = stats?.Hasar ?? 0;
                     const maxdmg = tools.maxdmg(idmg, expm);
                     embed = embed
                         .addField("`Minimum Hasar`", maxdmg*tools.mindmg_r|0, true)
@@ -333,13 +382,13 @@ exports.on_event = async (evt, args) => {
                     send_embed_item(msg, 11111000),
                 ]);
             }
-            /*
+            
             else if (parser.is(msg, "torpil")) {
                 const do_f = async iid => {
                     await db.give_item(msg.author.id, iid);
                 };
                 parser.i_arg(msg, do_f, async ()=> await do_f(await tools.get_riid(state)));
-            }*/
+            }
         }
 
         break;
