@@ -120,7 +120,7 @@ exports.sync_module = (module, json_get, frequency) => {
 // damage veriyor bu formul
 exports.getexpm = (xp) => 1 + Math.log(1*xp/200000+1);
 
-exports.maxdmg = (idmg, expm) => (200 + idmg)*expm;
+exports.maxdmg = (idmg, expm) => (100 + idmg)*expm;
 exports.mindmg_r = .3;
 exports.getdmg = (maxdmg, buff) => (exports.mindmg_r+Math.random()*(1-exports.mindmg_r))*maxdmg*buff|0;
 

@@ -56,11 +56,6 @@ exports.on_event = async (evt, args) => {
 
         // vur command send on arena
         if (parser.is(msg, "vur")) {
-            if (!parser.cooldown_user(state, msg.author.id, "arena_vur", 4.7)) {
-                const reply = await parser.send_uwarn(msg, "komutu tekrar kullanabilmek icin lutfen bekleyin", 2);
-                toggle_purge(reply);
-                return;
-            }
             hit(msg);
             return;
         }
@@ -89,6 +84,11 @@ exports.on_event = async (evt, args) => {
                 if (!msg.guild.emojis.cache.get(id)) return;
                 await create(msg, nm, id, hp)
             }
+        }
+        else if (parser.is(msg, "yoket")) {
+            
+            await parser.send_uwarn(msg, `Yokediliyor... [alive: ${alive?.name ?? "<yok>"}]`);
+            alive = undefined;
         }
         /*else if (parser.is(msg, "dmg ")) r_arg(msg, /^[0-9]+/, async n => {
             xp = await php.get_exp(n);
@@ -150,13 +150,21 @@ const hit = async (msg, gm=false,gmdmg=0) => {
     const uname = msg.author.username;
     const uid   = msg.author.id;
 
+    //60 second is to allow spam dmg formula to init at full power
+    const init_diff = 60*1000;
+
     // if stats are not fetched, fetch them first
     if (!alive.dmgdone[uid]) {
+
+        // query in paralel
+        const promise_stats = db.get_user_value(uid, "stats");
+        const promise_exp   = db.get_user_value(uid, "exp");
         alive.dmgdone[uid] = {
             name: uname, 
             "dmg": 0,
-            "stats": await db.get_user_value(uid, "stats"),
-            "exp": await db.get_user_value(uid, "exp")
+            "stats": await promise_stats,
+            "exp": await promise_exp,
+            "timestamp": new Date()-init_diff
         };
     }
     const user = alive.dmgdone[uid];
@@ -164,10 +172,19 @@ const hit = async (msg, gm=false,gmdmg=0) => {
     const idmg = user?.stats?.Hasar ?? 0;
     const maxdmg = tools.maxdmg(idmg, expm);
     let dmg = tools.getdmg(maxdmg, buff);
-    if (gm) dmg=gmdmg|0;
     
-    alive.dmgdone[uid].dmg += dmg;
+    const now = new Date();
+    const timediff = now-(user.timestamp ?? (now - init_diff));
+    //http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIxLygxKzVeKC14KzIpKSIsImNvbG9yIjoiIzAwMDAwMCJ9LHsidHlwZSI6MCwiZXEiOiIxIiwiY29sb3IiOiIjNTkyQTJBIn0seyJ0eXBlIjowLCJlcSI6IjEvKDErMS4zXigteCsyMCkpIiwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjowLCJlcSI6IjEvKDErMS4zXigteCsyMCkpKzEvKDErNV4oLXgrMikpIiwiY29sb3IiOiIjMzlFMDFCIn0seyJ0eXBlIjoxMDAwLCJ3aW5kb3ciOlsiLTIxLjY3MDAwMDAwMDAwMDAwNSIsIjY5LjUzIiwiLTExLjEwNzI3MjcyNzI3MjcyNyIsIjExLjI5MjcyNzI3MjcyNzI3MSJdLCJzaXplIjpbNzUwLDU1MF19XQ--
+    const spam_reducer = 1/(1+Math.pow(1.3,(-timediff+20)))+1/(1+Math.pow(5,-(timediff/1000) + 2));
+    
+    dmg *= spam_reducer;
+    console.log(spam_reducer);
+    user.timestamp = now;
+    if (gm) dmg=gmdmg;
+    dmg |=0;
 
+    user.dmg += dmg;
     alive.hp-=dmg;
     if (alive.hp <= 0) {
         alive.hp = 0;
