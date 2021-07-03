@@ -119,10 +119,12 @@ exports.sync_module = (module, json_get, frequency) => {
 // Anlik sunucuda en fazla exp 148k, yaklasik 0.6~ + 1 -> 1.6 kat fazla
 // damage veriyor bu formul
 exports.getexpm = (xp) => 1 + Math.log(1*xp/200000+1);
+exports.base_dmg = (idmg, expm) => (100 + idmg)*expm;
+exports.damage_multiplier = (time_diff) => 1/(1+Math.pow(1.3,(-time_diff+20)))+1/(1+Math.pow(5,-(time_diff) + 2)); 
 
-exports.maxdmg = (idmg, expm) => (100 + idmg)*expm;
-exports.mindmg_r = .3;
-exports.getdmg = (maxdmg, buff) => (exports.mindmg_r+Math.random()*(1-exports.mindmg_r))*maxdmg*buff|0;
+
+exports.final_dmg = (base_dmg, time_diff) => base_dmg*exports.damage_multiplier(time_diff);
+///
 
 // platform specific tools:
 exports.is_disboard_bumped = (msg) => {

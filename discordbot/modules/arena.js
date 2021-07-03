@@ -168,28 +168,30 @@ const hit = async (msg, gm=false,gmdmg=0) => {
         };
     }
     const user = alive.dmgdone[uid];
-    const expm = tools.getexpm(user?.exp ?? 0);
     const idmg = user?.stats?.Hasar ?? 0;
-    const maxdmg = tools.maxdmg(idmg, expm);
-    let dmg = tools.getdmg(maxdmg, buff);
-    const now = new Date();
-    const timediff = (now-(user.timestamp ?? (now - init_diff)))/1000;
+    const expm = tools.getexpm(user?.exp ?? 0);
     
-    const spam_reducer = 1/(1+Math.pow(1.3,(-timediff+20)))+1/(1+Math.pow(5,-(timediff) + 2));
-    dmg *= spam_reducer;
-    user.timestamp = now;
-    if (gm) dmg=gmdmg|0;
-    dmg |=0;
-    user.dmg += dmg;
+    // calculate time difference for dmg calculation
+    const now = new Date();
+    const time_diff = (now-(user.timestamp ?? (now - init_diff)))/1000;
+    // get base damage
+    const base_dmg = tools.base_dmg(idmg, expm);
+    // get final damage
+    const final_dmg = (!gm ? tools.final_dmg(base_dmg, time_diff)*buff : gmdmg)|0;
 
-    alive.hp-=dmg;
+    // update user damage hit statistics
+    user.timestamp = now;
+    user.dmg += final_dmg;
+
+    // update mega emoji health
+    alive.hp-=final_dmg;
     if (alive.hp <= 0) {
         alive.hp = 0;
         alive.timestamp=0;
     }
     if (alive.lasthits.length==display_hits)
         alive.lasthits.shift();
-    alive.lasthits.push('`'+uname+': '+dmg+'`');
+    alive.lasthits.push('`'+uname+': '+final_dmg+'`');
     const m=alive;
     toggle_update(async ()=> {
         //update
