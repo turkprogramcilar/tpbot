@@ -2,7 +2,7 @@
 consts = {
     env: {
         phphost   : process.env.DCBOT_PHPHOST,
-        noarena   : process.env.DCBOT_NOARENA,
+        nokolezyum   : process.env.DCBOT_NOKOLEZYUM,
         prefix    : process.env.DCBOT_PREFIX,
         debug     : process.env.DCBOT_DEBUG,
         dbconnstr : process.env.DCBOT_DBCONNSTR,
@@ -41,7 +41,7 @@ rid = {
 cid = {
     p2p         : "824685500686008350",
     wschannel   : "825713784848252938",
-    arena       : consts.env.debug ? "852230553536167956" : "850465092537286656",
+    kolezyum       : consts.env.debug ? "852230553536167956" : "850465092537286656",
     ozelestiri  : "782947118062764033",
     hergunogren : "844643095923654667",
     ogreticisey : "836490628249550878",

@@ -25,7 +25,7 @@ exports.init = async (refState) => {
     state = refState;
     fetch_start = new Date();
     try {
-        const json = (await db.get_module_state("arena"));
+        const json = (await db.get_module_state("kolezyum"));
         alive = JSON.parse(json);
     } catch {
         alive = undefined;
@@ -46,15 +46,15 @@ exports.on_event = async (evt, args) => {
             await create(msg, match[1], match[2], 10000);
         }
 
-        // if not command in arena, return
-        if (msg.channel.id != cid.arena) {        
+        // if not command in kolezyum, return
+        if (msg.channel.id != cid.kolezyum) {        
             return;
         }
         
-        // messages send on arena (command or not, doesn't matter)
+        // messages send on kolezyum (command or not, doesn't matter)
         if (delete_messages) toggle_purge(msg);
 
-        // vur command send on arena
+        // vur command send on kolezyum
         if (parser.is(msg, "vur")) {
             hit(msg);
             return;
@@ -64,18 +64,18 @@ exports.on_event = async (evt, args) => {
         if (groups.admins.includes(msg.author.id) == false)
             return;
 
-        // gamemaster commands for arena
+        // gamemaster commands for kolezyum
         if (!parser.is(msg, "gm_")) return;
         if (fetch_start) parser.send_awarn(msg, "alive array is still being fetched. "
             + `(start=${fetch_start}, now=${new Date()}`);
 
-        if (parser.is(msg, "arena")) {
+        if (parser.is(msg, "kolezyum")) {
             delete_messages = !delete_messages;
-            msg.channel.send(`Arenaya atilan tum mesajlari sil: ${delete_messages}`);
+            msg.channel.send(`Kolezyumya atilan tum mesajlari sil: ${delete_messages}`);
         }
-        else if (parser.set_arg(msg, "buff",    f => buff = f,       "Arena hasar oranını düzenle"));
-        else if (parser.set_arg(msg, "sans",    f => spawn_rate = f, "Arena emoji çıkma şansını düzenle"));
-        else if (parser.set_arg(msg, "frekans", f => frequency = f,  "Arena güncelleme sıklığı (sn)"));
+        else if (parser.set_arg(msg, "buff",    f => buff = f,       "Kolezyum hasar oranını düzenle"));
+        else if (parser.set_arg(msg, "sans",    f => spawn_rate = f, "Kolezyum emoji çıkma şansını düzenle"));
+        else if (parser.set_arg(msg, "frekans", f => frequency = f,  "Kolezyum güncelleme sıklığı (sn)"));
         else if (parser.set_arg(msg, "vur",     f => hit(msg, true, f)));
         else if (parser.is(msg, "yarat ")) {
             r = msg.content.match(/^<:([A-z]+):([0-9]+)>\s*([0-9]+)/)
@@ -115,14 +115,14 @@ let frequency = 3;
 // following method is called everywhere where `alive` 
 // variable is updated, basically updates the db in case
 // any accidental shutdowns bot on heroku, whenever bot gets
-// live, fetches the recent state of arena from db
+// live, fetches the recent state of kolezyum from db
 const syncdb_alive = async () => {
-    tools.sync_module("arena", ()=>alive, frequency*1000);
+    tools.sync_module("kolezyum", ()=>alive, frequency*1000);
 }
 
 need_update = false;
 const toggle_update = (f) => {
-    tools.toggler(f, "arena_update", frequency*1000);
+    tools.toggler(f, "kolezyum_update", frequency*1000);
 }
 const toggle_purge = (msg) => {
     if (msg) purge_list.push(msg);
@@ -131,11 +131,11 @@ const toggle_purge = (msg) => {
         await msg.channel.bulkDelete(del);
         // keep going until list is empty, even if not toggled by a message yet
         if (purge_list.length!=0) toggle_purge(msg);
-    }, "arena_delete", frequency*1000);
+    }, "kolezyum_delete", frequency*1000);
 }
 const create = async (msg, name, eid, hp) => {
     if (alive) return null;
-    ch = msg.guild.channels.cache.get(cid.arena);
+    ch = msg.guild.channels.cache.get(cid.kolezyum);
     if (ch) ch.send(await embed_boss(name, eid, hp, hp)).then((msg) => {
         alive = {
             name: name, eid: eid, msg: msg, mhp: hp, hp: hp, dmgdone: {}, lasthits: [],
@@ -249,7 +249,7 @@ const embed_boss = async (name, eid, hp, mhp, lasthits=[], top=[], last='', drop
     };
 
     if (hp==0 || true) {
-        const fname = "arenadrop.png";
+        const fname = "kolezyumdrop.png";
         msg.files = [{
             attachment: (hp<=0 
                 ? await render_drop(drops,uipath,fname)
