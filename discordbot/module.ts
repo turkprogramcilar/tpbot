@@ -75,9 +75,17 @@ export class dcmodule {
     protected get_module_state() : any {
         return this.state.cache.module[this.module_name];
     }
-    protected set_module_state(key : string, value : any, auto_sync : boolean = true) {
+    protected set_module_state(key : string, value : string | number) {
         this.get_module_state()[key] = value;
-        if (auto_sync) this.promises_module_state_push.push(this.sync_db_ms());
+        const promise = this.sync_db_ms();
+        this.promises_module_state_push.push(promise);
+        return promise;
+    }
+    protected delete_module_state(key : string) {
+        delete (this.get_module_state()[key]);
+        const promise = this.sync_db_ms();
+        this.promises_module_state_push.push(promise);
+        return promise;
     }
     protected async module_state_push() : Promise<void[]> {
         const promise = Promise.all(this.promises_module_state_push);
