@@ -14,7 +14,8 @@ const constants = require("../../discordbot/constants");
         "Modul halen yukleniyor... Lutfen bir sure sonra tekrar deneyin.");
  */
 
-type module_user_state = {[key : string] : string | number | boolean} | undefined;
+type user_state_value = string | number | boolean | undefined;
+type module_user_state = {[key : string] : user_state_value};
 
 const UNNAMED_MODULE : string = "unnamed_module";
 // module state users for dc users
@@ -107,10 +108,15 @@ export class dcmodule {
 
         try {
             let json = (await db.get_module_state(this.module_name));
-            if (json == undefined) json = {};
+            if (json == undefined) {
+                json = {};
+                json[MS_DCUSERS] = {};
+            }
             this.set_raw_ms(JSON.parse(json));
         } catch {
-            this.set_raw_ms({});
+            let json : any = {};
+            json[MS_DCUSERS] = {};
+            this.set_raw_ms(json);
         } finally {
             this.db_fetch_start = undefined;
         }
@@ -124,7 +130,16 @@ export class dcmodule {
         return this.get_raw_ms()[key];
     }
     protected get_module_state_user(user_id : string) : module_user_state {
-        return this.get_raw_ms()[MS_DCUSERS][user_id];
+        return this.get_raw_ms()[MS_DCUSERS][user_id] ?? {};
+    }
+    protected get_module_state_user_value(user_id : string, key : string) : user_state_value {
+        return this.get_module_state_user(user_id)[key];
+    }
+    protected get_module_state_author() : module_user_state {
+        return this.get_module_state_user(this.get_msg().author.id);
+    }
+    protected get_module_state_author_value(key : string) : user_state_value {
+        return this.get_module_state_author()[key];
     }
     protected set_module_state(key : string, value : string | number) {
         assert(MS_DCUSERS != key, "key can't be "+MS_DCUSERS+" because its been controlled by module");
@@ -132,8 +147,25 @@ export class dcmodule {
         return this.push_sync();
     }
     protected set_module_state_user(user_id : string, user_state : module_user_state) {
-        this.get_raw_ms()[MS_DCUSERS] = user_state;
+        this.get_raw_ms()[MS_DCUSERS][user_id] = user_state;
         return this.push_sync();
+    }
+    protected set_module_state_user_value(user_id : string, key : string, value : user_state_value) {
+        if (this.get_module_state_user_value(key, user_id) == undefined) {
+            let json : any = {}
+            json[key] = value;
+            this.set_module_state_user(user_id, json);
+        }
+        else
+            this.get_raw_ms()[MS_DCUSERS][user_id][key] = value;
+
+        return this.push_sync();
+    }
+    protected set_module_state_author(user_state : module_user_state) {
+        return this.set_module_state_user(this.get_msg().author.id, user_state);
+    }
+    protected set_module_state_author_value(key : string, value : user_state_value) {
+        return this.set_module_state_user_value(this.get_msg().author.id, key, value);
     }
     protected delete_module_state(key : string) {
         delete (this.get_raw_ms()[key]);
@@ -160,6 +192,11 @@ export class dcmodule {
     // parsing
     protected set_msg(msg : Message) {
         this.msg = msg;
+    }
+    protected get_msg() : Message {
+        const m = this.msg;
+        if (!m) throw Error(this.get_msg.name + "() can't be called before setting msg with " + this.set_msg.name);
+        return m;
     }
     protected is_prefixed() : boolean {
         return this.is_word(this.state.prefix);
