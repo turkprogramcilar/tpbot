@@ -17,6 +17,7 @@ export class dcmodule {
     private msg : Message | undefined;
     protected db_fetch_start : Date | undefined;
     protected state: any;
+    private promises_module_state_push : Promise<void>[] = [];
 
     constructor(protected module_name : string = UNNAMED_MODULE, protected cache_module_db : boolean = false, ) { }
     
@@ -74,8 +75,15 @@ export class dcmodule {
     protected get_module_state() : any {
         return this.state.cache.module[this.module_name];
     }
-    protected set_module_state(key : string, value : any) {
+    protected set_module_state(key : string, value : any, auto_sync : boolean = true) {
         this.get_module_state()[key] = value;
+        if (auto_sync) this.promises_module_state_push.push(this.sync_db_ms());
+    }
+    protected async module_state_push() : Promise<void[]> {
+        const promise = Promise.all(this.promises_module_state_push);
+        this.promises_module_state_push = [];
+        //return (async () => { await promise; return; })();
+        return promise;
     }
 
     // parsing
