@@ -13,9 +13,12 @@ const constants = require("../../discordbot/constants");
     if (fetch_start) return await parser.send_uwarn(msg,
         "Modul halen yukleniyor... Lutfen bir sure sonra tekrar deneyin.");
  */
+
+type module_user_state = {[key : string] : string | number | boolean} | undefined;
+
 const UNNAMED_MODULE : string = "unnamed_module";
 // module state users for dc users
-const MS_USERS : string = "dcusers";
+const MS_DCUSERS : string = "dcusers";
 export class dcmodule {
 
     private msg : Message | undefined;
@@ -105,9 +108,9 @@ export class dcmodule {
         try {
             let json = (await db.get_module_state(this.module_name));
             if (json == undefined) json = {};
-            this.state.cache.module[this.module_name] = JSON.parse(json);
+            this.set_raw_ms(JSON.parse(json));
         } catch {
-            this.state.cache.module[this.module_name] = {};
+            this.set_raw_ms({});
         } finally {
             this.db_fetch_start = undefined;
         }
@@ -115,23 +118,25 @@ export class dcmodule {
         await this.after_init();
     }
     protected async sync_db_ms() {
-        await tools.sync_module(this.module_name, ()=>this.state.cache.module[this.module_name], 1) 
+        await tools.sync_module(this.module_name, ()=>this.get_raw_ms(), 1) 
     };
     protected get_module_state(key : string) : any {
-        return this.state.cache.module[this.module_name][key];
+        return this.get_raw_ms()[key];
+    }
+    protected get_module_state_user(user_id : string) : module_user_state {
+        return this.get_raw_ms()[MS_DCUSERS][user_id];
     }
     protected set_module_state(key : string, value : string | number) {
-        assert(MS_USERS != key, "key can't be MS_USERS because its been controlled by module");
-        this.state.cache.module[this.module_name][key] = value;
+        assert(MS_DCUSERS != key, "key can't be "+MS_DCUSERS+" because its been controlled by module");
+        this.get_raw_ms()[key] = value;
         return this.push_sync();
     }
-    protected set_module_state_user(key : string, value : {[key : string] : string | number | boolean}) {
-        assert(MS_USERS != key, "key can't be MS_USERS because its been controlled by module");
-        this.state.cache.module[this.module_name][MS_USERS] = value;
+    protected set_module_state_user(user_id : string, user_state : module_user_state) {
+        this.get_raw_ms()[MS_DCUSERS] = user_state;
         return this.push_sync();
     }
     protected delete_module_state(key : string) {
-        delete (this.state.cache.module[this.module_name]);
+        delete (this.get_raw_ms()[key]);
         return this.push_sync();
     }
     protected async module_state_push() : Promise<void[]> {
@@ -144,6 +149,12 @@ export class dcmodule {
         const promise = this.sync_db_ms();
         this.promises_module_state_push.push(promise);
         return promise;
+    }
+    private get_raw_ms() {
+        return this.state.cache.module[this.module_name];
+    }
+    private set_raw_ms(value : any) {
+        this.state.cache.module[this.module_name] = value;
     }
 
     // parsing
