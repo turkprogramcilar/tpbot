@@ -14,8 +14,8 @@ const constants = require("../../discordbot/constants");
         "Modul halen yukleniyor... Lutfen bir sure sonra tekrar deneyin.");
  */
 
-type user_state_value = string | number | boolean | undefined;
-type module_user_state = {[key : string] : user_state_value};
+export type user_state_value = string | number | boolean | undefined;
+export type module_user_state = {[key : string] : user_state_value};
 
 const UNNAMED_MODULE : string = "unnamed_module";
 // module state users for dc users
@@ -204,6 +204,16 @@ export class dcmodule {
     protected is_word(word : string) : boolean {
         return parser.is(this.msg, word);
     }
+    protected async switch_word(cases : [string, () => void][]) : Promise<boolean> {
+        for (const [word, func] of cases) {
+            if (this.is_word(word)) {
+                await func();
+                return true;
+            }
+        }
+        return false;
+    }
+
     // parsers with getters
     protected get_unsigned() : number | null {
         let u : number | null = null;
