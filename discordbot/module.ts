@@ -122,23 +122,40 @@ export class dcmodule {
 // boilerplate code:
 /* 
 
-import { Message, MessageReaction, PartialUser, User } from "discord.js";
+
+import { GuildMember, Message, MessageReaction, PartialUser, Presence, User } from "discord.js";
 import { dcmodule } from "../module";
 
 
-class coderstatus extends dcmodule {
+const this_dcmodule = class newmodule extends dcmodule {
     
+    constructor() { super(newmodule.name, false); }
     
     public async after_init(){}
-    public async on_message(msg : Message){
+    public async on_message(msg : Message) {
 
-        if (msg.content == "ping") await msg.channel.send("pong");
+         // assign message to the parser
+        this.set_msg(msg);
+
+        // if not a command, return
+        if (!this.is_prefixed()) return;
+
+        if (this.is_word("ping"))
+            return await this.inform("pong");
+        
+        // if not admin, return
+        if (!this.is_admin(msg.author.id)) return;
+
+        // add a coder app id to the database
+        if (this.is_word("echo")) 
+            return await this.inform(this.get_word() ?? "<no echo message>");
     }
-    public async on_reaction(reaction : MessageReaction, user : User | PartialUser){}
+    public async on_reaction(reaction : MessageReaction, user : User | PartialUser) { }
+    public async on_presence_update(old_p: Presence | undefined, new_p: Presence) { }
 }
 
-const self = new coderstatus();
-export async function on_event(evt: string, args: any) { return self.on_event(evt, args); }
-export async function init(refState: any) { return self.init(refState); }
+const this_instance = new this_dcmodule();
+export async function on_event(evt: string, args: any) { return this_instance.on_event(evt, args); }
+export async function init(refState: any) { return this_instance.init(refState); }
 
 */
