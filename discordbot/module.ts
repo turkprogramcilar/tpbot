@@ -1,4 +1,5 @@
 // package imports
+import { channel } from "diagnostic_channel";
 import { Message, Client, User, PartialUser, MessageReaction, Presence, GuildManager, Guild } from "discord.js";
 // local imports
 const db        = require("../../discordbot/mongodb");
@@ -19,7 +20,9 @@ export class dcmodule {
     protected state: any;
     private promises_module_state_push : Promise<void>[] = [];
 
-    constructor(protected module_name : string = UNNAMED_MODULE, protected cache_module_db : boolean = false, ) { }
+    constructor(
+        protected module_name : string = UNNAMED_MODULE, 
+        protected administative_commands : boolean = false) { }
     
     public get_client() : Client { 
         return this.state.client; 
@@ -36,8 +39,47 @@ export class dcmodule {
     public async on_event(evt: string, args: any) {
 
         switch(evt) {
-            case 'message': const msg : Message = args.msg;
+            case 'message': 
+                const msg : Message = args.msg;
+                const msg_str = msg.content;
+
                 await this.on_message(msg);
+
+                // beyond is only when administative commands are set to true
+                if (this.administative_commands == false) return;
+
+                msg.content = msg_str;
+                this.set_msg(msg);
+
+                // if not admin or not command return
+                if (!this.is_admin(msg.author.id) || !this.is_prefixed()) return;
+
+                // if admin doesn't point this module, return
+                if (!this.is_word(this.module_name)) return;
+                
+                if (this.is_word("channel_id")) {
+
+                    const key = "channel_id";
+
+                    const channel_id = this.get_module_state()[key];
+                    const new_channel_id = this.get_unsigned();
+                    if (!new_channel_id) {
+
+                        if (this.is_word("delete")) {
+
+                            const p1 = this.delete_module_state(key);
+                            const p2 = this.warn(`deleting channel restriction for the module ${this.module_name}`);
+                            await p1; await p2;
+                            return;
+                        }
+                        return await this.warn("channel id is "+(channel_id ?? "<undefined>"));
+                    }
+
+                    const p1 = this.affirm(`updating channel id to ${new_channel_id}, before it was ${channel_id ?? "<undefined>"}`);
+                    const p2 = this.set_module_state(key, new_channel_id);
+                    await p1, await p2;
+                    return;
+                }
             break;
             case 'messageReactionAdd':
                 const reaction : MessageReaction = args.reaction;
@@ -52,14 +94,14 @@ export class dcmodule {
 
         this.state = refState;
         
-        if (!this.cache_module_db) return;
         if (this.module_name == UNNAMED_MODULE)
             throw new Error("Module is UNNAMED while cache module db is enabled.");
 
         this.db_fetch_start = new Date();
 
         try {
-            const json = (await db.get_module_state(this.module_name));
+            let json = (await db.get_module_state(this.module_name));
+            if (json == undefined) json = {};
             this.state.cache.module[this.module_name] = JSON.parse(json);
         } catch {
             this.state.cache.module[this.module_name] = {};
