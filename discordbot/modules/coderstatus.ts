@@ -23,31 +23,31 @@ class coderstatus extends dcmodule {
 
             const user_id = this.get_mention();
             if (!user_id)
-                return await this.inform(`none is mentioned.`);
+                return await this.warn(`none is mentioned.`);
 
             const app_name = this.get_word();
             if (!app_name)
-                return await this.inform(`app name is not given.`);
+                return await this.warn(`app name is not given.`);
 
             // get the user
             const user = await this.get_client().users.fetch(user_id);
 
             // activities needs to be 1
             if (user.presence.activities.length != 1)
-                return await this.inform(`activities length is ${user.presence.activities.length} != 1`);
+                return await this.warn(`activities length is ${user.presence.activities.length} != 1`);
 
             const activity = user.presence.activities[0];
 
             const app_id = activity.applicationID;
             if (!app_id)
-                return await this.inform(`app_id is either undefined null or empty (or false kekw)`);
+                return await this.warn(`app_id is either undefined null or empty (or false kekw)`);
             
             // inform what's happening as the final action being taken
             const ref = this.get_module_state();
             if (ref.coder_apps[app_name])
-                await this.inform(`app name with ${app_name} was existing before "${ref.coder_apps[app_name]}". Updating with "${app_id}"...`);
+                await this.warn(`app name with ${app_name} was existing before "${ref.coder_apps[app_name]}". Updating with "${app_id}"...`);
             else
-                await this.inform(`app name with ${app_name} with id "${app_id}" is being added to the coder apps...`);
+                await this.warn(`app name with ${app_name} with id "${app_id}" is being added to the coder apps...`);
 
             // do the updates
             ref.coder_apps[app_name] = app_id;
