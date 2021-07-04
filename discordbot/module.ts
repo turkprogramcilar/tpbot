@@ -69,10 +69,13 @@ export class dcmodule {
         await this.after_init();
     }
     protected async sync_db_ms() {
-        await tools.sync_module(this.module_name, ()=>this.state.cache.module[this.module_name], 1) 
+        await tools.sync_module(this.module_name, ()=>this.get_module_state(), 1) 
     };
-    protected get_ms() : any {
+    protected get_module_state() : any {
         return this.state.cache.module[this.module_name];
+    }
+    protected set_module_state(key : string, value : any) {
+        this.get_module_state()[key] = value;
     }
 
     // parsing
