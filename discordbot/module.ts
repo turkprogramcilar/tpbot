@@ -119,8 +119,11 @@ export class dcmodule {
     }
 
     // send message back
-    protected async inform(information : string) {
-        return await parser.send_uwarn(this.msg, information, true);
+    protected async warn(warning : string) {
+        return await parser.send_uwarn(this.msg, warning, true);
+    }
+    protected async affirm(information : string) {
+        return await parser.send_uok(this.msg, information, true);
     }
 
     public async after_init() {}
