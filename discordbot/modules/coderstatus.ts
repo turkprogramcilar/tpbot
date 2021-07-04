@@ -43,14 +43,14 @@ class coderstatus extends dcmodule {
                 return await this.warn(`app_id is either undefined null or empty (or false kekw)`);
             
             // inform what's happening as the final action being taken
-            const ref = this.get_module_state();
-            if (ref.coder_apps[app_name])
-                await this.warn(`app name with ${app_name} was existing before "${ref.coder_apps[app_name]}". Updating with "${app_id}"...`);
+            const module_state_app_name = this.get_module_state(app_name);
+            if (module_state_app_name)
+                await this.warn(`app name with ${app_name} was existing before "${module_state_app_name}". Updating with "${app_id}"...`);
             else
                 await this.warn(`app name with ${app_name} with id "${app_id}" is being added to the coder apps...`);
 
             // do the updates
-            ref.coder_apps[app_name] = app_id;
+            this.set_module_state(app_name, app_id);
             await this.sync_db_ms();
         }
         
@@ -68,7 +68,7 @@ class coderstatus extends dcmodule {
         };
 
         const coder_apps : string[]
-            = Object.values( (this.get_module_state()?.coder_apps) ?? {} ) ?? []
+            = Object.values( (this.get_module_state("coder_apps")) ?? {} ) ?? []
             ;
 
         const action : todo =

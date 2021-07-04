@@ -1,4 +1,5 @@
 // package imports
+import { assert } from "console";
 import { channel } from "diagnostic_channel";
 import { Message, Client, User, PartialUser, MessageReaction, Presence, GuildManager, Guild } from "discord.js";
 // local imports
@@ -13,6 +14,8 @@ const constants = require("../../discordbot/constants");
         "Modul halen yukleniyor... Lutfen bir sure sonra tekrar deneyin.");
  */
 const UNNAMED_MODULE : string = "unnamed_module";
+// module state users for dc users
+const MS_USERS : string = "dcusers";
 export class dcmodule {
 
     private msg : Message | undefined;
@@ -61,7 +64,7 @@ export class dcmodule {
 
                     const key = "channel_id";
 
-                    const channel_id = this.get_module_state()[key];
+                    const channel_id = this.get_module_state(key);
                     const new_channel_id = this.get_unsigned();
                     if (!new_channel_id) {
 
@@ -112,27 +115,34 @@ export class dcmodule {
         await this.after_init();
     }
     protected async sync_db_ms() {
-        await tools.sync_module(this.module_name, ()=>this.get_module_state(), 1) 
+        await tools.sync_module(this.module_name, ()=>this.state.cache.module[this.module_name], 1) 
     };
-    protected get_module_state() : any {
-        return this.state.cache.module[this.module_name];
+    protected get_module_state(key : string) : any {
+        return this.state.cache.module[this.module_name][key];
     }
     protected set_module_state(key : string, value : string | number) {
-        this.get_module_state()[key] = value;
-        const promise = this.sync_db_ms();
-        this.promises_module_state_push.push(promise);
-        return promise;
+        assert(MS_USERS != key, "key can't be MS_USERS because its been controlled by module");
+        this.state.cache.module[this.module_name][key] = value;
+        return this.push_sync();
+    }
+    protected set_module_state_user(key : string, value : {[key : string] : string | number | boolean}) {
+        assert(MS_USERS != key, "key can't be MS_USERS because its been controlled by module");
+        this.state.cache.module[this.module_name][MS_USERS] = value;
+        return this.push_sync();
     }
     protected delete_module_state(key : string) {
-        delete (this.get_module_state()[key]);
-        const promise = this.sync_db_ms();
-        this.promises_module_state_push.push(promise);
-        return promise;
+        delete (this.state.cache.module[this.module_name]);
+        return this.push_sync();
     }
     protected async module_state_push() : Promise<void[]> {
         const promise = Promise.all(this.promises_module_state_push);
         this.promises_module_state_push = [];
         //return (async () => { await promise; return; })();
+        return promise;
+    }
+    private async push_sync() {
+        const promise = this.sync_db_ms();
+        this.promises_module_state_push.push(promise);
         return promise;
     }
 
