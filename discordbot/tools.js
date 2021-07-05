@@ -180,7 +180,13 @@ exports.send_embed_item = async (msg, id, state) => {
             .addField('`'+title+'`', parser.tqs(JSON.stringify(i??{},null,'\t'),'json'))
     });
 };
-
+exports.ac_reduces_dmg = (ac, dmg) => {
+    if (dmg <= 0) return 0;
+    if (ac  <= 0) return 3;
+    const x = ac/dmg;
+    //http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIxLygoeCozNis3KS8yMSkiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjMsImVxIjpbWyIwIiwiMyJdLFsiMSIsIjAuNSJdLFsiMiIsIjAuMjUiXSxbIjMiLCIwLjE2NiJdXSwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjoxMDAwLCJ3aW5kb3ciOlsiLTAuOTgwMDYxNTM4NDYxNTM4MyIsIjMuNTE5OTM4NDYxNTM4NDYwNiIsIi0xLjQwMDk0OTk5OTk5OTk5OTUiLCIzLjA5OTA0OTk5OTk5OTk5OTYiXX1d
+    return 1/((x*36+7)/21);
+}
 exports.i0 = (iid) => iid.toString().length == 9 ? iid/10|0 : iid;
 exports.iplus = (iid) => iid.toString().length != 9 ? 0 : parseInt(iid.toString()[8]);
 exports.iplus_stat = (iid, stat) => stat * Math.pow(1.11, exports.iplus(iid)) | 0;
