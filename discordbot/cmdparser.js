@@ -24,6 +24,7 @@ exports.tqs = (str,format='') => { return exports.tq((str?.toString() ?? "").sub
 exports.send_awarn = async (msg, str) => await send_tqs_custom(msg, str, "fix", "warning");
 exports.send_uwarn = async (msg, str, reply=false) => await send_tqs_custom(msg, str, "diff", "! uyarı", reply);
 exports.send_uok   = async (msg, str, reply=false) => await send_tqs_custom(msg, str, "bash", "# bilgi", reply);
+exports.send_custom= async (msg, str, format, reply=false, title="") => await send_tqs_custom(msg, str, format, title, reply);
 const send_tqs_custom = async (msg, str, format, title, reply=false) => {
     sendmsg = exports.tqs(title+": "+str,format);
     if (reply)
