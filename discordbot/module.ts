@@ -204,6 +204,9 @@ export class dcmodule {
     protected get_author_id() : string {
         return this.get_msg().author.id;
     }
+    protected get_author_name() : string {
+        return this.get_msg().author.username;
+    }
     protected is_prefixed() : boolean {
         return this.is_word(this.state.prefix);
     }
@@ -246,10 +249,37 @@ export class dcmodule {
     protected async warn(warning : string) {
         return await parser.send_uwarn(this.msg, warning, true);
     }
-    protected async affirm(information : string) {
-        return await parser.send_uok(this.msg, information, true);
+    protected async affirm(affirmation : string) {
+        return await parser.send_uok(this.msg, affirmation, true);
+    }
+    protected async custom_info(information : string, format : string = "") {
+        return await parser.send_custom(this.msg, information, format, true);
     }
 
+    // db operations wrapper
+    protected user_stats(user_id : string) : Promise<{[key : string] : number | string }> {
+        return db.get_user_value(user_id, "stats");
+    }
+    protected author_stats() {
+        return this.user_stats(this.get_author_id());
+    }
+    protected user_exp(user_id : string) : Promise<number> {
+        return db.get_user_value(user_id, "exp");
+    }
+    protected author_exp() {
+        return this.user_exp(this.get_author_id());
+    }
+
+    // other wrappers
+    protected calculate_hit(target_armor : number, self_sum_item_damage : number, self_experience : number, time_difference_seconds : number) : number {
+        
+        const idmg = self_sum_item_damage;
+        const expm = tools.getexpm(self_experience);
+        const base_damage = tools.base_dmg(idmg, expm);
+        const final_damage = tools.final_dmg(base_damage, time_difference_seconds);
+        return tools.ac_reduces_dmg(target_armor, final_damage) | 0;
+    }
+    // to be overridden by child classes
     public async after_init() {}
     public async on_message(msg : Message) {}
     public async on_reaction(reaction : MessageReaction, user : User | PartialUser) {}
