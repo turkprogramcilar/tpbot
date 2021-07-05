@@ -26,12 +26,23 @@ exports.send_uwarn = async (msg, str, reply=false) => await send_tqs_custom(msg,
 exports.send_uok   = async (msg, str, reply=false) => await send_tqs_custom(msg, str, "bash", "# bilgi", reply);
 exports.send_custom= async (msg, str, format, reply=false, title="") => await send_tqs_custom(msg, str, format, title, reply);
 const send_tqs_custom = async (msg, str, format, title, reply=false) => {
-    sendmsg = exports.tqs(title+": "+str,format);
+    sendmsg = exports.tqs((title == '' ? "" : title+": ")+str,format);
     if (reply)
         return await msg.reply(sendmsg);
     else
         return await msg.channel.send(sendmsg);
 }
+// async operations' raw text
+const get_tqs_custom = (str, format, title) => {
+    sendmsg = exports.tqs((title == '' ? "" : title+": ")+str,format);
+    return sendmsg;
+}
+exports.get_awarn = (str) => get_tqs_custom(str, "fix", "warning");
+exports.get_uwarn = (str) => get_tqs_custom(str, "diff", "! uyarı");
+exports.get_uok   = (str) => get_tqs_custom(str, "bash", "# bilgi");
+exports.get_custom= (str, format, title="") => get_tqs_custom(str, format, title);
+
+
 exports.mention = async (msg, f, fe=()=>{}) => { await exports.regex_arg(msg, f, fe, x=>x, /^<@!?([0-9]+)>/, 1); }
 exports.mention_else_self = async (msg, f) => { await exports.mention(msg, f, ()=>f(msg.author.id))}
 exports.r_arg = async (msg, regex, f, fe=()=>{}) => { return await exports.regex_arg(msg, f, fe, x=>x, regex); }

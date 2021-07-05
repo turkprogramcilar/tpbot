@@ -1,7 +1,7 @@
 // package imports
 import { assert } from "console";
 import { channel } from "diagnostic_channel";
-import { Message, Client, User, PartialUser, MessageReaction, Presence, GuildManager, Guild } from "discord.js";
+import { Message, Client, User, PartialUser, MessageReaction, Presence, GuildManager, Guild, GuildChannel, TextChannel } from "discord.js";
 // local imports
 const db        = require("../../discordbot/mongodb");
 const tools     = require("../../discordbot/tools");
@@ -20,12 +20,14 @@ export type module_user_state = {[key : string] : user_state_value};
 const UNNAMED_MODULE : string = "unnamed_module";
 // module state users for dc users
 const MS_DCUSERS : string = "dcusers";
+const MS_BULK : string = "bulkmessages";
+const FORBIDDEN_KEYS : string[] = [MS_DCUSERS, MS_BULK];
 export class dcmodule {
 
     private msg : Message | undefined;
     protected db_fetch_start : Date | undefined;
     protected state: any;
-    private promises_module_state_push : Promise<void>[] = [];
+    private promises_module_state_queue : Promise<void>[] = [];
 
     constructor(
         protected module_name : string = UNNAMED_MODULE, 
@@ -41,8 +43,6 @@ export class dcmodule {
     public fetch_guild_member(guild : Guild, user_id : string) { 
         return guild.members.cache.get(user_id);
     }
-    
-
     public async on_event(evt: string, args: any) {
 
         switch(evt) {
@@ -144,14 +144,15 @@ export class dcmodule {
     protected get_module_state_author_value(key : string) : user_state_value {
         return this.get_module_state_author()[key];
     }
-    protected set_module_state(key : string, value : string | number) {
-        assert(MS_DCUSERS != key, "key can't be "+MS_DCUSERS+" because its been controlled by module");
+    protected set_module_state(key : string, value : string | number, dont_assert : boolean = false) {
+        assert(dont_assert || FORBIDDEN_KEYS.includes(key) == false, "key can't be "+key+" because its been controlled by module");
+        assert(dont_assert || key.startsWith(MS_BULK) == false, "key can't start with "+key+" because its been controlled by module");
         this.get_raw_ms()[key] = value;
-        return this.push_sync();
+        return this.queue_sync();
     }
     protected set_module_state_user(user_id : string, user_state : module_user_state) {
         this.get_raw_ms()[MS_DCUSERS][user_id] = user_state;
-        return this.push_sync();
+        return this.queue_sync();
     }
     protected set_module_state_user_value(user_id : string, key : string, value : user_state_value) {
         if (this.get_module_state_user_value(key, user_id) == undefined) {
@@ -162,7 +163,7 @@ export class dcmodule {
         else
             this.get_raw_ms()[MS_DCUSERS][user_id][key] = value;
 
-        return this.push_sync();
+        return this.queue_sync();
     }
     protected set_module_state_author(user_state : module_user_state) {
         return this.set_module_state_user(this.get_author_id(), user_state);
@@ -172,17 +173,17 @@ export class dcmodule {
     }
     protected delete_module_state(key : string) {
         delete (this.get_raw_ms()[key]);
-        return this.push_sync();
+        return this.queue_sync();
     }
-    protected async module_state_push() : Promise<void[]> {
-        const promise = Promise.all(this.promises_module_state_push);
-        this.promises_module_state_push = [];
+    protected async module_state_manual_sync_promise_queue() : Promise<void[]> {
+        const promise = Promise.all(this.promises_module_state_queue);
+        this.promises_module_state_queue = [];
         //return (async () => { await promise; return; })();
         return promise;
     }
-    private async push_sync() {
+    private async queue_sync() {
         const promise = this.sync_db_ms();
-        this.promises_module_state_push.push(promise);
+        this.promises_module_state_queue.push(promise);
         return promise;
     }
     private get_raw_ms() {
@@ -246,14 +247,60 @@ export class dcmodule {
     }
 
     // send message back
-    protected async warn(warning : string) {
-        return await parser.send_uwarn(this.msg, warning, true);
+    protected async warn(warning : string, bulk : boolean = false) {
+        if (!bulk)
+            return await parser.send_uwarn(this.msg, warning, true);
+        else if (this.msg?.channel.id)
+            this.bulk_buffer(this.msg.channel.id, parser.get_uwarn(warning))
     }
-    protected async affirm(affirmation : string) {
-        return await parser.send_uok(this.msg, affirmation, true);
+    protected async affirm(affirmation : string, bulk : boolean = false) {
+        if (!bulk)
+            return await parser.send_uok(this.msg, affirmation, true);
+        else if (this.msg?.channel.id)
+            this.bulk_buffer(this.msg.channel.id, parser.get_uok(affirmation))
     }
-    protected async custom_info(information : string, format : string = "") {
-        return await parser.send_custom(this.msg, information, format, true);
+    protected async custom_info(information : string, format : string, bulk : boolean = false) {
+        if (!bulk)
+            return await parser.send_custom(this.msg, information, format, true);
+        else if (this.msg?.channel.id)
+            this.bulk_buffer(this.msg.channel.id, parser.get_custom(information, format))
+    }
+
+    // bulk message system
+    private bulk_buffer(channel_id : string, message : string) {
+        
+        let bulk = this.get_module_state(MS_BULK);
+        if (bulk == undefined)
+            bulk = {};
+
+        if (bulk[channel_id] == undefined)
+            bulk[channel_id] = [];
+
+        bulk[channel_id].push(message);
+
+        // ping bulk flusher
+        tools.toggler_async(()=>this.flush_bulk_buffer(channel_id), MS_BULK, 3000);
+
+        return this.set_module_state(MS_BULK, bulk, true);
+            // last send = now
+    }
+    private async flush_bulk_buffer(channel_id : string) {
+        const limit = 2000;
+        const bulk = this.get_module_state(MS_BULK);
+        let buffer = "";
+        while (bulk[channel_id] != undefined && bulk[channel_id].length > 0) {
+            const message = bulk[channel_id].shift();
+            if (buffer.length + message.length /* + 1 */ > limit) {
+                bulk[channel_id].unshift(message);
+                break;
+            }
+            buffer += message;// + '\n';
+        }
+        if (buffer.length <= 0)
+            return;
+        const channel = await this.get_client().channels.cache.get(channel_id) as TextChannel;
+        if (channel != undefined)
+            return channel.send(buffer);
     }
 
     // db operations wrapper
