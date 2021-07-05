@@ -82,7 +82,7 @@ const this_dcmodule = class arena extends dcmodule {
                 values.sort((b, a) => (a[key] as number ?? 0) - (b[key] as number ?? 0));
                 const top_deaths = values.slice(0, 5).reduce((a, c, i) => a+= `${i+1}. ${c["name"]} (${c[key]})\n`, "");
 
-                return this.custom_info(msg, `En çok leşi olan arena oyuncuları:\n${top_kills}\nEn çok kez dirilmiş arena oyuncuları:\n${top_deaths}`, "", true);
+                return this.custom_info(msg, `+ En çok leşi olan arena oyuncuları:\n${top_kills}\n- En çok kez dirilmiş arena oyuncuları:\n${top_deaths}`, "diff", true);
             }],
             ["hedef", async () => {
                 const mention_id = this.get_mention(msg);
