@@ -122,8 +122,8 @@ const this_dcmodule = class arena extends dcmodule {
                     target.inside = false;
                     const p1 = this.custom_info(msg, `[${target.name} oyuncusu mağlup edildi.] (${self.name} tarafından)`, "css", true);
                     const p2 = this.set_arena_player_user(target_id, target);
-                    const p3 = this.set_module_state_user_value(msg.author.id, "kill", this.get_module_state_user_value(msg.author.id, "kill") ?? 0 + 1);
-                    const p4 = this.set_module_state_user_value(target_id, "death", this.get_module_state_user_value(target_id, "kill") ?? 0 + 1);
+                    const p3 = this.set_module_state_user_value(msg.author.id, "kill", (this.get_module_state_user_value(msg.author.id, "kill") as number ?? 0) + 1);
+                    const p4 = this.set_module_state_user_value(target_id, "death", (this.get_module_state_user_value(target_id, "death") as number ?? 0) + 1);
                     await p1; await p2; await p3; await p4; return;
                 }
                 else {
