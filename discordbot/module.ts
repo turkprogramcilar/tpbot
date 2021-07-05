@@ -155,8 +155,11 @@ export class dcmodule {
         return this.queue_sync();
     }
     protected set_module_state_user_value(user_id : string, key : string, value : user_state_value) {
+        
+        let json : any = this.get_module_state_user(user_id);
+        if (json == undefined)
+            json = {};
         if (this.get_module_state_user_value(key, user_id) == undefined) {
-            let json : any = {}
             json[key] = value;
             this.set_module_state_user(user_id, json);
         }
