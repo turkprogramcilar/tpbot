@@ -25,10 +25,8 @@ const this_dcmodule = class arena extends dcmodule {
 
         const channel_id = this.get_module_state("channel_id");
         if (channel_id != undefined && channel_id != msg.channel.id) return;
-
-        // if not a command, return
-        if (!this.is_prefixed()) return;
-
+        
+        const max_hp = 1000;
         const inside = this.get_module_state_author_value("inside");
         if (this.is_word("gir")) {
 
@@ -44,12 +42,12 @@ const this_dcmodule = class arena extends dcmodule {
                     return x;
             };
             
-            const user_stats = await p1;
-            const experience = await p2;
+            const user_stats = (await p1) ?? {};
+            const experience = (await p2) ?? 0;
             const time = new Date().getTime() - 60*1000;
             this.set_arena_player_author({
                 name   : this.get_author_name(),
-                health : 1000,
+                health : max_hp,
                 armor  : purify(user_stats["Ac"]),
                 target : undefined,
                 lasthit: time,
@@ -57,7 +55,7 @@ const this_dcmodule = class arena extends dcmodule {
                 sum_item_damage: purify(user_stats["Damage"]),
                 experience: experience,
             });
-            return;
+            return await this.affirm(`${this.get_author_name()} arenaya giriş yaptı.`, true);
         }
         
         if (inside == undefined || inside == false)
@@ -67,8 +65,15 @@ const this_dcmodule = class arena extends dcmodule {
         const switch_taken = await this.switch_word([
         // switch_word begin, alignment has down shifted by 1 tab //
         
-        ["cik", () => {
-            return this.set_arena_player_author_value(state => state.inside = false);
+        ["cik", async () => {
+            const p1 = this.set_arena_player_author_value(state => state.inside = false);
+            const p2 = this.affirm(`${this.get_author_name()} arenayı terketti.`, true);
+            await p1, await p2; return;
+        }],
+        ["vaziyet", () => {
+            
+            const self = this.get_arena_player_author();
+            return this.affirm(`${self.name}: [Can: ${self.health}] [Hasar: ${self.sum_item_damage}] [Zırh: ${self.armor}] [Exp katsayı: ${this.experience_multiplier(self.experience).toFixed(2)}]`, true);
         }],
         ["hedef", async () => {
             const mention_id = this.get_mention();
@@ -79,10 +84,10 @@ const this_dcmodule = class arena extends dcmodule {
                 return await this.warn("Kendinden nefret etmene gerek yok artık. Kodlamaya hemen başla ve hayatını kurtar." + ` [${this.get_author_name()}]`, true);
 
             const target = this.locate_arena_player(mention_id);
-            if (!target)
+            if (!target || !target.inside)
                 return await this.warn("Hedef arena alanı içerisinde değil." + ` [${this.get_author_name()}]`, true);
             
-            const p1 = this.affirm(`${this.get_author_name}, [${target.name}] oyuncusunu hedef aldı`, true)
+            const p1 = this.affirm(`[${target.name}] oyuncusu hedef alındı (${this.get_author_name()} tarafından)`, true)
             const p2 = this.set_arena_player_author_value(state => state.target = mention_id);
             await p1; await p2; return;
         }],
@@ -106,12 +111,12 @@ const this_dcmodule = class arena extends dcmodule {
                 self.target = undefined;
                 target.health = 0;
                 target.inside = false;
-                const p1 = this.custom_info(`[${target.name} hedefi ${self.name} tarafından mağlup edildi.]`, "css", true);
+                const p1 = this.custom_info(`[${target.name} oyuncusu mağlup edildi.] (${self.name} tarafından)`, "css", true);
                 const p2 = this.set_arena_player_user(target_id, target);
                 await p1; await p2; return;
             }
             else {
-                return await this.affirm(`${self.name} hedefi [${target.name}] oyuncusuna ${target_loss} hasar verdi. Hedef kalan can: ${target.health}`, true);
+                return await this.affirm(`[${target.name}] oyuncusuna ${target_loss} hasar verildi. Hedef kalan can: ${target.health}. (${self.name} tarafından)`, true);
             }
         }],
         // switch_word end //

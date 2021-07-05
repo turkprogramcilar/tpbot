@@ -279,7 +279,7 @@ export class dcmodule {
         bulk[channel_id].push(message);
 
         // ping bulk flusher
-        tools.toggler_async(()=>this.flush_bulk_buffer(channel_id), MS_BULK, 3000);
+        tools.toggler_async(()=>this.flush_bulk_buffer(channel_id), MS_BULK, 5000);
 
         return this.set_module_state(MS_BULK, bulk, true);
             // last send = now
@@ -296,11 +296,14 @@ export class dcmodule {
             }
             buffer += message;// + '\n';
         }
+        const p1 = this.set_module_state(MS_BULK, bulk, true);
         if (buffer.length <= 0)
-            return;
+            return await p1;
         const channel = await this.get_client().channels.cache.get(channel_id) as TextChannel;
-        if (channel != undefined)
-            return channel.send(buffer);
+        if (channel != undefined) {
+            await channel.send(buffer);
+        }
+        await p1;
     }
 
     // db operations wrapper
@@ -321,10 +324,13 @@ export class dcmodule {
     protected calculate_hit(target_armor : number, self_sum_item_damage : number, self_experience : number, time_difference_seconds : number) : number {
         
         const idmg = self_sum_item_damage;
-        const expm = tools.getexpm(self_experience);
+        const expm = this.experience_multiplier(self_experience);
         const base_damage = tools.base_dmg(idmg, expm);
         const final_damage = tools.final_dmg(base_damage, time_difference_seconds);
         return tools.ac_reduces_dmg(target_armor, final_damage) | 0;
+    }
+    protected experience_multiplier(experience : number) {
+        return tools.getexpm(experience);
     }
     // to be overridden by child classes
     public async after_init() {}
