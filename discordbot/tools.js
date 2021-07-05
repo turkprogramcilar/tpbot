@@ -139,7 +139,7 @@ exports.is_disboard_bumped = (msg) => {
 }
 
 //embeds:
-exports.send_embed_item = async (msg, id, state) => {
+exports.get_embed_item = async (id, state) => {
     const plus = exports.iplus(id);
     const fullid = id;
     id = exports.i0(id);
@@ -171,14 +171,17 @@ exports.send_embed_item = async (msg, id, state) => {
         }
     }
     
-    await msg.channel.send({
+    return {
         files: [{
             attachment: p,
             name:'icon.png'
         }],
         embed: embedded
             .addField('`'+title+'`', parser.tqs(JSON.stringify(i??{},null,'\t'),'json'))
-    });
+    };
+}
+exports.send_embed_item = async (msg, id, state) => {
+    await msg.channel.send(exports.get_embed_item(id, state));
 };
 exports.ac_reduces_dmg = (ac, dmg) => {
     const x = ac/dmg;

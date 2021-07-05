@@ -177,6 +177,9 @@ const upgrade_chance = {
     8:  .2,
     9:  .1,
 }
+const get_plus_text = (plus_id, space_before=false) => {
+    return (tools.iplus(plus_id)>0?`${space_before?" ":""}(+${tools.iplus(plus_id)})`:"");
+}
 const send_embed_item = async (msg, id) => await tools.send_embed_item(msg, id, state);
 const render_inventory = async (inventory, iconspath, bgfile, wear) => {
     // l= length, oix= offset inventory x, ogx= offset gear x, iw= inventory width,
@@ -263,7 +266,9 @@ exports.on_event = async (evt, args) => {
                         //
 
                         // get the item from the slot
-                        const inv = await db.get_inventory(msg.author.id);
+                        const user_id = msg.author.id;
+                        const save_content = msg.content;
+                        const inv = await db.get_inventory(user_id);
                         for (let islot of [islot_scroll, islot_item]) {
                             islot--;
                             if (!inv || !inv[islot])
@@ -274,11 +279,50 @@ exports.on_event = async (evt, args) => {
                         if (!scroll_ids.includes(inv[islot_scroll]))
                             return await parser.send_uwarn(msg, "Belirtilen item yükseltme kağıdı değildir.");
 
-                        const upgrading_item = await db.get_item(inv[islot_item]);
+                        const plus_item_id = inv[islot_item];
+                        const plus = tools.iplus(plus_item_id);
+                        const raw_item_id = tools.i0(plus_item_id); 
+                        const upgrading_item = await db.get_item(raw_item_id);
+                        const chance = upgrade_chance[plus+1];
+                        if (plus >= 9)
+                            return await parser.send_uwarn(msg, `${upgrading_item["strName"]} ${get_plus_text(plus_item_id)} eşyası en son seviyede olduğundan daha da yükseltilemez.`);
+
                         if (!is_wearable(upgrading_item["Slot"]))
                             return await parser.send_uwarn(msg, "Belirtilen item yükseltilebilir bir item değildir.");
-                        //
-                        console.log("OK");
+                        
+                        msg.content = save_content;
+                        if (parser.is(msg, "onay")) {
+
+                            // best wishes
+                            const success = Math.random() < chance;
+
+                            // update inventory accordingly
+                            const fst = Math.max(islot_item, islot_scroll);
+                            const snd = Math.min(islot_item, islot_scroll);
+                            inv.splice(fst, 1);
+                            inv.splice(snd, 1);
+                            
+                            let p1;
+                            if (success) {
+
+                                // add upgraded item
+                                const upgraded_item_id = (plus > 0 ? plus_item_id : raw_item_id * 10) + 1;
+                                inv.push(upgraded_item_id);
+
+                                // send tablet reyiz
+                                const json_msg = await tools.get_embed_item(upgraded_item_id, state);
+                                json_msg.embed = json_msg.embed.setImage("https://media1.tenor.com/images/42d06fef33fc592977f6ec40175bff6e/tenor.gif?itemid=13959094");
+                                p1 = msg.channel.send(json_msg);
+                            }
+                            else {
+                                const gif = "https://tenor.com/view/tablet-reis-shocked-gifhttps://media.tenor.com/images/56d14f372c164bd6fd4798514d18ce9b/tenor.gif-14644456";
+                                p1 = msg.channel.send(gif);
+                            }
+                            await db.set_inventory(user_id, inv); await p1; return;
+                        }
+                        else
+                            return await parser.send_uwarn(msg, `${upgrading_item["strName"]}${get_plus_text(plus_item_id, true)} eşyasını bir seviye atlatmak üzeresin. Bunun ihtimali %${100*chance}. Eğer başarısız olursa eşyan yokolacak. Onaylıyorsan aynı komutun sonuna "onay" yazıp komutu tekrar çalıştırın.`, true);
+
 
                     }, async () => await parser.send_uwarn(msg, str));
 
@@ -324,7 +368,6 @@ exports.on_event = async (evt, args) => {
                 await parser.mention_else_self(msg, async id => {
                     
                     const user = msg.guild.members.cache.get(id).user;
-                    
 
                     const pi = db.get_inventory(id);
                     const pw = db.get_wear(id);
@@ -338,8 +381,8 @@ exports.on_event = async (evt, args) => {
                     const p_have_raw = Promise.all(pluses_have.map(iid => db.get_item(tools.i0(iid))));
                     const worn_raw = await p_worn_raw;
                     const have_raw = await p_have_raw;
-                    const text_worn = worn_raw.reduce((a, c, i) => a+=`${i+1}.\t${c["strName"]} ${(tools.iplus(pluses_worn[i])>0?` (+${tools.iplus(pluses_worn[i])})`:"")}\n`,"");
-                    const text_have = have_raw.reduce((a, c, i) => a+=`${i+1}.\t${c["strName"]} ${(tools.iplus(pluses_have[i])>0?` (+${tools.iplus(pluses_have[i])})`:"")}\n`,"");
+                    const text_worn = worn_raw.reduce((a, c, i) => a+=`${i+1}.\t${c["strName"]} ${get_plus_text(pluses_worn[i])}\n`,"");
+                    const text_have = have_raw.reduce((a, c, i) => a+=`${i+1}.\t${c["strName"]} ${get_plus_text(pluses_have[i])}\n`,"");
 
                     let embed = new Discord.MessageEmbed()
                     .setTitle("`"+user.username+"`")
