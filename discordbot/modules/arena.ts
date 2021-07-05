@@ -123,7 +123,7 @@ const this_dcmodule = class arena extends dcmodule {
                     const p1 = this.custom_info(msg, `[${target.name} oyuncusu mağlup edildi.] (${self.name} tarafından)`, "css", true);
                     const p2 = this.set_arena_player_user(target_id, target);
                     const p3 = this.set_module_state_user_value(msg.author.id, "kill", (this.get_module_state_user_value(msg.author.id, "kill") as number ?? 0) + 1);
-                    const p4 = this.set_module_state_user_value(target_id, "death", (this.get_module_state_user_value(target_id, "death") as number ?? 0) + 1);
+                    const p4 = this.set_module_state_user_value(target_id,    "death", (this.get_module_state_user_value(target_id, "death")    as number ?? 0) + 1);
                     await p1; await p2; await p3; await p4; return;
                 }
                 else {
@@ -146,16 +146,7 @@ const this_dcmodule = class arena extends dcmodule {
         const update_here_when_interface_changes : arena_player = {
             health: 0, armor: 0, target: "", lasthit: 0, sum_item_damage: 0, inside: false, experience: 0, name:"",
         }
-        return this.set_module_state_user(user_id, {
-            "name": user_state.name,
-            "health": user_state.health,
-            "armor": user_state.armor,
-            "sum_item_damage": user_state.sum_item_damage,
-            "lasthit": user_state.lasthit,
-            "target": user_state.target,
-            "inside": user_state.inside,
-            "experience": user_state.experience,
-        });
+        return this.upsert_module_state_user(user_id, {...user_state});
     }
     private set_arena_player_user_value(user_id : string, modifier : (state : arena_player) => void) {
         

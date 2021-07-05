@@ -148,6 +148,12 @@ export class dcmodule {
         this.get_raw_ms()[MS_DCUSERS][user_id] = user_state;
         return this.queue_sync();
     }
+    protected upsert_module_state_user(user_id : string, user_state : module_user_state) {
+        if (this.get_raw_ms()[MS_DCUSERS] == undefined)
+            this.get_raw_ms()[MS_DCUSERS] = {};
+        this.get_raw_ms()[MS_DCUSERS][user_id] = {...this.get_raw_ms()[MS_DCUSERS][user_id], ...user_state};
+        return this.queue_sync();
+    }
     protected set_module_state_user_value(user_id : string, key : string, value : user_state_value) {
         
         let json : any = this.get_module_state_user(user_id);
