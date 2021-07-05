@@ -129,6 +129,9 @@ export class dcmodule {
     protected get_module_state(key : string) : any {
         return this.get_raw_ms()[key];
     }
+    protected get_module_state_users() : {[key : string] : module_user_state} {
+        return this.get_raw_ms()[MS_DCUSERS];
+    }
     protected get_module_state_user(user_id : string) : module_user_state {
         return this.get_raw_ms()[MS_DCUSERS][user_id] ?? {};
     }
@@ -136,7 +139,7 @@ export class dcmodule {
         return this.get_module_state_user(user_id)[key];
     }
     protected get_module_state_author() : module_user_state {
-        return this.get_module_state_user(this.get_msg().author.id);
+        return this.get_module_state_user(this.get_author_id());
     }
     protected get_module_state_author_value(key : string) : user_state_value {
         return this.get_module_state_author()[key];
@@ -162,10 +165,10 @@ export class dcmodule {
         return this.push_sync();
     }
     protected set_module_state_author(user_state : module_user_state) {
-        return this.set_module_state_user(this.get_msg().author.id, user_state);
+        return this.set_module_state_user(this.get_author_id(), user_state);
     }
     protected set_module_state_author_value(key : string, value : user_state_value) {
-        return this.set_module_state_user_value(this.get_msg().author.id, key, value);
+        return this.set_module_state_user_value(this.get_author_id(), key, value);
     }
     protected delete_module_state(key : string) {
         delete (this.get_raw_ms()[key]);
@@ -197,6 +200,9 @@ export class dcmodule {
         const m = this.msg;
         if (!m) throw Error(this.get_msg.name + "() can't be called before setting msg with " + this.set_msg.name);
         return m;
+    }
+    protected get_author_id() : string {
+        return this.get_msg().author.id;
     }
     protected is_prefixed() : boolean {
         return this.is_word(this.state.prefix);
