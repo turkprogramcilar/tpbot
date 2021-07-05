@@ -93,9 +93,9 @@ const wear_item = async (uid, islot, msg) => {
     const p2 = db.set_inventory(uid, inv);
     // calculate stats
     const pluses_worn = Object.values(wear)
-    const items = await Promise.all(pluses_worn.map(iid => db.get_item(tools.i0(iid))));
+    const items_raw = await Promise.all(pluses_worn.map(iid => db.get_item(tools.i0(iid))));
     
-    const dmg = items.reduce( (a, item, i) => a += tools.iplusdmg(pluses_worn[i], item["Damage"] ?? 0), 0);
+    const dmg = items_raw.reduce( (a, item, i) => a += tools.iplus_stat(pluses_worn[i], item["Damage"] ?? 0), 0);
     const p3 = db.set_user_value(uid, "stats", {"Damage": dmg});
     await p1; await p2; await p3;
 }

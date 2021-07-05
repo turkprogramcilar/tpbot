@@ -164,8 +164,8 @@ exports.send_embed_item = async (msg, id, state) => {
         delete i["strName"]; //delete i["strDesc"];
         //delete i["IconID"];  //delete i["BuyPrice"];
         for (const k of Object.keys(i)) {
-            if (plus > 0 && k=="Damage")
-                i[k] = exports.iplusdmg(fullid, i[k]);
+            if (plus && plus > 0)
+                i[k] = exports.iplus_stat(fullid, i[k]);
             if (!i[k] || i[k].toString()=='0') if (k!='Slot')
                 delete i[k];
         }
@@ -183,4 +183,4 @@ exports.send_embed_item = async (msg, id, state) => {
 
 exports.i0 = (iid) => iid.toString().length == 9 ? iid/10|0 : iid;
 exports.iplus = (iid) => iid.toString().length != 9 ? 0 : parseInt(iid.toString()[8]);
-exports.iplusdmg = (iid, dmg) => dmg * Math.pow(1.11, exports.iplus(iid)) | 0;
+exports.iplus_stat = (iid, stat) => stat * Math.pow(1.11, exports.iplus(iid)) | 0;
