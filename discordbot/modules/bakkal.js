@@ -94,9 +94,18 @@ const wear_item = async (uid, islot, msg) => {
     // calculate stats
     const pluses_worn = Object.values(wear)
     const items_raw = await Promise.all(pluses_worn.map(iid => db.get_item(tools.i0(iid))));
-    
-    const dmg = items_raw.reduce( (a, item, i) => a += tools.iplus_stat(pluses_worn[i], item["Damage"] ?? 0), 0);
-    const p3 = db.set_user_value(uid, "stats", {"Damage": dmg});
+    const stats = {};
+    for (const stat_key of item_stats) {
+
+        const stat_total = items_raw.reduce( (a, item, i) => {
+            
+            let stat_value = (item[stat_key] ?? 0);
+            if (!Number.isSafeInteger(stat_value)) stat_value = 0;
+            return a += tools.iplus_stat(pluses_worn[i], stat_value)
+        }, 0);
+        stats[stat_key] = stat_total;
+    }
+    const p3 = db.set_user_value(uid, "stats", stats);
     await p1; await p2; await p3;
 }
 const double_slots = {
@@ -355,12 +364,25 @@ exports.on_event = async (evt, args) => {
                     .setDescription(parser.tqs(`Exp: {${uexp}} [Lvl: ${lvl}]\nHasar çarpanı: {${expm.toFixed(2)}}`,"css"))
                     .setThumbnail(user.avatarURL())
                     .setImage(`attachment://${iname}`);
-                    for (const [k, v] of Object.entries(stats ?? {})) {
-                        embed = embed.addField(`\`Item ${k.replace(/^\w/, c => c.toUpperCase())}\``, v, true);
+
+                    // display all item stats on the player
+                    const max_str_len = item_stats.map(x=>x.length).reduce((a,c)=>a=a>c?a:c,0);
+                    let all_item_stats = ""; let counter = 0;
+                    for (const [item_stat_key, item_stat_value] of Object.entries(stats ?? {})) {
+                        let spacing_length = max_str_len-item_stat_key.length-item_stat_value.toString().length;
+                        spacing_length = spacing_length < 0 ? 0 : spacing_length;
+                        const spacing = Array(spacing_length).fill(" ").reduce((a,c)=>a+=c,"");
+                        all_item_stats += `[${item_stat_key.replace(/^\w/, c => c.toUpperCase())}]: ${item_stat_value}`+spacing;
+                        if (++counter % 2 == 0) {
+                            all_items_stats = all_item_stats.slice(0, -spacing_length);
+                            all_item_stats += "\n";
+                        }
                     }
+                    if (all_item_stats == "") all_item_stats = "-";
                     embed = embed
                         .addField("`Ortalama Hasar`", base_dmg|0, true)
-                        .addField("`Maksimum Hasar`", base_dmg*2|0, true);
+                        .addField("`Maksimum Hasar`", base_dmg*2|0, true)
+                        .addField(`\`Eşyalardan gelen güçler:\``, parser.tqs(all_item_stats, "ini"));
                     await msg.channel.send({
                         files: [{
                             attachment: image,
