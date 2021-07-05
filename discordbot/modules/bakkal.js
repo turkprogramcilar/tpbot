@@ -320,6 +320,37 @@ exports.on_event = async (evt, args) => {
                 await promise_update_db;
             });
             else if (parser.is(msg, "sil ")) await parser.u_arg(msg, async u => await burn_item(msg.author.id, u));
+            else if (parser.is(msg, "envanter")) {
+                await parser.mention_else_self(msg, async id => {
+                    
+                    const user = msg.guild.members.cache.get(id).user;
+                    
+
+                    const pi = db.get_inventory(id);
+                    const pw = db.get_wear(id);
+                    const inventory = await pi;
+                    const wear = await pw;
+
+                    // calculate stats
+                    const pluses_worn = Object.values(wear)
+                    const pluses_have = Object.values(inventory);
+                    const p_worn_raw = Promise.all(pluses_worn.map(iid => db.get_item(tools.i0(iid))));
+                    const p_have_raw = Promise.all(pluses_have.map(iid => db.get_item(tools.i0(iid))));
+                    const worn_raw = await p_worn_raw;
+                    const have_raw = await p_have_raw;
+                    const text_worn = worn_raw.reduce((a, c, i) => a+=`${i+1}.\t${c["strName"]} ${(tools.iplus(pluses_worn[i])>0?` (+${tools.iplus(pluses_worn[i])})`:"")}\n`,"");
+                    const text_have = have_raw.reduce((a, c, i) => a+=`${i+1}.\t${c["strName"]} ${(tools.iplus(pluses_have[i])>0?` (+${tools.iplus(pluses_have[i])})`:"")}\n`,"");
+
+                    let embed = new Discord.MessageEmbed()
+                    .setTitle("`"+user.username+"`")
+                    .setDescription(parser.tqs(`[Envanterdeki eşyalar]\n${text_have}\n\n[Giyilen eşyalar]\n${text_worn}`, "ini"))
+                    .setThumbnail(user.avatarURL());
+
+                    await msg.channel.send({
+                        embed: embed
+                    });
+                });
+            }
             else if (parser.is(msg, "profil")) {
                 const premium = parser.is(msg,'p');
                 await parser.mention_else_self(msg, async id => {
