@@ -168,7 +168,7 @@ const hit = async (msg, gm=false,gmdmg=0) => {
         };
     }
     const user = alive.dmgdone[uid];
-    const idmg = user?.stats?.Hasar ?? 0;
+    const idmg = user?.stats?.Damage ?? 0;
     const expm = tools.getexpm(user?.exp ?? 0);
     
     // calculate time difference for dmg calculation

@@ -96,7 +96,7 @@ const wear_item = async (uid, islot, msg) => {
     const items = await Promise.all(pluses_worn.map(iid => db.get_item(tools.i0(iid))));
     
     const dmg = items.reduce( (a, item, i) => a += tools.iplusdmg(pluses_worn[i], item["Damage"] ?? 0), 0);
-    const p3 = db.set_user_value(uid, "stats", {"Hasar": dmg});
+    const p3 = db.set_user_value(uid, "stats", {"Damage": dmg});
     await p1; await p2; await p3;
 }
 const double_slots = {
@@ -107,6 +107,11 @@ const double_slots = {
     2: 0,
     11: 9,
 };
+const item_stats = [
+   "Damage", "Weight", "Ac", "Hitrate", "Evasionrate", "DaggerAc", "SwordAc", "MaceAc", "AxeAc", "SpearAc", "BowAc", "FireDamage", "IceDamage", "LightningDamage", "PoisonDamage", "HPDrain", "MPDamage", "MPDrain", "MirrorDamage", "StrB", "StaB", "DexB", "IntelB", "ChaB", "MaxHpB", "MaxMpB", "FireR", "ColdR", "LightningR", "MagicR", "PoisonR", "CurseR"
+    // all original:
+    //"Num", "strName", "Kind", "Slot", "Race", "Class", "Damage", "Delay", "Range", "Weight", "Duration", "BuyPrice", "SellPrice", "Ac", "Countable", "Effect1", "Effect2", "ReqLevel", "ReqLevelMax", "ReqRank", "ReqTitle", "ReqStr", "ReqSta", "ReqDex", "ReqIntel", "ReqCha", "SellingGroup", "ItemType", "Hitrate", "Evasionrate", "DaggerAc", "SwordAc", "MaceAc", "AxeAc", "SpearAc", "BowAc", "FireDamage", "IceDamage", "LightningDamage", "PoisonDamage", "HPDrain", "MPDamage", "MPDrain", "MirrorDamage", "Droprate", "StrB", "StaB", "DexB", "IntelB", "ChaB", "MaxHpB", "MaxMpB", "FireR", "ColdR", "LightningR", "MagicR", "PoisonR", "CurseR"
+];
 const slot_to_wear = {
     /* ItemSlot1HEitherHand */  0  : [6, 8],
 	/* ItemSlot1HRightHand */	1  : [8],
@@ -342,7 +347,7 @@ exports.on_event = async (evt, args) => {
                     const stats = await db.get_user_value(id, "stats");
 
                     const expm = tools.getexpm(uexp??0);
-                    const idmg = stats?.Hasar ?? 0;
+                    const idmg = stats?.Damage ?? 0;
                     const base_dmg = tools.base_dmg(idmg, expm);
 
                     let embed = new Discord.MessageEmbed()
