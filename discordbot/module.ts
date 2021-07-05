@@ -24,7 +24,6 @@ const MS_BULK : string = "bulkmessages";
 const FORBIDDEN_KEYS : string[] = [MS_DCUSERS, MS_BULK];
 export class dcmodule {
 
-    private msg : Message | undefined;
     protected db_fetch_start : Date | undefined;
     protected state: any;
     private promises_module_state_queue : Promise<void>[] = [];
@@ -56,33 +55,32 @@ export class dcmodule {
                 if (this.administative_commands == false) return;
 
                 msg.content = msg_str;
-                this.set_msg(msg);
 
                 // if not admin or not command return
-                if (!this.is_admin(msg.author.id) || !this.is_prefixed()) return;
+                if (!this.is_admin(msg.author.id) || !this.is_prefixed(msg)) return;
 
                 // if admin doesn't point this module, return
-                if (!this.is_word(this.module_name)) return;
+                if (!this.is_word(msg, this.module_name)) return;
                 
-                if (this.is_word("channel_id")) {
+                if (this.is_word(msg, "channel_id")) {
 
                     const key = "channel_id";
 
                     const channel_id = this.get_module_state(key);
-                    const new_channel_id = this.get_unsigned();
+                    const new_channel_id = this.get_unsigned(msg);
                     if (!new_channel_id) {
 
-                        if (this.is_word("delete")) {
+                        if (this.is_word(msg, "delete")) {
 
                             const p1 = this.delete_module_state(key);
-                            const p2 = this.warn(`deleting channel restriction for the module ${this.module_name}`);
+                            const p2 = this.warn(msg, `deleting channel restriction for the module ${this.module_name}`);
                             await p1; await p2;
                             return;
                         }
-                        return await this.warn("channel id is "+(channel_id ?? "<undefined>"));
+                        return await this.warn(msg, "channel id is "+(channel_id ?? "<undefined>"));
                     }
 
-                    const p1 = this.affirm(`updating channel id to ${new_channel_id}, before it was ${channel_id ?? "<undefined>"}`);
+                    const p1 = this.affirm(msg, `updating channel id to ${new_channel_id}, before it was ${channel_id ?? "<undefined>"}`);
                     const p2 = this.set_module_state(key, new_channel_id);
                     await p1, await p2;
                     return;
@@ -138,12 +136,6 @@ export class dcmodule {
     protected get_module_state_user_value(user_id : string, key : string) : user_state_value {
         return this.get_module_state_user(user_id)[key];
     }
-    protected get_module_state_author() : module_user_state {
-        return this.get_module_state_user(this.get_author_id());
-    }
-    protected get_module_state_author_value(key : string) : user_state_value {
-        return this.get_module_state_author()[key];
-    }
     protected set_module_state(key : string, value : string | number, dont_assert : boolean = false) {
         assert(dont_assert || FORBIDDEN_KEYS.includes(key) == false, "key can't be "+key+" because its been controlled by module");
         assert(dont_assert || key.startsWith(MS_BULK) == false, "key can't start with "+key+" because its been controlled by module");
@@ -168,12 +160,6 @@ export class dcmodule {
 
         return this.queue_sync();
     }
-    protected set_module_state_author(user_state : module_user_state) {
-        return this.set_module_state_user(this.get_author_id(), user_state);
-    }
-    protected set_module_state_author_value(key : string, value : user_state_value) {
-        return this.set_module_state_user_value(this.get_author_id(), key, value);
-    }
     protected delete_module_state(key : string) {
         delete (this.get_raw_ms()[key]);
         return this.queue_sync();
@@ -197,29 +183,15 @@ export class dcmodule {
     }
 
     // parsing
-    protected set_msg(msg : Message) {
-        this.msg = msg;
+    protected is_prefixed(msg : Message) : boolean {
+        return this.is_word(msg, this.state.prefix);
     }
-    protected get_msg() : Message {
-        const m = this.msg;
-        if (!m) throw Error(this.get_msg.name + "() can't be called before setting msg with " + this.set_msg.name);
-        return m;
+    protected is_word(msg : Message, word : string) : boolean {
+        return parser.is(msg, word);
     }
-    protected get_author_id() : string {
-        return this.get_msg().author.id;
-    }
-    protected get_author_name() : string {
-        return this.get_msg().author.username;
-    }
-    protected is_prefixed() : boolean {
-        return this.is_word(this.state.prefix);
-    }
-    protected is_word(word : string) : boolean {
-        return parser.is(this.msg, word);
-    }
-    protected async switch_word(cases : [string, () => void][]) : Promise<boolean> {
+    protected async switch_word(msg : Message, cases : [string, () => void | Promise<void>][]) : Promise<boolean> {
         for (const [word, func] of cases) {
-            if (this.is_word(word)) {
+            if (this.is_word(msg, word)) {
                 await func();
                 return true;
             }
@@ -228,19 +200,19 @@ export class dcmodule {
     }
 
     // parsers with getters
-    protected get_unsigned() : number | null {
+    protected get_unsigned(msg : Message) : number | null {
         let u : number | null = null;
-        parser.u_arg(this.msg, (x : any) => u = x);
+        parser.u_arg(msg, (x : any) => u = x);
         return u;
     }
-    protected get_mention() : string | null {
+    protected get_mention(msg : Message) : string | null {
         let id : string | null = null;
-        parser.mention(this.msg, (x : any) => id = x);
+        parser.mention(msg, (x : any) => id = x);
         return id;
     }
-    protected get_word() : string | null {
+    protected get_word(msg : Message) : string | null {
         let word : string | null = null;
-        parser.r_arg(this.msg, /^\w+/, (x : any) => word = x);
+        parser.r_arg(msg, /^\w+/, (x : any) => word = x);
         return word;
     }
 
@@ -250,23 +222,23 @@ export class dcmodule {
     }
 
     // send message back
-    protected async warn(warning : string, bulk : boolean = false) {
+    protected async warn(msg : Message, warning : string, bulk : boolean = false) {
         if (!bulk)
-            return await parser.send_uwarn(this.msg, warning, true);
-        else if (this.msg?.channel.id)
-            this.bulk_buffer(this.msg.channel.id, parser.get_uwarn(warning))
+            return await parser.send_uwarn(msg, warning, true);
+        else if (msg.channel.id)
+            this.bulk_buffer(msg.channel.id, parser.get_uwarn(warning))
     }
-    protected async affirm(affirmation : string, bulk : boolean = false) {
+    protected async affirm(msg : Message, affirmation : string, bulk : boolean = false) {
         if (!bulk)
-            return await parser.send_uok(this.msg, affirmation, true);
-        else if (this.msg?.channel.id)
-            this.bulk_buffer(this.msg.channel.id, parser.get_uok(affirmation))
+            return await parser.send_uok(msg, affirmation, true);
+        else if (msg.channel.id)
+            this.bulk_buffer(msg.channel.id, parser.get_uok(affirmation))
     }
-    protected async custom_info(information : string, format : string, bulk : boolean = false) {
+    protected async custom_info(msg : Message, information : string, format : string, bulk : boolean = false) {
         if (!bulk)
-            return await parser.send_custom(this.msg, information, format, true);
-        else if (this.msg?.channel.id)
-            this.bulk_buffer(this.msg.channel.id, parser.get_custom(information, format))
+            return await parser.send_custom(msg, information, format, true);
+        else if (msg.channel.id)
+            this.bulk_buffer(msg.channel.id, parser.get_custom(information, format))
     }
 
     // bulk message system
@@ -313,14 +285,8 @@ export class dcmodule {
     protected user_stats(user_id : string) : Promise<{[key : string] : number | string }> {
         return db.get_user_value(user_id, "stats");
     }
-    protected author_stats() {
-        return this.user_stats(this.get_author_id());
-    }
     protected user_exp(user_id : string) : Promise<number> {
         return db.get_user_value(user_id, "exp");
-    }
-    protected author_exp() {
-        return this.user_exp(this.get_author_id());
     }
 
     // other wrappers

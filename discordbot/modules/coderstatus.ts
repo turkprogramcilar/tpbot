@@ -9,45 +9,42 @@ class coderstatus extends dcmodule {
     public async after_init(){}
     public async on_message(msg : Message) {
 
-         // assign message to the parser
-        this.set_msg(msg);
-
         // if not a command, return
-        if (!this.is_prefixed()) return;
+        if (!this.is_prefixed(msg)) return;
         
         // if not admin, return
         if (!this.is_admin(msg.author.id)) return;
 
         // add a coder app id to the database
-        if (this.is_word("coder_app")) {
+        if (this.is_word(msg, "coder_app")) {
 
-            const user_id = this.get_mention();
+            const user_id = this.get_mention(msg);
             if (!user_id)
-                return await this.warn(`none is mentioned.`);
+                return await this.warn(msg, `none is mentioned.`);
 
-            const app_name = this.get_word();
+            const app_name = this.get_word(msg);
             if (!app_name)
-                return await this.warn(`app name is not given.`);
+                return await this.warn(msg, `app name is not given.`);
 
             // get the user
             const user = await this.get_client().users.fetch(user_id);
 
             // activities needs to be 1
             if (user.presence.activities.length != 1)
-                return await this.warn(`activities length is ${user.presence.activities.length} != 1`);
+                return await this.warn(msg, `activities length is ${user.presence.activities.length} != 1`);
 
             const activity = user.presence.activities[0];
 
             const app_id = activity.applicationID;
             if (!app_id)
-                return await this.warn(`app_id is either undefined null or empty (or false kekw)`);
+                return await this.warn(msg, `app_id is either undefined null or empty (or false kekw)`);
             
             // inform what's happening as the final action being taken
             const module_state_app_name = this.get_module_state(app_name);
             if (module_state_app_name)
-                await this.warn(`app name with ${app_name} was existing before "${module_state_app_name}". Updating with "${app_id}"...`);
+                await this.warn(msg, `app name with ${app_name} was existing before "${module_state_app_name}". Updating with "${app_id}"...`);
             else
-                await this.warn(`app name with ${app_name} with id "${app_id}" is being added to the coder apps...`);
+                await this.warn(msg, `app name with ${app_name} with id "${app_id}" is being added to the coder apps...`);
 
             // do the updates
             this.set_module_state(app_name, app_id);
