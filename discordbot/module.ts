@@ -131,7 +131,7 @@ export class dcmodule {
         return this.get_raw_ms()[MS_DCUSERS];
     }
     protected get_module_state_user(user_id : string) : module_user_state {
-        return this.get_raw_ms()[MS_DCUSERS][user_id] ?? {};
+        return ((this.get_raw_ms() ?? {})[MS_DCUSERS] ?? {})[user_id] ?? {};
     }
     protected get_module_state_user_value(user_id : string, key : string) : user_state_value {
         return this.get_module_state_user(user_id)[key];
@@ -143,6 +143,8 @@ export class dcmodule {
         return this.queue_sync();
     }
     protected set_module_state_user(user_id : string, user_state : module_user_state) {
+        if (this.get_raw_ms()[MS_DCUSERS] == undefined)
+            this.get_raw_ms()[MS_DCUSERS] = {};
         this.get_raw_ms()[MS_DCUSERS][user_id] = user_state;
         return this.queue_sync();
     }
@@ -176,7 +178,7 @@ export class dcmodule {
         return promise;
     }
     private get_raw_ms() {
-        return this.state.cache.module[this.module_name];
+        return (this.state?.cache?.module ?? {})[this.module_name];
     }
     private set_raw_ms(value : any) {
         this.state.cache.module[this.module_name] = value;
