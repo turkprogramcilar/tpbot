@@ -66,12 +66,12 @@ let togglera_states = {}
 let togglera_timers = {}
 exports.toggler_async = async (f, k, fq) => {
     if (!togglera_timers[k]) {
-        await f();
-        togglera_states[k] = false;
         togglera_timers[k] = setTimeout(async () => {
             togglera_timers[k] = null;
             if (togglera_states[k]) await exports.toggler_async(f, k, fq);
         }, fq);
+        togglera_states[k] = false;
+        await f();
     } else {
         togglera_states[k] = true;
     }
