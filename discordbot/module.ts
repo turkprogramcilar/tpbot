@@ -298,12 +298,12 @@ export class dcmodule {
     }
 
     // other wrappers
-    protected calculate_hit(target_armor : number, self_sum_item_damage : number, self_experience : number, time_difference_seconds : number) : number {
+    protected calculate_hit(target_armor : number, self_sum_item_damage : number, self_experience : number, time_difference_seconds : number, cap : number) : number {
         
         const idmg = self_sum_item_damage;
         const expm = this.experience_multiplier(self_experience);
         const base_damage = tools.base_dmg(idmg, expm);
-        const final_damage = tools.final_dmg(base_damage, time_difference_seconds);
+        const final_damage = tools.final_dmg(base_damage, time_difference_seconds, cap);
         return tools.ac_reduces_dmg(target_armor, final_damage) | 0;
     }
     protected experience_multiplier(experience : number) {

@@ -112,7 +112,7 @@ const this_dcmodule = class arena extends dcmodule {
 
                 const now = new Date().getTime();
                 const time_diff = (now - self.lasthit)/1000;
-                const target_loss = this.calculate_hit(target.armor, self.sum_item_damage, self.experience, time_diff);
+                const target_loss = this.calculate_hit(target.armor, self.sum_item_damage, self.experience, time_diff, 1);
                 target.health -= target_loss;
                 self.lasthit = now;
                 

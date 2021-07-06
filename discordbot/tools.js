@@ -123,7 +123,10 @@ exports.base_dmg = (idmg, expm) => (100 + idmg)*expm;
 exports.damage_multiplier = (time_diff) => 1/(1+Math.pow(1.3,(-time_diff+20)))+1/(1+Math.pow(5,-(time_diff) + 2)); 
 
 
-exports.final_dmg = (base_dmg, time_diff) => base_dmg*exports.damage_multiplier(time_diff);
+exports.final_dmg = (base_dmg, time_diff, cap = 2) => {
+    const r = exports.damage_multiplier(time_diff);
+    return base_dmg*(r > cap ? cap : r);
+};
 ///
 
 // platform specific tools:
@@ -187,9 +190,8 @@ exports.ac_reduces_dmg = (ac, dmg) => {
     const x = ac/dmg;
     let r;
     if (dmg <= 0) r = 0;
-    else if (ac  <= 0) r = 3;
-    //http://fooplot.com/#W3sidHlwZSI6MCwiZXEiOiIxLygoeCozNis3KS8yMSkiLCJjb2xvciI6IiMwMDAwMDAifSx7InR5cGUiOjMsImVxIjpbWyIwIiwiMyJdLFsiMSIsIjAuNSJdLFsiMiIsIjAuMjUiXSxbIjMiLCIwLjE2NiJdXSwiY29sb3IiOiIjMDAwMDAwIn0seyJ0eXBlIjoxMDAwLCJ3aW5kb3ciOlsiLTAuOTgwMDYxNTM4NDYxNTM4MyIsIjMuNTE5OTM4NDYxNTM4NDYwNiIsIi0xLjQwMDk0OTk5OTk5OTk5OTUiLCIzLjA5OTA0OTk5OTk5OTk5OTYiXX1d
-    else r = 1/((x*36+7)/21);
+    else if (ac  <= 0) r = 1;
+    else r = Math.pow(.5, (x));
     return dmg * r;
 }
 exports.i0 = (iid) => iid.toString().length == 9 ? iid/10|0 : iid;
