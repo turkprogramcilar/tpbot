@@ -375,14 +375,15 @@ exports.on_event = async (evt, args) => {
                     const wear = await pw;
 
                     // calculate stats
-                    const pluses_worn = Object.values(wear)
-                    const pluses_have = Object.values(inventory);
+                    const pluses_worn = Object.values(wear ?? {})
+                    const pluses_have = Object.values(inventory ?? {});
                     const p_worn_raw = Promise.all(pluses_worn.map(iid => db.get_item(tools.i0(iid))));
                     const p_have_raw = Promise.all(pluses_have.map(iid => db.get_item(tools.i0(iid))));
                     const worn_raw = await p_worn_raw;
                     const have_raw = await p_have_raw;
-                    const text_worn = worn_raw.reduce((a, c, i) => a+=`${i+1}.\t${c["strName"]} ${get_plus_text(pluses_worn[i])}\n`,"");
-                    const text_have = have_raw.reduce((a, c, i) => a+=`${i+1}.\t${c["strName"]} ${get_plus_text(pluses_have[i])}\n`,"");
+	                const _text = (iid, c, k, text) => c[k] ? " ["+text+": " + (tools.iplus_stat(iid, c[k])) + "]" : "";
+                    const text_worn = worn_raw.reduce((a, c, i) => a+=`${i+1}.\t${c["strName"]} ${(tools.iplus(pluses_worn[i])>0?` (+${tools.iplus(pluses_worn[i])})`:"")}${_text(i, c, "Damage", "Hasar")}${_text(pluses_worn[i], c, "Ac", "Zırh")}\n`,"");
+                    const text_have = have_raw.reduce((a, c, i) => a+=`${i+1}.\t${c["strName"]} ${(tools.iplus(pluses_have[i])>0?` (+${tools.iplus(pluses_have[i])})`:"")}${_text(i, c, "Damage", "Hasar")}${_text(pluses_have[i], c, "Ac", "Zırh")}\n`,"");
 
                     let embed = new Discord.MessageEmbed()
                     .setTitle("`"+user.username+"`")
