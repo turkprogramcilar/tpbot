@@ -338,8 +338,9 @@ exports.on_event = async (evt, args) => {
                     const p_have_raw = Promise.all(pluses_have.map(iid => db.get_item(tools.i0(iid))));
                     const worn_raw = await p_worn_raw;
                     const have_raw = await p_have_raw;
-                    const text_worn = worn_raw.reduce((a, c, i) => a+=`${i+1}.\t${c["strName"]} ${(tools.iplus(pluses_worn[i])>0?` (+${tools.iplus(pluses_worn[i])})`:"")}\n`,"");
-                    const text_have = have_raw.reduce((a, c, i) => a+=`${i+1}.\t${c["strName"]} ${(tools.iplus(pluses_have[i])>0?` (+${tools.iplus(pluses_have[i])})`:"")}\n`,"");
+	            const _text = (c, k, text) => c[k] ? " "+text+": " + c[k] : "";
+                    const text_worn = worn_raw.reduce((a, c, i) => a+=`${i+1}.\t${c["strName"]} ${(tools.iplus(pluses_worn[i])>0?` (+${tools.iplus(pluses_worn[i])})`:"")}${_text("Damage", "Hasar")}${_text("Ac", "Zırh")}\n`,"");
+                    const text_have = have_raw.reduce((a, c, i) => a+=`${i+1}.\t${c["strName"]} ${(tools.iplus(pluses_have[i])>0?` (+${tools.iplus(pluses_have[i])})`:"")}${_text("Damage", "Hasar")}${_text("Ac", "Zırh")}\n`,"");
 
                     let embed = new Discord.MessageEmbed()
                     .setTitle("`"+user.username+"`")
