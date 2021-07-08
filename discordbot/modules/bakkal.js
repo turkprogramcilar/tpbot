@@ -347,7 +347,7 @@ exports.on_event = async (evt, args) => {
                             await db.set_inventory(user_id, inv); await p1; return;
                         }
                         else
-                            return await parser.send_uwarn(msg, `${upgrading_item["strName"]}${get_plus_text(plus_item_id, true)} eşyasını bir seviye atlatmak üzeresin. Bunun ihtimali %${100*chance}. Eğer başarısız olursa eşyan yokolacak. Onaylıyorsan aynı komutun sonuna "onay" yazıp komutu tekrar çalıştırın.`, true);
+                            return await parser.send_uwarn(msg, `${upgrading_item["strName"]}${get_plus_text(plus_item_id, true)} eşyasını bir seviye atlatmak üzeresin. Bunun ihtimali %${100*chance}. Eğer başarısız olursa eşyan yokolacak. Onaylıyorsan aynı komutun sonuna "onay" yazıp komutu tekrar çalıştır.`, true);
 
 
                     }, async () => await parser.send_uwarn(msg, str));
