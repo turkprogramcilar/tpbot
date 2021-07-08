@@ -184,7 +184,7 @@ exports.get_embed_item = async (id, state) => {
     };
 }
 exports.send_embed_item = async (msg, id, state) => {
-    await msg.channel.send(exports.get_embed_item(id, state));
+    await msg.channel.send(await exports.get_embed_item(id, state));
 };
 exports.ac_reduces_dmg = (ac, dmg) => {
     const x = ac/dmg;
