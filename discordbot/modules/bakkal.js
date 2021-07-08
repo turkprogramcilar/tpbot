@@ -9,15 +9,29 @@ const Discord   = require('discord.js');
 const { parse } = require("path");
 const Jimp      = require("jimp");
 
-const take_off_items = async (uid) => {
+const take_off_items = async (uid, wear_slot = undefined) => {
     const wear = await db.get_wear(uid);
     const inv  = await db.get_inventory(uid);
-    for (const [key, value] of Object.entries(wear)) {
-        inv.push(value);
+    if (wear_slot == undefined) {
+        for (const [key, value] of Object.entries(wear)) {
+            inv.push(value);
+        }
     }
-    const p1 = db.set_wear(uid, {});
+    else {
+        if (wear[wear_slot] != undefined)
+            inv.push(wear[wear_slot]);
+    }
+    if (wear_slot == undefined) 
+        wear = {};
+    else {
+        delete wear[wear_slot];
+    }
+    const p1 = db.set_wear(uid, wear);
     const p2 = db.set_inventory(uid, inv);
-    const p3 = db.set_user_value(uid, "stats", {});
+    const p3 = wear_slot == undefined 
+                ? db.set_user_value(uid, "stats", {}) 
+                : recalc_stats(uid, wear)
+                ;
     await p1; await p2; await p3;
 }
 const burn_item = async (uid, islot) => {
@@ -28,6 +42,24 @@ const burn_item = async (uid, islot) => {
         
     inv.splice(islot, 1);
     await db.set_inventory(uid, inv);
+}
+const recalc_stats = async (uid, wear) => {
+
+    // calculate stats
+    const pluses_worn = Object.values(wear)
+    const items_raw = await Promise.all(pluses_worn.map(iid => db.get_item(tools.i0(iid))));
+    const stats = {};
+    for (const stat_key of item_stats) {
+
+        const stat_total = items_raw.reduce( (a, item, i) => {
+            
+            let stat_value = (item[stat_key] ?? 0);
+            if (!Number.isSafeInteger(stat_value)) stat_value = 0;
+            return a += tools.iplus_stat(pluses_worn[i], stat_value)
+        }, 0);
+        stats[stat_key] = stat_total;
+    }
+    return db.set_user_value(uid, "stats", stats);
 }
 const wear_item = async (uid, islot, msg) => {
     islot--;
@@ -91,21 +123,7 @@ const wear_item = async (uid, islot, msg) => {
     inv.splice(islot, 1);
     const p1 = db.set_wear(uid, wear);
     const p2 = db.set_inventory(uid, inv);
-    // calculate stats
-    const pluses_worn = Object.values(wear)
-    const items_raw = await Promise.all(pluses_worn.map(iid => db.get_item(tools.i0(iid))));
-    const stats = {};
-    for (const stat_key of item_stats) {
-
-        const stat_total = items_raw.reduce( (a, item, i) => {
-            
-            let stat_value = (item[stat_key] ?? 0);
-            if (!Number.isSafeInteger(stat_value)) stat_value = 0;
-            return a += tools.iplus_stat(pluses_worn[i], stat_value)
-        }, 0);
-        stats[stat_key] = stat_total;
-    }
-    const p3 = db.set_user_value(uid, "stats", stats);
+    const p3 = recalc_stats(uid, wear);
     await p1; await p2; await p3;
 }
 const double_slots = {
@@ -255,6 +273,14 @@ exports.on_event = async (evt, args) => {
 
             if (parser.is(msg, "giy ")) await parser.u_arg(msg, async u => await wear_item(msg.author.id, u, msg));
             else if (parser.is(msg, "soyun")) await take_off_items(msg.author.id);
+            else if (parser.is(msg, "cikart")) {
+                
+                const str = "Kullanim: %yukselt <yükseltme kağıdı slot no> <yükselcek item slot no>";
+
+                await parser.u_arg(msg, async slot_wear => {
+                    await take_off_items(msg.author.id, slot_wear-1);
+                });
+            }
             else if (parser.is(msg, "yukselt")) {
 
                 const str = "Kullanim: %yukselt <yükseltme kağıdı slot no> <yükselcek item slot no>";
