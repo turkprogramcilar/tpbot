@@ -408,13 +408,33 @@ exports.on_event = async (evt, args) => {
                     const p_have_raw = Promise.all(pluses_have.map(iid => db.get_item(tools.i0(iid))));
                     const worn_raw = await p_worn_raw;
                     const have_raw = await p_have_raw;
-	                const _text = (iid, c, k, text) => c[k] ? " ["+text+": " + (tools.iplus_stat(iid, c[k])) + "]" : "";
-                    const text_worn = worn_raw.reduce((a, c, i) => a+=`${(parseInt(worn_slots[i])+1)}.${worn_slots[i]<9?" ":""}\t${c["strName"]}${(tools.iplus(pluses_worn[i])>0?` (+${tools.iplus(pluses_worn[i])})`:"")}${_text(pluses_worn[i], c, "Damage", "Hasar")}${_text(pluses_worn[i], c, "Ac", "Zırh")}\n`,"");
-                    const text_have = have_raw.reduce((a, c, i) => a+=`${i + 1                      }.${i < 9 ? " " : ""      }\t${c["strName"]}${(tools.iplus(pluses_have[i])>0?` (+${tools.iplus(pluses_have[i])})`:"")}${_text(pluses_have[i], c, "Damage", "Hasar")}${_text(pluses_have[i], c, "Ac", "Zırh")}\n`,"");
+	                const _stat_text = (iid, c, k, text) => c[k] ? " '"+text+" " + (tools.iplus_stat(iid, c[k])) + "'" : "";
+                    const _text = (no, no_space_cond, item_id, item_stats) => {
+
+                        let stats = "";
+                        stats += _stat_text(item_id, item_stats, "Damage", "Hasar");
+                        stats += _stat_text(item_id, item_stats, "Ac", "Zırh");
+                        if (stats.length > 0)
+                            stats = ":" + stats;
+
+                        const name = item_stats["strName"].replace(/'/, "`");
+
+                        let hashtags = "";
+                        const raw_item_id = item_stats["Num"];
+
+                        if (scroll_ids.includes(raw_item_id))
+                            hashtags += " #Yukseltici";
+                        if (key_ids.includes(raw_item_id))
+                            hashtags += " #Anektar";
+                        
+                        return `${no}.${no_space_cond?" ":""}\t${name}${(tools.iplus(item_id)>0?` [+${tools.iplus(item_id)}]`:"")}${hashtags}${stats};\n`
+                    };
+                    const text_worn = worn_raw.reduce((a, c, i) => a+=_text(parseInt(worn_slots[i]) + 1, worn_slots[i] < 9, pluses_worn[i], c),"");
+                    const text_have = have_raw.reduce((a, c, i) => a+=_text(i + 1                      , i < 9            , pluses_have[i], c),"");
 
                     let embed = new Discord.MessageEmbed()
                     .setTitle("`"+user.username+"`")
-                    .setDescription(parser.tqs(`[Envanterdeki eşyalar]\n${text_have}\n\n[Giyilen eşyalar]\n${text_worn}`, "ini"))
+                    .setDescription(parser.tqs(`[Envanterdeki eşyalar]\n${text_have}\n\n[Giyilen eşyalar]\n${text_worn}`, "css"))
                     .setThumbnail(user.avatarURL());
 
                     await msg.channel.send({
