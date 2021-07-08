@@ -488,10 +488,12 @@ exports.on_event = async (evt, args) => {
             }
             
             else if (parser.is(msg, "torpil")) {
-                const do_f = async iid => {
-                    await db.give_item(msg.author.id, iid);
-                };
-                parser.i_arg(msg, do_f, async ()=> await do_f(await tools.get_riid(state)));
+                await parser.mention_else_self(msg, async id => {
+                    const do_f = async iid => {
+                        await db.give_item(id, iid);
+                    };
+                    parser.i_arg(msg, do_f, async ()=> await do_f(await tools.get_riid(state)));
+                });
             }
         }
 
