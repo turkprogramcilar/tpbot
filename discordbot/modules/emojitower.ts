@@ -10,7 +10,7 @@ const this_dcmodule = class emojitower extends dcmodule {
     
     public async after_init(){
         //const compression = require('compression');
-        const PORT = process.env.DCBOT_WSPORT || 3000;
+        const PORT = process.env.PORT || process.env.DCBOT_WSPORT || 3000;
         const INDEX = 'www/index.html';
 
         // https server
