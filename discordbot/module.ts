@@ -320,33 +320,31 @@ export class dcmodule {
 // boilerplate code:
 /* 
 
-
 import { GuildMember, Message, MessageReaction, PartialUser, Presence, User } from "discord.js";
 import { dcmodule } from "../module";
 
 
-const this_dcmodule = class newmodule extends dcmodule {
+
+const this_dcmodule = class emojitower extends dcmodule {
     
-    constructor() { super(newmodule.name, false); }
+    constructor() { super(emojitower.name, false); }
     
     public async after_init(){}
     public async on_message(msg : Message) {
 
-         // assign message to the parser
-        this.set_msg(msg);
 
         // if not a command, return
-        if (!this.is_prefixed()) return;
+        if (!this.is_prefixed(msg)) return;
 
-        if (this.is_word("ping"))
-            return await this.inform("pong");
+        if (this.is_word(msg, "ping"))
+            return await this.affirm(msg, "pong");
         
         // if not admin, return
         if (!this.is_admin(msg.author.id)) return;
 
         // add a coder app id to the database
-        if (this.is_word("echo")) 
-            return await this.inform(this.get_word() ?? "<no echo message>");
+        if (this.is_word(msg, "echo")) 
+            return await this.affirm(msg, this.get_word(msg) ?? "<no echo message>");
     }
     public async on_reaction(reaction : MessageReaction, user : User | PartialUser) { }
     public async on_presence_update(old_p: Presence | undefined, new_p: Presence) { }
