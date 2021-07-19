@@ -13,13 +13,15 @@ const htmlp   = require('node-html-parser');
 const mpath = "./modules/";
 const ts_mpath = "../build/discordbot/modules/"
 
-exports.init = async (state, token, mods = []) => {
+exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
     
     const client  = new Discord.Client();
     state = {
         client: client,
         prefix: consts.env.prefix ?? "%",
-        ws: {},
+        ws: {
+            send_all: ws_f
+        },
         cooldown: {
             global: {},
             users: {},
@@ -201,8 +203,4 @@ exports.init = async (state, token, mods = []) => {
     });
 
     await Promise.all(promises);
-}
-
-module.exports.set_sendallF = (f) => {
-    state.ws.send_all = f;
 }

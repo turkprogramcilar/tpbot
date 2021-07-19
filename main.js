@@ -10,9 +10,7 @@ Object.keys(bots).map(async function(token) {
     
     const modules = bots[token];
     let bot = require("./discordbot/bot.js")
-    await bot.init({}, token, modules);
-    if (webserver != undefined && modules.includes("wschannel"))
-        bot.set_sendallF(webserver.send_all);
+    await bot.init({}, token, modules, webserver?.send_all);
 })
 console.log('OK')
 

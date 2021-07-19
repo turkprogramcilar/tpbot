@@ -3,8 +3,10 @@ Türk Programcılar Discord sunucusu tarafından geliştirilen bot
 
 `Özellikler: (liste tam değildir)`
 - Mega emoji kolezyum
-- WebSockets sunucusu ile kanal yayını (şu an için geliştirilmesi devam etmiyor)
+- WebSockets sunucusu ile kanal yayını ( ~~şu an için geliştirilmesi devam etmiyor~~ __20.07.2021: destek geldi güncel olarak çalışıyor__)
 - Exp sistemi
+- Nvidia
+- Gladyatör Ekselans ve Bakkal Risitas modülleri
 
 `Environment variable` tanımlamaları
 ```
