@@ -1,5 +1,15 @@
 **node_modules
+
 .vscode
+.vsconfig
+
 discordbot/data/users.json
 
 build/*
+
+unity/Logs
+unity/obj
+unity/Temp
+unity/Web
+unity/UserSettings
+unity/Library
