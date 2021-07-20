@@ -8,10 +8,10 @@ Türk Programcılar Discord sunucusu tarafından geliştirilen bot
 - Nvidia
 - Unity emoji oyunu
 ### Modül dizini
-- [Bakkal Risitas](#Bakkal%20Risitas)
-- [Gladyatör Risitas](#Gladyatör%20Risitas)
-- [Ünity Risitas](#Ünity%20Risitas)
-- [Şu anda kodluyor](#Şu%20anda%20kodluyor)
+- [Bakkal Risitas](#Bakkal&#x20;Risitas)
+- [Gladyatör Risitas](#Gladyatör&#x20;Risitas)
+- [Ünity Risitas](#Ünity&#x20;Risitas)
+- [Şu anda kodluyor](#Şu&#x20;anda&#x20;kodluyor)
 
 `Environment variable` tanımlamaları
 ```
