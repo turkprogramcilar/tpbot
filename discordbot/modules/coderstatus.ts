@@ -52,7 +52,7 @@ class coderstatus extends dcmodule {
         }
         
     }
-    public async on_reaction(reaction : MessageReaction, user : User | PartialUser) {}
+    public async on_reaction_add(reaction : MessageReaction, user : User | PartialUser) {}
     public async on_presence_update(old_p: Presence | undefined, new_p: Presence) {
 
         // if null or empty, defensive coding

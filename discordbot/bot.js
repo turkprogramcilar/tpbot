@@ -60,6 +60,10 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
                 m.on_event(evt, [a1, a2]);
         }); 
     }
+    client.on('messageReactionRemove', async (reaction,user) => {
+        for (const m of modules) 
+            m.on_event('messageReactionRemove', {reaction: reaction, user: user});
+    });
     client.on('messageReactionAdd', async (reaction,user) => {
         for (const m of modules) 
             m.on_event('messageReactionAdd', {reaction: reaction, user: user});

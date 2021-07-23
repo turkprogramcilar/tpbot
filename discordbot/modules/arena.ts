@@ -135,7 +135,7 @@ const this_dcmodule = class arena extends dcmodule {
         if (await this.switch_word(msg, commands)) return;
         
     }
-    public async on_reaction(reaction : MessageReaction, user : User | PartialUser) { }
+    public async on_reaction_add(reaction : MessageReaction, user : User | PartialUser) { }
     public async on_presence_update(old_p: Presence | undefined, new_p: Presence) { }
 
     private get_arena_player_user(user_id : string) : arena_player {

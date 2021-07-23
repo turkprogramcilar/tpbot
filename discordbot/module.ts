@@ -87,9 +87,13 @@ export class dcmodule {
                 }
             break;
             case 'messageReactionAdd':
+            case 'messageReactionRemove':
                 const reaction : MessageReaction = args.reaction;
                 const user : User | PartialUser = args.user;
-                await this.on_reaction(reaction, user);
+                if (evt == 'messageReactionAdd')                    
+                    await this.on_reaction_add(reaction, user);
+                else
+                    await this.on_reaction_remove(reaction, user);
             break;
             case 'presenceUpdate':
                 await this.on_presence_update(args[0], args[1]);
@@ -312,7 +316,8 @@ export class dcmodule {
     // to be overridden by child classes
     public async after_init() {}
     public async on_message(msg : Message) {}
-    public async on_reaction(reaction : MessageReaction, user : User | PartialUser) {}
+    public async on_reaction_add(reaction : MessageReaction, user : User | PartialUser) {}
+    public async on_reaction_remove(reaction : MessageReaction, user : User | PartialUser) {}
     public async on_presence_update(new_p: Presence, old_p: Presence) {}
 }
 
