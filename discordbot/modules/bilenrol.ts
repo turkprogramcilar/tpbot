@@ -13,7 +13,7 @@ const this_dcmodule = class bilenrol extends dcmodule {
     public async after_init(){
         
         const guilds = await Promise.all(this.get_client().guilds.cache.map(g => g.fetch()));
-        const guild = await Promise.all(guilds.filter(g => g.channels.cache.get(this.ch_roles) != undefined));
+        const guild = guilds.filter(g => g.channels.cache.get(this.ch_roles) != undefined);
         if (guild.length == 0) {
             console.error("guild length == 0");
             return;
