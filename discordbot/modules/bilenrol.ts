@@ -14,29 +14,18 @@ const this_dcmodule = class bilenrol extends dcmodule {
         
         const guilds = await Promise.all(this.get_client().guilds.cache.map(g => g.fetch()));
         const guild = await Promise.all(guilds.filter(g => g.channels.cache.get(this.ch_roles) != undefined));
-        if (guild.length == 0)
+        if (guild.length == 0) {
+            console.error("guild length == 0");
             return;
+        }
         const channel = guild[0].channels.cache.get(this.ch_roles)!;
         if (channel?.isText()) {
             const text_channel = channel as TextChannel;
             await text_channel.messages.fetch();
         }
-    }
-    public async on_message(msg : Message) {
-
-
-        // if not a command, return
-        if (!this.is_prefixed(msg)) return;
-
-        if (this.is_word(msg, "ping bielnrol"))
-            return await this.affirm(msg, "pong bielnrol");
-        
-        // if not admin, return
-        if (!this.is_admin(msg.author.id)) return;
-
-        // add a coder app id to the database
-        if (this.is_word(msg, "echo")) 
-            return await this.affirm(msg, this.get_word(msg) ?? "<no echo message>");
+        else {
+            console.error("channel is not text");
+        }
     }
     public async on_reaction_remove(reaction : MessageReaction, user : User | PartialUser) {
         await this.reaction_internal(reaction, user, false);
@@ -62,19 +51,25 @@ const this_dcmodule = class bilenrol extends dcmodule {
             role = custom[role];
         }
         else if (!roles.includes(role)) {
+            console.log("not allowed role: "+role);
             return;
         }
         role = (word => `${word.charAt(0).toUpperCase()}${word.slice(1).toLowerCase()}` )(role);
 
         const guild = reaction.message.guild;
-        if (!guild) return;
-
+        if (!guild) {
+            console.error("!guild");
+            return;
+        }
         // ensure the guild member
         const guild_member : GuildMember | undefined
             = await this.fetch_guild_member(guild, user.id)
         // if failed to ensure the guild member, we can't do anything about it
         // (remember: !null is true, !undefined is true)
-        if (!guild_member) return;
+        if (!guild_member) {
+            console.error("!guild_member");
+            return;
+        }
 
         const role_name = `${role} Bilen`;
         const guild_roles = await guild.roles.fetch();
@@ -94,6 +89,7 @@ const this_dcmodule = class bilenrol extends dcmodule {
         else
             await guild_member.roles.remove([role_to_give.id]);
 
+        console.log("allowed role: "+role);
     }
 }
 
