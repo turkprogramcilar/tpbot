@@ -12,12 +12,7 @@ const this_dcmodule = class bilenrol extends dcmodule {
     
     public async after_init(){
         
-        const guild = this.get_client().guilds.cache.filter(g => g.channels.cache.get(this.ch_roles) != undefined);
-        if (guild.size == 0) {
-            console.error("guild length == 0");
-            return;
-        }
-        const channel = guild.first()!.channels.cache.get(this.ch_roles)!;
+        const channel = await this.get_client().channels.fetch(this.ch_roles);
         if (channel?.isText()) {
             const text_channel = channel as TextChannel;
             await text_channel.messages.fetch();
