@@ -75,15 +75,18 @@ const this_dcmodule = class bilenrol extends dcmodule {
         else {
             role_to_give = await guild.roles.create({data: {name: role_name}});
         }
-
+        
+        const p1 = role_to_give.setMentionable(true);
+        let p2;
         // give the d to the user if s/he's not given yet, or remove depending on action
         //const found = reaction.users.cache.findKey(u => u.id == user.id) != null;
         if (add)
-            await guild_member.roles.add([role_to_give.id]);
+            p2 = guild_member.roles.add([role_to_give.id]);
         else
-            await guild_member.roles.remove([role_to_give.id]);
+            p2 = guild_member.roles.remove([role_to_give.id]);
 
         console.log("allowed role: "+role);
+        await p1; await p2;
     }
 }
 
