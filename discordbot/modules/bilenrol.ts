@@ -32,19 +32,32 @@ const this_dcmodule = class bilenrol extends dcmodule {
         if (reaction.message.channel.id != this.ch_roles)
             return;
 
-        const roles = ["angular", "aspnet", "bootstrap", "css", "clang", "cplusplus", "csharp", "dart", "django", "ecmascript", "flutter", "fsharp", "go", "godot", "haskell", "html", "java", "javascript", "kotlin", "laravel", "lua", "mongodb", "mssql", "mysql", "nodejs", "perl", "php", "python", "react", "ruby", "rust", "sql", "typescript", "unity", "unrealengine", "visualbasic"];
-        const custom : any = {
+        enum role_type {
+            language,
+            fan_club
+        };
+        const language_roles = ["angular", "aspnet", "bootstrap", "css", "clang", "cplusplus", "csharp", "dart", "django", "ecmascript", "flutter", "fsharp", "go", "godot", "haskell", "html", "java", "javascript", "kotlin", "laravel", "lua", "mongodb", "mssql", "mysql", "nodejs", "perl", "php", "python", "react", "ruby", "rust", "sql", "typescript", "unity", "unrealengine", "visualbasic"];
+        const fan_club_roles = ["ricardo", "risitas"];
+        const language_roles_custom : any = {
             "microsoft": "mssql",
             "👢": "bootstrap",
             "logo_django2": "django",
         }
 
         // test to see if these are allowed roles
+        let type : role_type;
         let role = reaction.emoji.name.toLowerCase();
-        if (Object.keys(custom).includes(role)) {
-            role = custom[role];
+        if (Object.keys(language_roles_custom).includes(role)) {
+            role = language_roles_custom[role];
+            type = role_type.language;
         }
-        else if (!roles.includes(role)) {
+        else if (language_roles.includes(role)) {
+            type = role_type.language;
+        }
+        else if (fan_club_roles.includes(role)) {
+            type = role_type.fan_club;
+        }
+        else {
             console.log("not allowed role: "+role);
             return;
         }
@@ -65,7 +78,11 @@ const this_dcmodule = class bilenrol extends dcmodule {
             return;
         }
 
-        const role_name = `${role} Bilen`;
+        const role_postfix : {[key in role_type]: string} = {
+            [role_type.fan_club]: "Fan",
+            [role_type.language]: "Bilen",
+        }
+        const role_name = `${role} ${role_postfix[type]}`;
         const guild_roles = await guild.roles.fetch();
         const filter_result = guild_roles.cache.filter(x => x.name == role_name);
         let role_to_give : Role;
