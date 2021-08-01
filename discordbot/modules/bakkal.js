@@ -392,6 +392,10 @@ exports.on_event = async (evt, args) => {
             else if (parser.is(msg, "sil ")) await parser.u_arg(msg, async u => await burn_item(msg.author.id, u));
             else if (parser.is(msg, "envanter")) {
                 await parser.mention_else_self(msg, async id => {
+
+                    // get skip if supplied with arg
+                    let skip = 0;
+                    parser.u_arg(msg, i => skip = i)
                     
                     const user = msg.guild.members.cache.get(id).user;
 
@@ -399,6 +403,9 @@ exports.on_event = async (evt, args) => {
                     const pw = db.get_wear(id);
                     const inventory = await pi;
                     const wear = await pw;
+
+                    // skip
+                    inventory.splice(0, skip);
 
                     // calculate stats
                     const worn_slots = Object.keys(wear ?? {});
@@ -427,7 +434,7 @@ exports.on_event = async (evt, args) => {
                         if (key_ids.includes(raw_item_id))
                             hashtags += " #Anektar";
                         
-                        return `${no}.${no_space_cond?" ":""}\t${name}${(tools.iplus(item_id)>0?` [+${tools.iplus(item_id)}]`:"")}${hashtags}${stats};\n`
+                        return `${no+skip_e}.${no_space_cond?" ":""}\t${name}${(tools.iplus(item_id)>0?` [+${tools.iplus(item_id)}]`:"")}${hashtags}${stats};\n`
                     };
                     const text_worn = worn_raw.reduce((a, c, i) => a+=_text(parseInt(worn_slots[i]) + 1, worn_slots[i] < 9, pluses_worn[i], c),"");
                     const text_have = have_raw.reduce((a, c, i) => a+=_text(i + 1                      , i < 9            , pluses_have[i], c),"");
