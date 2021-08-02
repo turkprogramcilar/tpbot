@@ -40,14 +40,15 @@ class coderstatus extends dcmodule {
                 app_id = activity.name;
             
             // inform what's happening as the final action being taken
-            const module_state_app_name = this.get_module_state(app_name);
-            if (module_state_app_name)
+            const module_state_app_name = this.get_module_state("coder_apps");
+            if (module_state_app_name[app_name])
                 await this.warn(msg, `app name with ${app_name} was existing before "${module_state_app_name}". Updating with "${app_id}" id/name...`);
             else
                 await this.warn(msg, `app name with ${app_name} with id/name "${app_id}" is being added to the coder apps...`);
 
+            module_state_app_name[app_name] = app_id;
             // do the updates
-            this.set_module_state(app_name, app_id);
+            this.set_module_state("coder_apps", module_state_app_name);
             await this.sync_db_ms();
         }
         
