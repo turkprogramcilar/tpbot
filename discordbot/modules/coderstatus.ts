@@ -35,16 +35,16 @@ class coderstatus extends dcmodule {
 
             const activity = user.presence.activities[0];
 
-            const app_id = activity.applicationID;
+            let app_id = activity.applicationID;
             if (!app_id)
-                return await this.warn(msg, `app_id is either undefined null or empty (or false kekw)`);
+                app_id = activity.name;
             
             // inform what's happening as the final action being taken
             const module_state_app_name = this.get_module_state(app_name);
             if (module_state_app_name)
-                await this.warn(msg, `app name with ${app_name} was existing before "${module_state_app_name}". Updating with "${app_id}"...`);
+                await this.warn(msg, `app name with ${app_name} was existing before "${module_state_app_name}". Updating with "${app_id}" id/name...`);
             else
-                await this.warn(msg, `app name with ${app_name} with id "${app_id}" is being added to the coder apps...`);
+                await this.warn(msg, `app name with ${app_name} with id/name "${app_id}" is being added to the coder apps...`);
 
             // do the updates
             this.set_module_state(app_name, app_id);
@@ -69,7 +69,7 @@ class coderstatus extends dcmodule {
             ;
 
         const action : todo =
-            new_p.activities.find(x => Object.values(coder_apps).includes(x.applicationID ?? ""))
+            new_p.activities.find(x => Object.values(coder_apps).includes(x.applicationID ?? (x.name ?? "")))
                 ? todo.add
                 : todo.del
                 ;
