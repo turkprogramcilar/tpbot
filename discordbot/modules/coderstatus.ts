@@ -57,7 +57,7 @@ class coderstatus extends dcmodule {
     public async on_presence_update(old_p: Presence | undefined, new_p: Presence) {
 
         // if null or empty, defensive coding
-        if (!new_p) return;
+        if (!new_p || this.is_initialized() == false) return;
 
         // test to see if user's new status update includes these app's in playing status
         enum todo {

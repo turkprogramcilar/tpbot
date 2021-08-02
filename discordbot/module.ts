@@ -24,7 +24,7 @@ const MS_BULK : string = "bulkmessages";
 const FORBIDDEN_KEYS : string[] = [MS_DCUSERS, MS_BULK];
 export class dcmodule {
 
-    protected db_fetch_start : Date | undefined;
+    protected db_fetch_start : Date | undefined = new Date();
     protected state: any;
     private promises_module_state_queue : Promise<void>[] = [];
 
@@ -124,6 +124,9 @@ export class dcmodule {
         }
 
         await this.after_init();
+    }
+    protected is_initialized() : boolean {
+        return this.db_fetch_start == undefined;
     }
     protected async sync_db_ms() {
         await tools.sync_module(this.module_name, ()=>this.get_raw_ms(), 1) 
