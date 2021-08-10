@@ -434,7 +434,7 @@ exports.on_event = async (evt, args) => {
                         if (key_ids.includes(raw_item_id))
                             hashtags += " #Anektar";
                         
-                        return `${no+skip_e}.${no_space_cond?" ":""}\t${name}${(tools.iplus(item_id)>0?` [+${tools.iplus(item_id)}]`:"")}${hashtags}${stats};\n`
+                        return `${no+skip}.${no_space_cond?" ":""}\t${name}${(tools.iplus(item_id)>0?` [+${tools.iplus(item_id)}]`:"")}${hashtags}${stats};\n`
                     };
                     const text_worn = worn_raw.reduce((a, c, i) => a+=_text(parseInt(worn_slots[i]) + 1, worn_slots[i] < 9, pluses_worn[i], c),"");
                     const text_have = have_raw.reduce((a, c, i) => a+=_text(i + 1                      , i < 9            , pluses_have[i], c),"");
