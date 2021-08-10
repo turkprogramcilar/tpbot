@@ -17,19 +17,19 @@
     "discord.js": "^12.5.3",
     "express": "^4.17.1",
     "jimp": "^0.16.1",
-    "mongodb": "^3.6.9",
-    "node-html-parser": "^3.3.5",
-    "utf-8-validate": "^5.0.4",
-    "ws": "^7.4.6",
-    "xss": "^1.0.8"
+    "mongodb": "^3.6.11",
+    "node-html-parser": "^3.3.6",
+    "utf-8-validate": "^5.0.5",
+    "ws": "^7.5.3",
+    "xss": "^1.0.9"
   },
   "devDependencies": {
-    "@types/chai": "^4.2.19",
-    "@types/mocha": "^8.2.2",
-    "@types/node": "^15.12.5",
+    "@types/chai": "^4.2.21",
+    "@types/mocha": "^8.2.3",
+    "@types/node": "^15.14.7",
     "chai": "^4.3.4",
-    "mocha": "^9.0.1",
-    "ts-node": "^10.0.0",
-    "typescript": "^4.3.4"
+    "mocha": "^9.0.3",
+    "ts-node": "^10.2.0",
+    "typescript": "^4.3.5"
   }
 }
