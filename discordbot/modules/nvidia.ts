@@ -1,5 +1,5 @@
 // package imports
-import { Message, Client } from "discord.js";
+import { Message, Client, Channel } from "discord.js";
 // local imports
 const constants = require("../../../discordbot/constants");
 const parser    = require("../../../discordbot/cmdparser");
@@ -43,7 +43,7 @@ export const init = async (refState: any) => {
     }
     
     const channel = await client.channels.fetch(constants.cid.printfscanf);
-    if (channel.isText() && state.cache.module[module_name].nvidias.length > 0) {
+    if (channel?.isText() && state.cache.module[module_name].nvidias.length > 0) {
         await Promise.all(state.cache.module[module_name].nvidias.map((mid: string) => channel.messages.fetch(mid)));
     }
 }
