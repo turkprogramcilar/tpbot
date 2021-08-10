@@ -36,11 +36,12 @@ const this_dcmodule = class bilenrol extends dcmodule {
             language,
             fan_club
         };
-        const language_roles = ["xml", "angular", "aspnet", "bootstrap", "css", "clang", "cplusplus", "csharp", "dart", "django", "ecmascript", "flutter", "fsharp", "go", "godot", "haskell", "html", "java", "javascript", "kotlin", "laravel", "lua", "mongodb", "mssql", "mysql", "nodejs", "perl", "php", "python", "react", "ruby", "rust", "sql", "typescript", "unity", "unrealengine", "visualbasic"];
+        const language_roles = ["xml", "angular", "aspnet", "bootstrap", "css", "clang", "cplusplus", "csharp", "django", "ecmascript", "flutter", "fsharp", "go", "godot", "haskell", "html", "java", "javascript", "kotlin", "laravel", "lua", "mongodb", "mssql", "mysql", "nodejs", "perl", "php", "python", "react", "ruby", "rust", "sql", "typescript", "unity", "unrealengine", "visualbasic"];
         const fan_club_roles = ["ricardo", "risitas"];
         const language_roles_custom : any = {
             "microsoft": "mssql",
             "👢": "bootstrap",
+            "🎯": "dart",
             "logo_django2": "django",
         }
 
