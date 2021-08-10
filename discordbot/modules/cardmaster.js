@@ -75,9 +75,9 @@ exports.on_event = async (evt, args) => {
             if (fetch_start) return await parser.send_uwarn(msg,
                 "Modul halen yukleniyor... Lutfen bir sure sonra tekrar deneyin.");
 
-            if (!areas.includes(msg.channel.id)) return;
-
             if (parser.is(msg, "kart ")) return await cmd_kart(msg);
+
+            if (!areas.includes(msg.channel.id)) return;
 
             if (!parser.cooldown_user(state, msg.author.id, "pitmaster_oyun", slowmode))
                 return await parser.send_uwarn(msg, `komut kullanabilmek icin lutfen ${slowmode} saniye bekleyin`);
