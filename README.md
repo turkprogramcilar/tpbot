@@ -7,11 +7,6 @@ Türk Programcılar Discord sunucusu tarafından geliştirilen bot
 - Exp sistemi
 - Nvidia
 - Unity emoji oyunu
-### Modül dizini
-- [Bakkal Risitas](#Bakkal-Risitas)
-- [Gladyatör Risitas](#Gladyatör-Risitas)
-- [Ünity Risitas](#Ünity-Risitas)
-- [Şu anda kodluyor](#Şu-anda-kodluyor)
 
 `Environment variable` tanımlamaları
 ```
@@ -43,6 +38,55 @@ Yukarıda örneği verilen token karşısında bulunan 2 modül aynı bot içeri
 }
 ```
 Yukarıda örneği verilen farkli tokenlar karşısında bulunan modüler ayrı botlar içerisinde çalıştırılır.
+
+# Geliştirici notları
+
+Türk Programcılar discord sunucusu bot yazılımı zaman içerisinde ihtiyaçlar doğrultusunda eklemeler yapılarak geliştirilmiş, her bir eklemede farklı bir sistem ve mekanik içine dahil ederken eskiye dönük olarak diğer tüm modüllerine destek vermiştir.
+
+Modüllere ayrılmış bir mimari üzerine `TypeScript` dil uzantısı desteği alarak daha temiz ve güvenli bir kod pratiği oluşturulmuş ve son olarak `Discord.js v13` güncellemesini de bünyesine kattıktan sonra daha modern, klasörlerle izole bir modül mimarisine geçmiştir.
+
+## Çoklu mimari yapısı
+Mimari yapısının karmaşıklığı aynı anda farklı zamanlarda oluşturulmuş olan modül mimarisine halen desteği sürdürmeye çalışmasından gelmektedir. Bunu kabaca kronolojik bir sırayla örneklendirmek gerekirse şu şekilde birkaç modül örnek verilebilir.
+
+### Atatürk.js (legacy js)
+Modül çok sade, tek görevi olan bir modüldür. Sadece init edildikten sonra mesaj ve emoji reaksiyon dinlemesi yapar. Bu bir `legacy js` diyebileceğimiz miras kalmış olan eski bir modüldür. `exports.init` ve `exports.on_event` gibi yapıları vardır. Bu kategoride daha karmaşık modül örneği olarak `bakkal.js` verilebilir. Bu `legacy js` kategorisinde ve init exports gibi yapıları olmasına rağmen çok daha karmaşık görevleri olan bir modüldür.
+
+### Nvidia.ts (legacy ts)
+Bu modülün de tek bir görevi vardır ve jsden `TypeScript` geçişi sırasında varolan `JavaScript` mimarisini bire bir kopyalamıştır. Bu arafta kalmış bir mimari denilebilir. `TypeScript` geçişi sonrası daha doğru bir mimari sonra oturtulmuştur. Bu modüllerin yüklenmesi kendi mimarileri farklı olmasına rağmen yine de sonraki `TypeScript` mimarileri ile aynı mantıkta yüklenmektedir.
+
+### Boilerplate.ts (legacy ts)
+Bu modül `boilerplate` denilen başlangıçta modül oluştururken kullanılan bir iskelet dosyasıdır. Basit bir ping pong örneği. Bu `TypeScript` ile varılmak istenen mimari için oluşturulmuş bir modüldür. `v13`e kadar son mimari yapısını temsil etmiştir. Bu kategoride `coderstatus.ts` modülü bir başka örnek olarak gösterilebilir.
+
+### modern_boilerplate (modern ts)
+Bu mimari `v13` için yeni geliştirilmiş ve özellikle `command` yapısına destek sağlamak amacıyla klasör altında modül geliştirme imkanı sunmuştur. Modül klasörü altında bir `main.ts` dosyası bulunur ve bu dosya tamamen `legacy ts` mimarisini kullanarak modülün diğer tüm fonksiyonalitesini sağlarken aynı zamanda `support_commands` bayrağı otomatik modül tanıma sistemi tarafından otomatik kaldırıldığından dolayı içerisinde bulunan commands klasöründeki tüm komut dosyalarını tarayarak haznesine kayıt eder ve işletilmesini sağlar. Bu iskelet yapısında örnek olarak `/ping` komutu işlenmiştir.
+
+### Özel amaç için geliştirilmiş diğer mimariler
+Türk programcılar discord sunucusu botun herhangi bir genel modül yapısına uymayan özel gereksinimlerden doğmuş bir kaç mimarisi daha bulunmaktadır. Bunlardan birine örnek `WebSocket` ve `HTTP` protokollerini kullanarak sunucu içerisinden bir websitesine yayın yapmayı imkan kılan `wschannel.js` modülü verilebilir.
+
+Bir diğer örnek olarak ise `Unity3d` oyun motorunda geliştirilmiş olan `WebGL` oyunumuz ile `emojitower.ts` modülü birleşiminden oluşan, sunucu içerisinde gönderilen mesajlardaki sunucumuza özel emojileri tarayarak oyun içerisindeki labirentte çıkartan sistem mimarisi örnek verilebilir.
+
+## Çalışma prensibi
+`main.js` dosyasi belirtilen `token` ve `modül` sözlüğünü işleyerek gerekli botları teker teker ayağa kaldırır. 
+
+Her bir can bulan bot soluğunu `bot.js` dosyasında alır. Burada bir botun birden fazla modül sorumluluğu olabileceğinden sorumluluk alanındaki modüller dosya sisteminde taranarak öncelikle hangi mimaride olduğuna karar verilir. 
+
+An itibariyle üç farklı mimariden birinin belirlenmesiyle her bir mimarinin özel yükleme yönetime göre botun sorumluluk alanındaki modüller birer birer yüklenir ve gereken `event` kayıt işlemlerini discord `client` üzerinde yapılır. 
+
+### legacy js mimarisi
+Kabaca `require` yapılır ve modül içerisinde dışarı aktarılması beklenen `exports.init` ve `exports.on_event` yapıları üzerinden hareket edilir.
+
+### legacy ts mimarisi
+`TypeScript` dosyaları derlenmiş olduğundan dolayı farklı bir dizine `JavaScript` dosyaları çıkarılır. `Build` klasörü altında doğru tanımlama yapılarak `require` yapılır ve modül içerisinden devam edilir. Bu kategorinin önceden de belirtildiği gibi iki alt kategorisi vardır. Birincisi arafta kalmış olan `js-ts` mimarisi ve ikincisi ise modüler `ts` mimarisi. `js-ts` mimarisi `Build` klasörü altında ilgili dosya bulunduktan sonra yaklaşık olarak eski `legacy js` mimarisine benzemektedir. `ts` modüler mimari ise `module.ts` adında bir sınıf tanımlamasından kalıtım almış modülleri içeren mimaridir ve varolan `legacy js` mimarisinin üzerine kılıf geçirilerek `TypeScript` dilinin `type-safety` özelliğinden faydalanılmıştır. Daha nesne yönelimli bir yapısı bulunmaktadır.
+
+### modern ts klasör mimarisi
+Yükleme işlemi ``legacy-ts` mimarisinde olduğu gibi `Build` klasörü altında yapılır. Burada her bir modül kendi klasörü altında daha düzenli bir yapıda tutulur. Her modülün kendine has bir `main.ts` dosyası ve `commands` klasörü gibi yapı taşları bulunmaktadır.
+
+# Modül dizini
+(Liste tam değildir)
+- [Bakkal Risitas](#Bakkal-Risitas)
+- [Gladyatör Risitas](#Gladyatör-Risitas)
+- [Ünity Risitas](#Ünity-Risitas)
+- [Şu anda kodluyor](#Şu-anda-kodluyor)
 
 ### Bakkal Risitas
 ```diff
