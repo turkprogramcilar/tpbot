@@ -27,7 +27,11 @@ class coderstatus extends dcmodule {
                 return await this.warn(msg, `app name is not given.`);
 
             // get the user
-            const user = await this.get_client().users.fetch(user_id);
+            const user = await msg.guild?.members.fetch(user_id);
+            if (!user)
+                return await this.warn(msg, `can't fetch user with id ${user_id}`);
+            if (!user.presence)
+                return await this.warn(msg, `user.presence is null for user id ${user_id}`);
 
             // activities needs to be 1
             if (user.presence.activities.length != 1)
@@ -35,7 +39,7 @@ class coderstatus extends dcmodule {
 
             const activity = user.presence.activities[0];
 
-            let app_id = activity.applicationID;
+            let app_id = activity.applicationId;
             if (!app_id)
                 app_id = activity.name;
             
@@ -70,7 +74,7 @@ class coderstatus extends dcmodule {
             ;
 
         const action : todo =
-            new_p.activities.find(x => Object.values(coder_apps).includes(x.applicationID ?? (x.name ?? "")))
+            new_p.activities.find(x => Object.values(coder_apps).includes(x.applicationId ?? (x.name ?? "")))
                 ? todo.add
                 : todo.del
                 ;
@@ -81,7 +85,7 @@ class coderstatus extends dcmodule {
             : new_p.guild  ? (
                 // !"" is true, !undefined is true
                 //  "" is false, undefined is false, two cases are tested below
-                    new_p.userID ? (await this.fetch_guild_member(new_p.guild, new_p.userID)) ?? null
+                    new_p.userId ? (await this.fetch_guild_member(new_p.guild, new_p.userId)) ?? null
                 : new_p.member ? (await this.fetch_guild_member(new_p.guild, new_p.member)) ?? null
                 : null
             )
