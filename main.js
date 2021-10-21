@@ -12,5 +12,3 @@ Object.keys(bots).map(async function(token) {
     let bot = require("./discordbot/bot.js")
     await bot.init({}, token, modules, webserver?.send_all);
 })
-console.log('OK')
-
