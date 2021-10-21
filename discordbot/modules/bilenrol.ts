@@ -45,6 +45,11 @@ const this_dcmodule = class bilenrol extends dcmodule {
             "logo_django2": "django",
         }
 
+        if (!reaction.emoji.name) {
+            console.error(`reaction.emoji.name is null`);
+            return;
+        }
+
         // test to see if these are allowed roles
         let type : role_type;
         let role = reaction.emoji.name.toLowerCase();
@@ -85,13 +90,13 @@ const this_dcmodule = class bilenrol extends dcmodule {
         }
         const role_name = `${role} ${role_postfix[type]}`;
         const guild_roles = await guild.roles.fetch();
-        const filter_result = guild_roles.cache.filter(x => x.name == role_name);
+        const filter_result = guild_roles.filter(x => x.name == role_name);
         let role_to_give : Role;
         if (filter_result.size != 0) {
             role_to_give = filter_result.first()!;
         }
         else {
-            role_to_give = await guild.roles.create({data: {name: role_name}});
+            role_to_give = await guild.roles.create({name: role_name});
         }
         
         const p1 = role_to_give.setMentionable(true);
