@@ -15,7 +15,7 @@ const ts_mpath = "../build/discordbot/modules/"
 
 exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
     
-    const client  = new Discord.Client();
+    const client  = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS] });
     state = {
         client: client,
         prefix: consts.env.prefix ?? "%",
@@ -60,6 +60,11 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
                 m.on_event(evt, [a1, a2]);
         }); 
     }
+    client.on('interactionCreate', async interaction => {
+        if (!interaction.isCommand()) return;
+        for (const m of modules) 
+            m.on_event('interactionCreate', {interaction: interaction});
+    });
     client.on('messageReactionRemove', async (reaction,user) => {
         for (const m of modules) 
             m.on_event('messageReactionRemove', {reaction: reaction, user: user});

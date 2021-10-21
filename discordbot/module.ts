@@ -1,7 +1,7 @@
 // package imports
 import { assert } from "console";
 import { channel } from "diagnostic_channel";
-import { Message, Client, User, PartialUser, MessageReaction, Presence, GuildManager, Guild, GuildChannel, TextChannel } from "discord.js";
+import { Message, Client, User, PartialUser, MessageReaction, Presence, GuildManager, Guild, GuildChannel, TextChannel, Interaction, CommandInteraction } from "discord.js";
 // local imports
 const db        = require("../../discordbot/mongodb");
 const tools     = require("../../discordbot/tools");
@@ -45,6 +45,11 @@ export class dcmodule {
     public async on_event(evt: string, args: any) {
 
         switch(evt) {
+            case 'interactionCreate':
+                const interaction : Interaction = args.interaction;
+                if (interaction.isCommand())
+                    await this.on_command(interaction.commandName, interaction);
+            break;
             case 'message': 
                 const msg : Message = args.msg;
                 const msg_str = msg.content;
@@ -97,6 +102,7 @@ export class dcmodule {
             break;
             case 'presenceUpdate':
                 await this.on_presence_update(args[0], args[1]);
+            break;
         }
     }
     public async init(refState: any) {
@@ -319,6 +325,7 @@ export class dcmodule {
     // to be overridden by child classes
     public async after_init() {}
     public async on_message(msg : Message) {}
+    public async on_command(command : String, interaction : CommandInteraction) {}
     public async on_reaction_add(reaction : MessageReaction, user : User | PartialUser) {}
     public async on_reaction_remove(reaction : MessageReaction, user : User | PartialUser) {}
     public async on_presence_update(new_p: Presence, old_p: Presence) {}
