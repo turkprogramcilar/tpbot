@@ -59,7 +59,7 @@ export const on_event = async (evt: string, args: any) => {
         case 'message': const msg : Message = args.msg;
             if (msg.channel.id == constants.cid.printfscanf 
              && msg.author.id  == constants.uid.mee6bot
-             && msg.content.includes("just left the server")) {
+             && (msg.content.includes("server") || msg.content.includes("sunucudan"))) {
                 const newmsg = await msg.channel.send(nvidia[0]);
                 state.cache.module[module_name].nvidias.push(newmsg.id);
                 await sync_module();
