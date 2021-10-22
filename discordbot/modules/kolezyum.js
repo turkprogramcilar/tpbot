@@ -256,7 +256,7 @@ const embed_boss = async (name, eid, hp, mhp, lasthits=[], top=[], last='', drop
                 : await fs.readFile(uipath+"/"+fname)),
             name: fname
         }]
-        msg.embed = msg.embed.setImage("attachment://"+fname);
+        msg.embeds[0] = msg.embeds[0].setImage("attachment://"+fname);
     }
     return msg;
 }
