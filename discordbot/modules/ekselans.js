@@ -17,11 +17,11 @@ exports.on_event = async (evt, args) => {
             const rid = await tools.get_riid(state);
             const p1 = db.give_item(uid, rid);
             const user = await client.users.fetch(uid);
-            const p2 = msg.channel.send(new Discord.MessageEmbed()
+            const p2 = msg.channel.send({embeds:[new Discord.MessageEmbed()
                 .setDescription(parser.tqs("Afferin evlat. Seni aşağıdaki ödüllerle kutsuyorum"))
                 .setAuthor(user.username, user.avatarURL())
                 .addField("`Deneyim puanı (exp)`", parser.tqs(exps.bump))
-                .setThumbnail(client.user.avatarURL())
+                .setThumbnail(client.user.avatarURL())]}
             );
             await Promise.all([p0, p1, p2]);
             await tools.send_embed_item(msg, rid, state);

@@ -214,7 +214,8 @@ const cmd_kart = async (msg) => {
     if (parser.cooldown_user(state, msg.author.id, "pitmaster_kart", slowmode)) parser.u_arg(msg, async id => {
         //hardcoded card limitation: @TODO fix this
         if (id > 0 && id <= 16) {
-            await msg.channel.send(await card_embed(id)); 
+            const embed = await card_embed(id);
+            await msg.channel.send({embeds:[embed]}); 
         }
     });
 }

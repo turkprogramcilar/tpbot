@@ -214,12 +214,12 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
                 .querySelector('.commit-title.markdown-title')
                 .textContent.trim();
             
-            await msg.channel.send(new Discord.MessageEmbed()
+            await msg.channel.send({embeds:[new Discord.MessageEmbed()
                 .setDescription(parser.tqs(desc))
                 .setAuthor("Türk Programcılar", client.guilds.cache.get(sid.tpdc).iconURL(), url)
                 .addField("`commit date`", parser.tqs(new Date(r[1])))
                 .addField(`\`commit sha1\``, parser.tqs(`${sha1}`))
-                .setThumbnail(client.user.avatarURL())
+                .setThumbnail(client.user.avatarURL())]}
             );
             return;
         }

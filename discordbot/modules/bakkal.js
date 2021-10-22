@@ -380,10 +380,10 @@ exports.on_event = async (evt, args) => {
                 const promise_update_db = db.set_inventory(msg.author.id, inv);
 
                 const user = await client.users.fetch(msg.author.id);
-                await msg.channel.send(new Discord.MessageEmbed()
+                await msg.channel.send({embeds:[new Discord.MessageEmbed()
                     .setDescription(parser.tqs("Anektarını gırdındın. Ahanda rastgele çıkan item şudur:"))
                     .setAuthor(user.username, user.avatarURL())
-                    .setThumbnail(client.user.avatarURL())
+                    .setThumbnail(client.user.avatarURL())]}
                 );
                 await tools.send_embed_item(msg, rid, state);
 
