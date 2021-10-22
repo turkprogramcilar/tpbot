@@ -58,7 +58,7 @@ Bu modülün de tek bir görevi vardır ve jsden `TypeScript` geçişi sırasın
 Bu modül `boilerplate` denilen başlangıçta modül oluştururken kullanılan bir iskelet dosyasıdır. Basit bir ping pong örneği. Bu `TypeScript` ile varılmak istenen mimari için oluşturulmuş bir modüldür. `v13`e kadar son mimari yapısını temsil etmiştir. Bu kategoride `coderstatus.ts` modülü bir başka örnek olarak gösterilebilir.
 
 ### modern_boilerplate (modern ts)
-Bu mimari `v13` için yeni geliştirilmiş ve özellikle `command` yapısına destek sağlamak amacıyla klasör altında modül geliştirme imkanı sunmuştur. Modül klasörü altında bir `main.ts` dosyası bulunur ve bu dosya tamamen `legacy ts` mimarisini kullanarak modülün diğer tüm fonksiyonalitesini sağlarken aynı zamanda `support_commands` bayrağı otomatik modül tanıma sistemi tarafından otomatik kaldırıldığından dolayı içerisinde bulunan commands klasöründeki tüm komut dosyalarını tarayarak haznesine kayıt eder ve işletilmesini sağlar. Bu iskelet yapısında örnek olarak `/ping` komutu işlenmiştir.
+Bu mimari `v13` için yeni geliştirilmiş ve özellikle `command` yapısına destek sağlamak amacıyla klasör altında modül geliştirme imkanı sunmuştur. Modül klasörü altında bir `main.ts` dosyası bulunur ve bu dosya tamamen `legacy ts` mimarisini kullanarak modülün diğer tüm fonksiyonalitesini sağlarken aynı zamanda `support_commands` bayrağı modül tanıma sistemi tarafından otomatik kaldırıldığından dolayı içerisinde bulunan commands klasöründeki tüm komut dosyalarını tarayarak haznesine kayıt eder ve işletilmesini sağlar. Bu iskelet yapısında örnek olarak `/ping` komutu işlenmiştir.
 
 ### Özel amaç için geliştirilmiş diğer mimariler
 Türk programcılar discord sunucusu botun herhangi bir genel modül yapısına uymayan özel gereksinimlerden doğmuş bir kaç mimarisi daha bulunmaktadır. Bunlardan birine örnek `WebSocket` ve `HTTP` protokollerini kullanarak sunucu içerisinden bir websitesine yayın yapmayı imkan kılan `wschannel.js` modülü verilebilir.
@@ -79,7 +79,7 @@ Kabaca `require` yapılır ve modül içerisinde dışarı aktarılması beklene
 `TypeScript` dosyaları derlenmiş olduğundan dolayı farklı bir dizine `JavaScript` dosyaları çıkarılır. `Build` klasörü altında doğru tanımlama yapılarak `require` yapılır ve modül içerisinden devam edilir. Bu kategorinin önceden de belirtildiği gibi iki alt kategorisi vardır. Birincisi arafta kalmış olan `js-ts` mimarisi ve ikincisi ise modüler `ts` mimarisi. `js-ts` mimarisi `Build` klasörü altında ilgili dosya bulunduktan sonra yaklaşık olarak eski `legacy js` mimarisine benzemektedir. `ts` modüler mimari ise `module.ts` adında bir sınıf tanımlamasından kalıtım almış modülleri içeren mimaridir ve varolan `legacy js` mimarisinin üzerine kılıf geçirilerek `TypeScript` dilinin `type-safety` özelliğinden faydalanılmıştır. Daha nesne yönelimli bir yapısı bulunmaktadır.
 
 ### modern ts klasör mimarisi
-Yükleme işlemi ``legacy-ts` mimarisinde olduğu gibi `Build` klasörü altında yapılır. Burada her bir modül kendi klasörü altında daha düzenli bir yapıda tutulur. Her modülün kendine has bir `main.ts` dosyası ve `commands` klasörü gibi yapı taşları bulunmaktadır.
+Yükleme işlemi `legacy-ts` mimarisinde olduğu gibi `Build` klasörü altında yapılır. Burada her bir modül kendi klasörü altında daha düzenli bir yapıda tutulur. Her modülün kendine has bir `main.ts` dosyası ve `commands` klasörü gibi yapı taşları bulunmaktadır.
 
 # Modül dizini
 (Liste tam değildir)
