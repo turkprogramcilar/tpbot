@@ -128,7 +128,8 @@ const toggle_purge = (msg) => {
     if (msg) purge_list.push(msg);
     tools.toggler(async () => {
         const del = purge_list.splice(0,100);
-        await msg.channel.bulkDelete(del);
+        try { await msg.channel.bulkDelete(del); }
+        catch(error) { console.log(error) }
         // keep going until list is empty, even if not toggled by a message yet
         if (purge_list.length!=0) toggle_purge(msg);
     }, "kolezyum_delete", frequency*1000);
