@@ -43,8 +43,12 @@ export const init = async (refState: any) => {
     }
     
     const channel = await client.channels.fetch(constants.cid.printfscanf);
-    if (channel?.isText() && state.cache.module[module_name].nvidias.length > 0) {
-        await Promise.all(state.cache.module[module_name].nvidias.map((mid: string) => channel.messages.fetch(mid)));
+    try {
+        if (channel?.isText() && state.cache.module[module_name].nvidias.length > 0) {
+            await Promise.all(state.cache.module[module_name].nvidias.map((mid: string) => channel.messages.fetch(mid)));
+        }
+    } catch (error) {
+        console.error(error);
     }
 }
 
