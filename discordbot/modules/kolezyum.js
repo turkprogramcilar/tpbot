@@ -258,6 +258,7 @@ const embed_boss = async (name, eid, hp, mhp, lasthits=[], top=[], last='', drop
         }]
         msg.embeds[0] = msg.embeds[0].setImage("attachment://"+fname);
     }
+    if (msg.content.length == 0) msg.content = "-";
     return msg;
 }
 
