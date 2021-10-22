@@ -509,8 +509,8 @@ exports.on_event = async (evt, args) => {
                     }
                     if (all_item_stats == "") all_item_stats = "-";
                     embed = embed
-                        .addField("`Ortalama Hasar`", base_dmg|0, true)
-                        .addField("`Maksimum Hasar`", base_dmg*2|0, true)
+                        .addField("`Ortalama Hasar`", ""+(base_dmg|0), true)
+                        .addField("`Maksimum Hasar`", ""+(base_dmg*2|0), true)
                         .addField(`\`Eşyalardan gelen güçler:\``, parser.tqs(all_item_stats, "ini"));
                     await msg.channel.send({
                         files: [{
