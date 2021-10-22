@@ -180,8 +180,8 @@ exports.get_embed_item = async (id, state) => {
             attachment: p,
             name:'icon.png'
         }],
-        embed: embedded
-            .addField('`'+title+'`', parser.tqs(JSON.stringify(i??{},null,'\t'),'json'))
+        embeds: [embedded
+            .addField('`'+title+'`', parser.tqs(JSON.stringify(i??{},null,'\t'),'json'))]
     };
 }
 exports.send_embed_item = async (msg, id, state) => {

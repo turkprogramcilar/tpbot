@@ -245,7 +245,7 @@ const embed_boss = async (name, eid, hp, mhp, lasthits=[], top=[], last='', drop
     
     msg = {
         content: ''+lasthits.reduce((a,c)=>a+=c+' ',''),
-        embed: embed
+        embeds: [embed]
     };
 
     if (hp==0 || true) {

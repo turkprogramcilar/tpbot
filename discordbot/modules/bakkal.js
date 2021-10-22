@@ -445,7 +445,7 @@ exports.on_event = async (evt, args) => {
                     .setThumbnail(user.avatarURL());
 
                     await msg.channel.send({
-                        embed: embed
+                        embeds: [embed]
                     });
                 });
             }
@@ -517,7 +517,7 @@ exports.on_event = async (evt, args) => {
                             attachment: image,
                             name: iname
                         }],
-                        embed: embed
+                        embeds: [embed]
                     });
                 });
             }

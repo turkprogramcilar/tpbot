@@ -123,7 +123,7 @@ exports.on_event = async (evt, args) => {
                     }
                     await msg.channel.send({
                         content: header,
-                        embed: embed
+                        embeds: [embed]
                     });
                 });
             }
