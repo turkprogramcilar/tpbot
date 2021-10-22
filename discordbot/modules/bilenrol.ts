@@ -12,14 +12,7 @@ const this_dcmodule = class bilenrol extends dcmodule {
     
     public async after_init(){
         
-        const channel = await this.get_client().channels.fetch(this.ch_roles);
-        if (channel?.isText()) {
-            const text_channel = channel as TextChannel;
-            await text_channel.messages.fetch();
-        }
-        else {
-            console.error("channel is not text");
-        }
+        this.fetch_roles_channel(5);
     }
     public async on_reaction_remove(reaction : MessageReaction, user : User | PartialUser) {
         await this.reaction_internal(reaction, user, false);
@@ -110,6 +103,28 @@ const this_dcmodule = class bilenrol extends dcmodule {
 
         console.log("allowed role: "+role);
         await p1; await p2;
+    }
+    private async fetch_roles_channel(retry : number) {
+
+        try {
+            const channel = await this.get_client().channels.fetch(this.ch_roles);
+            if (!channel) {
+                throw new Error("channel is null");
+            }
+            if (!channel.isText()) {
+                throw new Error("channel is not text");
+            }
+            const text_channel = channel as TextChannel;
+            await text_channel.messages.fetch();
+
+        } catch (error) {
+
+            retry -= 1;
+            console.warn(`An error occurred in ${this.fetch_roles_channel.name}... Will retry if retry[${retry}] != 0`);
+            console.error(error);
+            if (retry != 0)
+                setTimeout(() => this.fetch_roles_channel(retry), 1000);
+        }
     }
 }
 
