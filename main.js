@@ -3,7 +3,13 @@ const { json } = require("express");
 const webserver =
     process.env.DCBOT_WEBSERVER != undefined && process.env.DCBOT_WEBSERVER != 'false'
     ? require("./webserver/server.js")
-    : undefined;
+    : undefined
+    ;
+
+const env_check = (env, name) => { if (env) console.warn(`${name} [VALUE=${env}]`); };
+env_check(process.env.DCBOT_DEBUG, "DCBOT_DEBUG");
+env_check(process.env.DCBOT_WEBSERVER, "DCBOT_WEBSERVER");
+
 
 let bots = JSON.parse(process.env.DCBOT_JSON)
 Object.keys(bots).map(async function(token) {
