@@ -1,7 +1,10 @@
 // package imports
+import { REST } from '@discordjs/rest';
+import { Routes } from 'discord-api-types/v9';
 import { assert } from "console";
 import { channel } from "diagnostic_channel";
-import { Message, Client, User, PartialUser, MessageReaction, Presence, GuildManager, Guild, GuildChannel, TextChannel, Interaction, CommandInteraction } from "discord.js";
+import { Message, Client, User, PartialUser, MessageReaction, Presence, GuildManager, Guild, GuildChannel, TextChannel, Interaction, CommandInteraction, Collection } from "discord.js";
+import { SlashCommandBuilder } from '@discordjs/builders';
 // local imports
 const db        = require("../../discordbot/mongodb");
 const tools     = require("../../discordbot/tools");
@@ -17,6 +20,11 @@ const constants = require("../../discordbot/constants");
 export type user_state_value = string | number | boolean | undefined;
 export type module_user_state = {[key : string] : user_state_value};
 
+interface CommandModule {
+    data : SlashCommandBuilder,
+    execute : (interaction : CommandInteraction) => Promise<void>,
+};
+
 const UNNAMED_MODULE : string = "unnamed_module";
 // module state users for dc users
 const MS_DCUSERS : string = "dcusers";
@@ -24,6 +32,7 @@ const MS_BULK : string = "bulkmessages";
 const FORBIDDEN_KEYS : string[] = [MS_DCUSERS, MS_BULK];
 export class dcmodule {
 
+    protected commands = new Collection<String, CommandModule>();
     protected db_fetch_start : Date | undefined = new Date();
     protected state: any;
     private promises_module_state_queue : Promise<void>[] = [];
@@ -47,8 +56,21 @@ export class dcmodule {
         switch(evt) {
             case 'interactionCreate':
                 const interaction : Interaction = args.interaction;
-                if (interaction.isCommand())
-                    await this.on_command(interaction.commandName, interaction);
+
+                if (!interaction.isCommand())
+                    return;
+
+                const command = this.commands.get(interaction.commandName);
+
+                if (!command)
+                    return;
+
+                try {
+                    await command.execute(interaction);
+                } catch (error) {
+                    console.error(error);
+                    await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+                }
             break;
             case 'message': 
                 const msg : Message = args.msg;
@@ -103,6 +125,9 @@ export class dcmodule {
             case 'presenceUpdate':
                 await this.on_presence_update(args[0], args[1]);
             break;
+            case 'ready':
+                await this.on_ready();
+            break;
         }
     }
     public async init(refState: any) {
@@ -112,23 +137,27 @@ export class dcmodule {
         if (this.module_name == UNNAMED_MODULE)
             throw new Error("Module is UNNAMED while cache module db is enabled.");
 
-        this.db_fetch_start = new Date();
+        const task1 = (async () => {
+            // load db state
+            this.db_fetch_start = new Date();
 
-        try {
-            let json = (await db.get_module_state(this.module_name));
-            if (json == undefined) {
-                json = {};
+            try {
+                let json = (await db.get_module_state(this.module_name));
+                if (json == undefined) {
+                    json = {};
+                    json[MS_DCUSERS] = {};
+                }
+                this.set_raw_ms(JSON.parse(json));
+            } catch {
+                let json : any = {};
                 json[MS_DCUSERS] = {};
+                this.set_raw_ms(json);
+            } finally {
+                this.db_fetch_start = undefined;
             }
-            this.set_raw_ms(JSON.parse(json));
-        } catch {
-            let json : any = {};
-            json[MS_DCUSERS] = {};
-            this.set_raw_ms(json);
-        } finally {
-            this.db_fetch_start = undefined;
-        }
-
+        })();
+        // await tasks
+        await task1;
         await this.after_init();
     }
     protected is_initialized() : boolean {
@@ -322,10 +351,50 @@ export class dcmodule {
     protected experience_multiplier(experience : number) {
         return tools.getexpm(experience);
     }
+    // some constants
+    protected readonly guild_id_tp = constants.sid.tpdc;
+
     // to be overridden by child classes
+    public async on_ready() {
+        // load commands
+        if (this.state.command_support !== true)
+            return;
+
+        const id = this.get_client().user?.id;
+        const token = this.get_client().token;
+        if (!id || !token) {
+            throw new Error("can't register commands. id or token is null");
+        }
+        const tpid = this.guild_id_tp
+        const rest = new REST({ version: '9' }).setToken(token);
+        (async () => {
+        try {
+            console.log('Started refreshing application (/) commands.');
+
+            const root = `build/discordbot/modules/${this.module_name}/commands/`;
+            const commands_folder_files : String[] = tools.get_files_sync(root);
+            const commandFiles = commands_folder_files.filter(file => file.endsWith('.js'));
+
+            for (const file of commandFiles) {
+                const command : CommandModule = require("../../"+root+file.substring(0, file.length-3));
+                // Set a new item in the Collection
+                // With the key as the command name and the value as the exported module
+                this.commands.set(command.data.name, command);
+            }
+            await rest.put(
+                Routes.applicationGuildCommands(id, tpid),
+                { body: this.commands.map(x => x.data.toJSON()) },
+            );
+
+            console.log('Successfully reloaded application (/) commands.');
+        }
+        catch (error) {
+            console.error(error);
+        }})();
+    }
     public async after_init() {}
     public async on_message(msg : Message) {}
-    public async on_command(command : String, interaction : CommandInteraction) {}
+    //public async on_command(command : String, interaction : CommandInteraction) {}
     public async on_reaction_add(reaction : MessageReaction, user : User | PartialUser) {}
     public async on_reaction_remove(reaction : MessageReaction, user : User | PartialUser) {}
     public async on_presence_update(new_p: Presence, old_p: Presence) {}

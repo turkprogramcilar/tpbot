@@ -12,10 +12,11 @@ const htmlp   = require('node-html-parser');
 
 const mpath = "./modules/";
 const ts_mpath = "../build/discordbot/modules/"
+const maints = "main";
 
 exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
     
-    const client  = new Discord.Client({ intents: [Discord.Intents.FLAGS.GUILDS] });
+    const client  = new Discord.Client({ intents: [32767] });
     state = {
         client: client,
         prefix: consts.env.prefix ?? "%",
@@ -39,16 +40,45 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
     let modules = [];
     const promises = [];
     for (const m of mods) {
-        const jspath = "discordbot/"+ mpath+m+".js";
-        const jsexists = (await tools.fs_exists(jspath));
-        const path = jsexists ? mpath+m : ts_mpath+m;
+
+        let path = null;
+        let cloned_state = {...state};
+
+        // is this a legacy js module?
+        if (await tools.fs_exists("discordbot/"+ mpath+m+".js")) {
+            path = mpath+m;
+        }
+
+        // is this a legacy ts module?
+        else if (await tools.fs_exists("discordbot/"+ ts_mpath+m+".js")) {
+            path = ts_mpath+m;
+        }
+
+        else if (await tools.fs_exists("discordbot/"+ ts_mpath+m)) {
+
+            if (await tools.fs_exists("discordbot/"+ ts_mpath+m+"/"+maints+".js")) {
+                path = ts_mpath+m+"/"+maints;
+                cloned_state.command_support = true;
+            }
+            else {
+                console.error("a modern ts module folder called "+m+" without "+maints+" cannot be loaded.");
+                continue;
+            }
+        }
+
+        if (!path) {
+            console.error("module not found: "+m);
+            exit(1);
+        }
         let a = modules.push(require(path))
-        promises.push(modules[a-1].init(state));
+        promises.push(modules[a-1].init(cloned_state));
     }
     client.login(token);
 
     client.on('ready', () => {
         console.log(`Logged in as ${client.user.tag}! (for modules=[${mods}])`);
+        for (const m of modules) 
+            m.on_event('ready', {});
 
         status.init(client, msg_status);
     });
@@ -73,7 +103,7 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
         for (const m of modules) 
             m.on_event('messageReactionAdd', {reaction: reaction, user: user});
     });
-    client.on('message', async msg => {
+    client.on('messageCreate', async msg => {
         if (msg.author == client.user)
             return;
 

@@ -82,6 +82,7 @@ const fs  = require("fs").promises;
 const fsC = require("fs")
 const db  = require("./mongodb.js");
 
+exports.get_files_sync = path => fsC.readdirSync(path);
 exports.fs_exists = async file =>
     fs.access(file, fsC.constants.F_OK)
         .then(() => true)

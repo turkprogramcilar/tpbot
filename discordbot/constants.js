@@ -127,4 +127,5 @@ module.exports = {
     groups,
     cid,
     uid,
+    sid,
 };
