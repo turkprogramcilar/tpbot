@@ -58,17 +58,46 @@ export class dcmodule {
     public get_client() : Client { 
         return this.state.client; 
     }
+    public is_admin(user_id : string) : boolean {
+        return constants.groups.admins.includes(user_id);
+    }
 
-    public fetch_user(user_id : string) { 
-        return this.get_client().users.fetch(user_id);
+    // init for module loader system defined in bot.js
+    public async init(refState: any) {
+
+        this.state = refState;
+        
+        if (this.module_name == UNNAMED_MODULE)
+            throw new Error("Module is UNNAMED while cache module db is enabled.");
+
+        const task1 = (async () => {
+            // load db state
+            this.db_fetch_start = new Date();
+
+            try {
+                let json = (await db.get_module_state(this.module_name));
+                if (json == undefined) {
+                    json = {};
+                    json[MS_DCUSERS] = {};
+                }
+                this.set_raw_ms(JSON.parse(json));
+            } catch {
+                let json : any = {};
+                json[MS_DCUSERS] = {};
+                this.set_raw_ms(json);
+            } finally {
+                this.db_fetch_start = undefined;
+            }
+        })();
+        // await tasks
+        await task1;
+        await this.after_init();
     }
-    public fetch_guild_member(guild : Guild, user_id : string) { 
-        return guild.members.cache.get(user_id);
-    }
+    // on_event for receiving events from bot.js
     public async on_event(evt: string, args: any) {
 
         switch(evt) {
-            case 'interactionCreate': this.handleInteractionCreate(args.interaction); break;
+            case 'interactionCreate': this.on_interaction_create(args.interaction); break;
             case 'message': 
                 const msg : Message = args.msg;
                 const msg_str = msg.content;
@@ -122,12 +151,83 @@ export class dcmodule {
             case 'presenceUpdate':
                 await this.on_presence_update(args[0], args[1]);
             break;
-            case 'ready':
-                await this.on_ready();
-            break;
+            case 'ready': this.on_ready(); break;
         }
     }
-    private async handleInteractionCreate(interaction : Interaction) {
+    protected async on_ready() {
+        // load commands
+        if (this.state.command_support !== true)
+            return;
+
+        const id = this.get_client().user?.id;
+        const token = this.get_client().token;
+        if (!id || !token) {
+            throw new Error("can't register commands. id or token is null");
+        }
+        const tpid = dcmodule.guild_id_tp
+        const rest = new REST({ version: '9' }).setToken(token);
+        (async () => {
+        try {
+            this.log.info('Started refreshing application (/) commands.');
+
+            const root = `build/discordbot/modules/${this.module_name}/commands/`;
+            const commands_folder_files : string[] = tools.get_files_sync(root);
+            const commandFiles = commands_folder_files.filter(file => file.endsWith('.js'));
+
+            for (const file of commandFiles) {
+                const command : CommandModule = require("../../"+root+file.substring(0, file.length-3));
+                // Set a new item in the Collection
+                // With the key as the command name and the value as the exported module
+                this.commands.set(command.data.name, command);
+                this.log.info("Require/Loading command file: "+file);
+            }
+            const response = await rest.put(
+                Routes.applicationGuildCommands(id, tpid),
+                { body: this.commands.map(x => x.data.toJSON()) },
+            );
+
+            const res_arr = response as any[];
+            if (!response || !res_arr) {
+                throw Error("invalid response");
+            }
+
+            if (commandFiles.length != res_arr.length) {
+                throw Error("response doesn't match with command length we sent.");
+            }
+
+            let tasks : Promise<void>[] = [];
+            for (const json of res_arr) {
+                const command_id : string = json.id;
+                const name : string = json.name;
+                const command = this.commands.get(name);
+                if (!command) {
+                    this.log.error(`json response with command name ${name} is not found on our side.`);
+                    break;
+                }
+                // check if command has defined an permissions for its commands
+                if (command.permissions) {
+
+                    const client = this.get_client(); 
+                    if (!client.application?.owner) await client.application?.fetch();
+
+                    const app_command = await client.guilds.cache.get(dcmodule.guild_id_tp)?.commands.fetch(command_id);
+                    if (!app_command) throw Error ("Can't fetch application command");
+                    
+                    await app_command.permissions.set({
+                        permissions: command.permissions
+                    });
+                }
+            }
+            await Promise.all(tasks);
+
+            this.log.info('Successfully reloaded application (/) commands.');
+        }
+        catch (error) {
+            this.log.error(error);
+            throw Error("Can't register commands in module.ts body");
+        }})();
+    }
+    protected async on_interaction_create(interaction : Interaction) {
 
         if (interaction.isCommand()) {
             const command = this.commands.get(interaction.commandName);
@@ -146,36 +246,16 @@ export class dcmodule {
             console.log(interaction);
         }
     }
-    public async init(refState: any) {
 
-        this.state = refState;
-        
-        if (this.module_name == UNNAMED_MODULE)
-            throw new Error("Module is UNNAMED while cache module db is enabled.");
-
-        const task1 = (async () => {
-            // load db state
-            this.db_fetch_start = new Date();
-
-            try {
-                let json = (await db.get_module_state(this.module_name));
-                if (json == undefined) {
-                    json = {};
-                    json[MS_DCUSERS] = {};
-                }
-                this.set_raw_ms(JSON.parse(json));
-            } catch {
-                let json : any = {};
-                json[MS_DCUSERS] = {};
-                this.set_raw_ms(json);
-            } finally {
-                this.db_fetch_start = undefined;
-            }
-        })();
-        // await tasks
-        await task1;
-        await this.after_init();
+    // client helper methods for fetching
+    public fetch_user(user_id : string) { 
+        return this.get_client().users.fetch(user_id);
     }
+    public fetch_guild_member(guild : Guild, user_id : string) { 
+        return guild.members.cache.get(user_id);
+    }
+
+    // database and module state methods
     protected is_initialized() : boolean {
         return this.db_fetch_start == undefined;
     }
@@ -282,10 +362,6 @@ export class dcmodule {
         return word;
     }
 
-    // controls
-    protected is_admin(user_id : string) : boolean {
-        return constants.groups.admins.includes(user_id);
-    }
 
     // send message back
     protected async warn(msg : Message, warning : string, bulk : boolean = false) {
@@ -369,79 +445,6 @@ export class dcmodule {
     }
 
     // to be overridden by child classes
-    public async on_ready() {
-        // load commands
-        if (this.state.command_support !== true)
-            return;
-
-        const id = this.get_client().user?.id;
-        const token = this.get_client().token;
-        if (!id || !token) {
-            throw new Error("can't register commands. id or token is null");
-        }
-        const tpid = dcmodule.guild_id_tp
-        const rest = new REST({ version: '9' }).setToken(token);
-        (async () => {
-        try {
-            this.log.info('Started refreshing application (/) commands.');
-
-            const root = `build/discordbot/modules/${this.module_name}/commands/`;
-            const commands_folder_files : string[] = tools.get_files_sync(root);
-            const commandFiles = commands_folder_files.filter(file => file.endsWith('.js'));
-
-            for (const file of commandFiles) {
-                const command : CommandModule = require("../../"+root+file.substring(0, file.length-3));
-                // Set a new item in the Collection
-                // With the key as the command name and the value as the exported module
-                this.commands.set(command.data.name, command);
-                this.log.info("Require/Loading command file: "+file);
-            }
-            const response = await rest.put(
-                Routes.applicationGuildCommands(id, tpid),
-                { body: this.commands.map(x => x.data.toJSON()) },
-            );
-
-            const res_arr = response as any[];
-            if (!response || !res_arr) {
-                throw Error("invalid response");
-            }
-
-            if (commandFiles.length != res_arr.length) {
-                throw Error("response doesn't match with command length we sent.");
-            }
-
-            let tasks : Promise<void>[] = [];
-            for (const json of res_arr) {
-                const command_id : string = json.id;
-                const name : string = json.name;
-                const command = this.commands.get(name);
-                if (!command) {
-                    this.log.error(`json response with command name ${name} is not found on our side.`);
-                    break;
-                }
-                // check if command has defined an permissions for its commands
-                if (command.permissions) {
-
-                    const client = this.get_client(); 
-                    if (!client.application?.owner) await client.application?.fetch();
-
-                    const app_command = await client.guilds.cache.get(dcmodule.guild_id_tp)?.commands.fetch(command_id);
-                    if (!app_command) throw Error ("Can't fetch application command");
-                    
-                    await app_command.permissions.set({
-                        permissions: command.permissions
-                    });
-                }
-            }
-            await Promise.all(tasks);
-
-            this.log.info('Successfully reloaded application (/) commands.');
-        }
-        catch (error) {
-            this.log.error(error);
-            throw Error("Can't register commands in module.ts body");
-        }})();
-    }
     public async after_init() {}
     public async on_message(msg : Message) {}
     //public async on_command(command : string, interaction : CommandInteraction) {}
