@@ -3,8 +3,9 @@ import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 import { assert } from "console";
 import { channel } from "diagnostic_channel";
-import { Message, Client, User, PartialUser, MessageReaction, Presence, GuildManager, Guild, GuildChannel, TextChannel, Interaction, CommandInteraction, Collection } from "discord.js";
+import { Message, Client, User, PartialUser, MessageReaction, Presence, GuildManager, Guild, GuildChannel, TextChannel, Interaction, CommandInteraction, Collection, ApplicationCommandData, ApplicationCommandPermissionData } from "discord.js";
 import { SlashCommandBuilder } from '@discordjs/builders';
+import { ApplicationCommandOptionTypes, ApplicationCommandPermissionTypes } from 'discord.js/typings/enums';
 // local imports
 const db        = require("../../discordbot/mongodb");
 const tools     = require("../../discordbot/tools");
@@ -23,6 +24,7 @@ export type module_user_state = {[key : string] : user_state_value};
 interface CommandModule {
     data : SlashCommandBuilder,
     execute : (interaction : CommandInteraction) => Promise<void>,
+    permissions : ApplicationCommandPermissionData[] | undefined,
 };
 
 const UNNAMED_MODULE : string = "unnamed_module";
@@ -30,17 +32,25 @@ const UNNAMED_MODULE : string = "unnamed_module";
 const MS_DCUSERS : string = "dcusers";
 const MS_BULK : string = "bulkmessages";
 const FORBIDDEN_KEYS : string[] = [MS_DCUSERS, MS_BULK];
-export class dcmodule {
 
-    protected commands = new Collection<String, CommandModule>();
+export class dcmodule {
+    // some constants
+    static readonly guild_id_tp         : string = constants.sid.tpdc;
+    static readonly role_id_kidemli     : string = constants.rid.kidemli;
+    static readonly role_id_hosgeldiniz : string = constants.rid.hosgeldiniz;
+
+    // fields
+    protected commands = new Collection<string, CommandModule>();
     protected db_fetch_start : Date | undefined = new Date();
     protected state: any;
     private promises_module_state_queue : Promise<void>[] = [];
 
+    // ctor
     constructor(
         protected module_name : string = UNNAMED_MODULE, 
         protected administative_commands : boolean = false) { }
     
+    // props
     public get_client() : Client { 
         return this.state.client; 
     }
@@ -351,8 +361,6 @@ export class dcmodule {
     protected experience_multiplier(experience : number) {
         return tools.getexpm(experience);
     }
-    // some constants
-    protected readonly guild_id_tp = constants.sid.tpdc;
 
     // to be overridden by child classes
     public async on_ready() {
@@ -365,14 +373,14 @@ export class dcmodule {
         if (!id || !token) {
             throw new Error("can't register commands. id or token is null");
         }
-        const tpid = this.guild_id_tp
+        const tpid = dcmodule.guild_id_tp
         const rest = new REST({ version: '9' }).setToken(token);
         (async () => {
         try {
             console.log('Started refreshing application (/) commands.');
 
             const root = `build/discordbot/modules/${this.module_name}/commands/`;
-            const commands_folder_files : String[] = tools.get_files_sync(root);
+            const commands_folder_files : string[] = tools.get_files_sync(root);
             const commandFiles = commands_folder_files.filter(file => file.endsWith('.js'));
 
             for (const file of commandFiles) {
@@ -380,21 +388,57 @@ export class dcmodule {
                 // Set a new item in the Collection
                 // With the key as the command name and the value as the exported module
                 this.commands.set(command.data.name, command);
+                console.log("Require/Loading command file: "+file);
             }
-            await rest.put(
+            const response = await rest.put(
                 Routes.applicationGuildCommands(id, tpid),
                 { body: this.commands.map(x => x.data.toJSON()) },
             );
+
+            const res_arr = response as any[];
+            if (!response || !res_arr) {
+                throw Error("invalid response");
+            }
+
+            if (commandFiles.length != res_arr.length) {
+                throw Error("response doesn't match with command length we sent.");
+            }
+
+            let tasks : Promise<void>[] = [];
+            for (const json of res_arr) {
+                const app_id : string = json.application_id;
+                const name : string = json.name;
+                const command = this.commands.get(name);
+                if (!command) {
+                    console.error(`json response with command name ${name} is not found on our side.`);
+                    break;
+                }
+                // check if command has defined an permissions for its commands
+                if (command.permissions) {
+
+                    const client = this.get_client(); 
+                    if (!client.application?.owner) await client.application?.fetch();
+
+                    const app_command = await client.guilds.cache.get(dcmodule.guild_id_tp)?.commands.fetch(app_id);
+                    if (!app_command) throw Error ("Can't fetch application command");
+                    
+                    await app_command.permissions.set({
+                        permissions: command.permissions
+                    });
+                }
+            }
+            await Promise.all(tasks);
 
             console.log('Successfully reloaded application (/) commands.');
         }
         catch (error) {
             console.error(error);
+            throw Error("Can't register commands in module.ts body");
         }})();
     }
     public async after_init() {}
     public async on_message(msg : Message) {}
-    //public async on_command(command : String, interaction : CommandInteraction) {}
+    //public async on_command(command : string, interaction : CommandInteraction) {}
     public async on_reaction_add(reaction : MessageReaction, user : User | PartialUser) {}
     public async on_reaction_remove(reaction : MessageReaction, user : User | PartialUser) {}
     public async on_presence_update(new_p: Presence, old_p: Presence) {}
