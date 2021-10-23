@@ -93,6 +93,10 @@ export class dcmodule {
         await task1;
         await this.after_init();
     }
+    // called after bot.js init (can be overridden by child modules)
+    public async after_init() {
+
+    }
     // on_event for receiving events from bot.js
     public async on_event(evt: string, args: any) {
 
@@ -246,6 +250,10 @@ export class dcmodule {
             console.log(interaction);
         }
     }
+    protected async on_message(msg : Message) {}
+    protected async on_reaction_add(reaction : MessageReaction, user : User | PartialUser) {}
+    protected async on_reaction_remove(reaction : MessageReaction, user : User | PartialUser) {}
+    protected async on_presence_update(new_p: Presence, old_p: Presence) {}
 
     // client helper methods for fetching
     public fetch_user(user_id : string) { 
@@ -362,7 +370,6 @@ export class dcmodule {
         return word;
     }
 
-
     // send message back
     protected async warn(msg : Message, warning : string, bulk : boolean = false) {
         if (!bulk)
@@ -443,12 +450,4 @@ export class dcmodule {
     protected experience_multiplier(experience : number) {
         return tools.getexpm(experience);
     }
-
-    // to be overridden by child classes
-    public async after_init() {}
-    public async on_message(msg : Message) {}
-    //public async on_command(command : string, interaction : CommandInteraction) {}
-    public async on_reaction_add(reaction : MessageReaction, user : User | PartialUser) {}
-    public async on_reaction_remove(reaction : MessageReaction, user : User | PartialUser) {}
-    public async on_presence_update(new_p: Presence, old_p: Presence) {}
 }
