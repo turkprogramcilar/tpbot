@@ -54,6 +54,7 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
             path = ts_mpath+m;
         }
 
+        // is this a modern ts folder module?
         else if (await tools.fs_exists("discordbot/"+ ts_mpath+m)) {
 
             if (await tools.fs_exists("discordbot/"+ ts_mpath+m+"/"+maints+".js")) {
@@ -70,8 +71,12 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
             console.error("module not found: "+m);
             exit(1);
         }
-        let a = modules.push(require(path))
-        promises.push(modules[a-1].init(cloned_state));
+        const loaded = require(path);
+        if (!loaded.init)
+            throw Error("Module has no init method defined at " +path);
+
+        modules.push(loaded);
+        promises.push(loaded.init(cloned_state));
     }
     client.login(token);
 
