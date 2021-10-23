@@ -3,7 +3,7 @@ import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 import { assert } from "console";
 import { channel } from "diagnostic_channel";
-import { Message, Client, User, PartialUser, MessageReaction, Presence, GuildManager, Guild, GuildChannel, TextChannel, Interaction, CommandInteraction, Collection, ApplicationCommandData, ApplicationCommandPermissionData } from "discord.js";
+import { Message, Client, User, PartialUser, MessageReaction, Presence, GuildManager, Guild, GuildChannel, TextChannel, Interaction, CommandInteraction, Collection, ApplicationCommandData, ApplicationCommandPermissionData, ButtonInteraction } from "discord.js";
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ApplicationCommandOptionTypes, ApplicationCommandPermissionTypes } from 'discord.js/typings/enums';
 import { log } from './log';
@@ -22,11 +22,16 @@ const constants = require("../../discordbot/constants");
 export type user_state_value = string | number | boolean | undefined;
 export type module_user_state = {[key : string] : user_state_value};
 
-interface CommandModule {
+interface command_module {
     data : SlashCommandBuilder,
     execute : (interaction : CommandInteraction) => Promise<void>,
     permissions : ApplicationCommandPermissionData[] | undefined,
 };
+interface command_user_state {
+    command_id : string,
+    state : number,
+}
+type user_id = string;
 
 const UNNAMED_MODULE : string = "unnamed_module";
 // module state users for dc users
@@ -42,9 +47,10 @@ export class dcmodule {
     static readonly role_id_hosgeldiniz : string = constants.rid.hosgeldiniz;
 
     // fields
-    protected commands = new Collection<string, CommandModule>();
+    protected commands = new Collection<string, command_module>();
     protected db_fetch_start : Date | undefined = new Date();
     protected state: any;
+    private command_states : { [key: user_id] : command_user_state } = {};
     private promises_module_state_queue : Promise<void>[] = [];
 
     // public readonly fields
@@ -138,7 +144,7 @@ export class dcmodule {
             const commandFiles = commands_folder_files.filter(file => file.endsWith('.js'));
 
             for (const file of commandFiles) {
-                const command : CommandModule = require("../../"+root+file.substring(0, file.length-3));
+                const command : command_module = require("../../"+root+file.substring(0, file.length-3));
                 // Set a new item in the Collection
                 // With the key as the command name and the value as the exported module
                 this.commands.set(command.data.name, command);
@@ -158,17 +164,19 @@ export class dcmodule {
                 throw Error("response doesn't match with command length we sent.");
             }
 
+            const switch_to_ids = new Collection<string, command_module>();
             let tasks : Promise<void>[] = [];
             for (const json of res_arr) {
                 const command_id : string = json.id;
                 const name : string = json.name;
-                const command = this.commands.get(name);
-                if (!command) {
+                const command_module = this.commands.get(name);
+                if (!command_module) {
                     this.log.error(`json response with command name ${name} is not found on our side.`);
                     break;
                 }
+                switch_to_ids.set(command_id, command_module);
                 // check if command has defined an permissions for its commands
-                if (command.permissions) {
+                if (command_module.permissions) {
 
                     const client = this.get_client(); 
                     if (!client.application?.owner) await client.application?.fetch();
@@ -177,11 +185,13 @@ export class dcmodule {
                     if (!app_command) throw Error ("Can't fetch application command");
                     
                     await app_command.permissions.set({
-                        permissions: command.permissions
+                        permissions: command_module.permissions
                     });
                 }
             }
             await Promise.all(tasks);
+
+            this.commands = switch_to_ids;
 
             this.log.info('Successfully reloaded application (/) commands.');
         }
@@ -192,21 +202,52 @@ export class dcmodule {
     }
     protected async on_interaction_create(interaction : Interaction) {
 
-        if (interaction.isCommand()) {
-            const command = this.commands.get(interaction.commandName);
+        const respond_interaction_failure_to_user = async (it : CommandInteraction | ButtonInteraction) => it.reply({ content: 'Komut işlenirken hata oluştu. Lütfen bir süre sonra tekrar deneyin. Hatanın devam etmesi durumunda lütfen yetkililer ile iletişime geçin. Teşekkürler!', ephemeral: true })
 
-            if (!command)
+        const user_id = interaction.user.id;
+        const user_info = {
+            id: user_id,
+            name: interaction.user.username,
+        };
+
+        if (interaction.isCommand()) {
+
+            const comm_id = interaction.commandId;
+            const command = this.commands.get(comm_id);
+            if (!command) {
+                this.log.warn(`command id[${comm_id}] is not found in commands`, user_info)
                 return;
+            }
     
             try {
                 await command.execute(interaction);
+                
+                // if user_id exists already, it will be overridden with state = 0
+                // so that it pushes user to the first stage of the command
+                this.command_states[user_id] = {
+                    command_id: comm_id,
+                    state: 0,
+                }
             } catch (error) {
-                this.log.error(error);
-                await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+
+                this.log.error(error, user_info);
+                await respond_interaction_failure_to_user(interaction);
             }
         }
         else if (interaction.isButton()) {
-            console.log(interaction);
+            
+            // assuming button is always triggered from a command
+            const user_state = this.command_states[user_id];
+
+            if (!user_state) {
+                this.log.warn("A button interaction's user_state cannot be found.", user_info);
+                await respond_interaction_failure_to_user(interaction);
+                return;
+            }
+            
+            user_state.state += 1; // bakalim referans mi yoksa value type mi gorecegiz :IBOYD:
+            this.log.info(user_state.state+"");
+            interaction.reply({content: "Pong! "+user_state.state, ephemeral: true});
         }
     }
     protected async on_message(msg : Message)
