@@ -409,7 +409,7 @@ export class dcmodule {
 
             let tasks : Promise<void>[] = [];
             for (const json of res_arr) {
-                const app_id : string = json.application_id;
+                const command_id : string = json.id;
                 const name : string = json.name;
                 const command = this.commands.get(name);
                 if (!command) {
@@ -422,7 +422,7 @@ export class dcmodule {
                     const client = this.get_client(); 
                     if (!client.application?.owner) await client.application?.fetch();
 
-                    const app_command = await client.guilds.cache.get(dcmodule.guild_id_tp)?.commands.fetch(app_id);
+                    const app_command = await client.guilds.cache.get(dcmodule.guild_id_tp)?.commands.fetch(command_id);
                     if (!app_command) throw Error ("Can't fetch application command");
                     
                     await app_command.permissions.set({
