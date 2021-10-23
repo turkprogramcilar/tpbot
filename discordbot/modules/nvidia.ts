@@ -5,6 +5,7 @@ const constants = require("../../../discordbot/constants");
 const parser    = require("../../../discordbot/cmdparser");
 const db        = require("../../../discordbot/mongodb");
 const tools     = require("../../../discordbot/tools");
+import { log } from '../log';
 
 const nvidia_link : string = "https://tenor.com/view/linus-linus-torvalds-nvidia-fuck-you-gif-18053606";
 const nvidia = [
@@ -24,6 +25,7 @@ const diff = <T> (a1: T[], b1: T[]) : T[] => ((f : any) => [...f(a1,b1),...f(b1,
 const utoa = { "🇿": "z", "🇾": "y", "🇽": "x", "🇼": "w", "🇻": "v", "🇺": "u", "🇹": "t", "🇸": "s", "🇷": "r", "🇶": "q", "🇵": "p", "🇴": "o", "🇳": "n", "🇲": "m", "🇱": "l", "🇰": "k", "🇯": "j", "🇮": "ı", "🇭": "h", "🇬": "g", "🇫": "f", "🇪": "e", "🇩": "d", "🇨": "c", "🇧": "b", "🇦": "a", "ℹ️": "i"};
 
 const module_name = "nvidia";
+const logger = new log(module_name);
 const sync_module = async () => tools.sync_module(module_name, ()=>state.cache.module[module_name], 1);
 let fetch_start : Date | undefined;
 let state: any;
@@ -48,7 +50,7 @@ export const init = async (refState: any) => {
             await Promise.all(state.cache.module[module_name].nvidias.map((mid: string) => channel.messages.fetch(mid)));
         }
     } catch (error) {
-        console.error(error);
+        logger.error(error);
     }
 }
 
@@ -81,7 +83,7 @@ export const on_event = async (evt: string, args: any) => {
                 try {
                     await reaction.fetch();
                 } catch (error) {
-                    console.error('Something went wrong when fetching the message: ', error);
+                    logger.error('Something went wrong when fetching the message: ' + error);
                     // Return as `reaction.message.author` may be undefined/null
                     return;
                 }

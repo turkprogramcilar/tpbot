@@ -39,7 +39,7 @@ const this_dcmodule = class bilenrol extends dcmodule {
         }
 
         if (!reaction.emoji.name) {
-            console.error(`reaction.emoji.name is null`);
+            this.log.error(`reaction.emoji.name is null`);
             return;
         }
 
@@ -57,14 +57,14 @@ const this_dcmodule = class bilenrol extends dcmodule {
             type = role_type.fan_club;
         }
         else {
-            console.log("not allowed role: "+role);
+            this.log.info("not allowed role: "+role);
             return;
         }
         role = (word => `${word.charAt(0).toUpperCase()}${word.slice(1).toLowerCase()}` )(role);
 
         const guild = reaction.message.guild;
         if (!guild) {
-            console.error("!guild");
+            this.log.error("!guild");
             return;
         }
         // ensure the guild member
@@ -73,7 +73,7 @@ const this_dcmodule = class bilenrol extends dcmodule {
         // if failed to ensure the guild member, we can't do anything about it
         // (remember: !null is true, !undefined is true)
         if (!guild_member) {
-            console.error("!guild_member");
+            this.log.error("!guild_member");
             return;
         }
 
@@ -101,7 +101,7 @@ const this_dcmodule = class bilenrol extends dcmodule {
         else
             p2 = guild_member.roles.remove([role_to_give.id]);
 
-        console.log("allowed role: "+role);
+        this.log.info("allowed role: "+role);
         await p1; await p2;
     }
     private async fetch_roles_channel(retry : number) {
@@ -120,8 +120,8 @@ const this_dcmodule = class bilenrol extends dcmodule {
         } catch (error) {
 
             retry -= 1;
-            console.warn(`An error occurred in ${this.fetch_roles_channel.name}... Will retry if retry[${retry}] != 0`);
-            console.error(error);
+            this.log.warn(`An error occurred in ${this.fetch_roles_channel.name}... Will retry if retry[${retry}] != 0`);
+            this.log.error(error);
             if (retry != 0)
                 setTimeout(() => this.fetch_roles_channel(retry), 1000);
         }

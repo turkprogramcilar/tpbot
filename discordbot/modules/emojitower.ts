@@ -19,7 +19,7 @@ const this_dcmodule = class emojitower extends dcmodule {
         //server.use(compression());
         app.use(express.static(process.env.WEB_UNITY));
         app.get('/test.html', (req : any, res : any) => res.sendFile(INDEX, { root: __dirname }));
-        const httpServer = app.listen(PORT, () => console.log(`Listening on ${PORT}`));
+        const httpServer = app.listen(PORT, () => this.log.info(`Listening on ${PORT}`));
 
 
         // websockets server
@@ -27,8 +27,8 @@ const this_dcmodule = class emojitower extends dcmodule {
 
         const wss = new Server({ server: httpServer });
         wss.on('connection', (ws : any) => {
-            console.log('Client connected');
-            ws.on('close', () => console.log('Client disconnected'));
+            this.log.info('Client connected');
+            ws.on('close', () => this.log.info('Client disconnected'));
         });
 
         const xss = require("xss");
@@ -43,7 +43,7 @@ const this_dcmodule = class emojitower extends dcmodule {
         const matches = [...msg.content.matchAll(/<a?:\w+:(\d+)>/g)];
         if (matches != null && matches.length > 0) {
             const res = JSON.stringify(matches.map(x=>`https://cdn.discordapp.com/emojis/${x[1]}`));
-            //console.log(res);
+            //this.log.info(res);
             this.send_unity_clients(res);
         }
         //<a?:\w+:(\d+)>
