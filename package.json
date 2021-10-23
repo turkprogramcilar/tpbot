@@ -4,7 +4,7 @@
   "description": "",
   "main": "main.js",
   "engines": {
-    "node": "17.x"
+    "node": "16.x"
   },
   "scripts": {
     "start": "node main.js",
