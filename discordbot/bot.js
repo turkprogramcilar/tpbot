@@ -96,7 +96,6 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
         }); 
     }
     client.on('interactionCreate', async interaction => {
-        if (!interaction.isCommand()) return;
         for (const m of modules) 
             m.on_event('interactionCreate', {interaction: interaction});
     });
