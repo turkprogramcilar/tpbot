@@ -68,24 +68,7 @@ export class dcmodule {
     public async on_event(evt: string, args: any) {
 
         switch(evt) {
-            case 'interactionCreate':
-                const interaction : Interaction = args.interaction;
-
-                if (!interaction.isCommand())
-                    return;
-
-                const command = this.commands.get(interaction.commandName);
-
-                if (!command)
-                    return;
-
-                try {
-                    await command.execute(interaction);
-                } catch (error) {
-                    this.log.error(error);
-                    await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-                }
-            break;
+            case 'interactionCreate': this.handleInteractionCreate(args.interaction); break;
             case 'message': 
                 const msg : Message = args.msg;
                 const msg_str = msg.content;
@@ -142,6 +125,25 @@ export class dcmodule {
             case 'ready':
                 await this.on_ready();
             break;
+        }
+    }
+    private async handleInteractionCreate(interaction : Interaction) {
+
+        if (interaction.isCommand()) {
+            const command = this.commands.get(interaction.commandName);
+
+            if (!command)
+                return;
+    
+            try {
+                await command.execute(interaction);
+            } catch (error) {
+                this.log.error(error);
+                await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
+            }
+        }
+        else if (interaction.isButton()) {
+            console.log(interaction);
         }
     }
     public async init(refState: any) {
