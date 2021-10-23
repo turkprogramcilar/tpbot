@@ -6,6 +6,7 @@ import { channel } from "diagnostic_channel";
 import { Message, Client, User, PartialUser, MessageReaction, Presence, GuildManager, Guild, GuildChannel, TextChannel, Interaction, CommandInteraction, Collection, ApplicationCommandData, ApplicationCommandPermissionData } from "discord.js";
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ApplicationCommandOptionTypes, ApplicationCommandPermissionTypes } from 'discord.js/typings/enums';
+import { log } from './log';
 // local imports
 const db        = require("../../discordbot/mongodb");
 const tools     = require("../../discordbot/tools");
@@ -45,6 +46,8 @@ export class dcmodule {
     protected state: any;
     private promises_module_state_queue : Promise<void>[] = [];
 
+    // public readonly fields
+    public readonly log = new log(this.module_name);
     // ctor
     constructor(
         protected module_name : string = UNNAMED_MODULE, 
@@ -78,7 +81,7 @@ export class dcmodule {
                 try {
                     await command.execute(interaction);
                 } catch (error) {
-                    console.error(error);
+                    this.log.error(error);
                     await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
                 }
             break;
@@ -377,7 +380,7 @@ export class dcmodule {
         const rest = new REST({ version: '9' }).setToken(token);
         (async () => {
         try {
-            console.log('Started refreshing application (/) commands.');
+            this.log.info('Started refreshing application (/) commands.');
 
             const root = `build/discordbot/modules/${this.module_name}/commands/`;
             const commands_folder_files : string[] = tools.get_files_sync(root);
@@ -388,7 +391,7 @@ export class dcmodule {
                 // Set a new item in the Collection
                 // With the key as the command name and the value as the exported module
                 this.commands.set(command.data.name, command);
-                console.log("Require/Loading command file: "+file);
+                this.log.info("Require/Loading command file: "+file);
             }
             const response = await rest.put(
                 Routes.applicationGuildCommands(id, tpid),
@@ -410,7 +413,7 @@ export class dcmodule {
                 const name : string = json.name;
                 const command = this.commands.get(name);
                 if (!command) {
-                    console.error(`json response with command name ${name} is not found on our side.`);
+                    this.log.error(`json response with command name ${name} is not found on our side.`);
                     break;
                 }
                 // check if command has defined an permissions for its commands
@@ -429,10 +432,10 @@ export class dcmodule {
             }
             await Promise.all(tasks);
 
-            console.log('Successfully reloaded application (/) commands.');
+            this.log.info('Successfully reloaded application (/) commands.');
         }
         catch (error) {
-            console.error(error);
+            this.log.error(error);
             throw Error("Can't register commands in module.ts body");
         }})();
     }
