@@ -101,48 +101,11 @@ export class dcmodule {
     public async on_event(evt: string, args: any) {
 
         switch(evt) {
-            case 'interactionCreate': this.on_interaction_create(args.interaction); break;
-            case 'message': 
-                const msg : Message = args.msg;
-                const msg_str = msg.content;
+            case 'ready'                : await this.on_ready();                              break;
+            case 'message'              : await this.on_message(args.msg);                    break;
+            case 'presenceUpdate'       : await this.on_presence_update(args[0], args[1]);    break;
+            case 'interactionCreate'    : await this.on_interaction_create(args.interaction); break;
 
-                await this.on_message(msg);
-
-                // beyond is only when administative commands are set to true
-                if (this.administative_commands == false) return;
-
-                msg.content = msg_str;
-
-                // if not admin or not command return
-                if (!this.is_admin(msg.author.id) || !this.is_prefixed(msg)) return;
-
-                // if admin doesn't point this module, return
-                if (!this.is_word(msg, this.module_name)) return;
-                
-                if (this.is_word(msg, "channel_id")) {
-
-                    const key = "channel_id";
-
-                    const channel_id = this.get_module_state(key);
-                    const new_channel_id = this.get_unsigned(msg);
-                    if (!new_channel_id) {
-
-                        if (this.is_word(msg, "delete")) {
-
-                            const p1 = this.delete_module_state(key);
-                            const p2 = this.warn(msg, `deleting channel restriction for the module ${this.module_name}`);
-                            await p1; await p2;
-                            return;
-                        }
-                        return await this.warn(msg, "channel id is "+(channel_id ?? "<undefined>"));
-                    }
-
-                    const p1 = this.affirm(msg, `updating channel id to ${new_channel_id}, before it was ${channel_id ?? "<undefined>"}`);
-                    const p2 = this.set_module_state(key, new_channel_id);
-                    await p1, await p2;
-                    return;
-                }
-            break;
             case 'messageReactionAdd':
             case 'messageReactionRemove':
                 const reaction : MessageReaction = args.reaction;
@@ -152,10 +115,6 @@ export class dcmodule {
                 else
                     await this.on_reaction_remove(reaction, user);
             break;
-            case 'presenceUpdate':
-                await this.on_presence_update(args[0], args[1]);
-            break;
-            case 'ready': this.on_ready(); break;
         }
     }
     protected async on_ready() {
@@ -250,7 +209,10 @@ export class dcmodule {
             console.log(interaction);
         }
     }
-    protected async on_message(msg : Message) {}
+    protected async on_message(msg : Message)
+    {
+        this.administrative_channel_adjust(msg);
+    }
     protected async on_reaction_add(reaction : MessageReaction, user : User | PartialUser) {}
     protected async on_reaction_remove(reaction : MessageReaction, user : User | PartialUser) {}
     protected async on_presence_update(new_p: Presence, old_p: Presence) {}
@@ -449,5 +411,42 @@ export class dcmodule {
     }
     protected experience_multiplier(experience : number) {
         return tools.getexpm(experience);
+    }
+
+    // administrative
+    protected async administrative_channel_adjust(msg : Message) {
+
+        // beyond is only when administative commands are set to true
+        if (this.administative_commands == false) return;
+
+        // if not admin or not command return
+        if (!this.is_admin(msg.author.id) || !this.is_prefixed(msg)) return;
+
+        // if admin doesn't point this module, return
+        if (!this.is_word(msg, this.module_name)) return;
+        
+        if (this.is_word(msg, "channel_id")) {
+
+            const key = "channel_id";
+
+            const channel_id = this.get_module_state(key);
+            const new_channel_id = this.get_unsigned(msg);
+            if (!new_channel_id) {
+
+                if (this.is_word(msg, "delete")) {
+
+                    const p1 = this.delete_module_state(key);
+                    const p2 = this.warn(msg, `deleting channel restriction for the module ${this.module_name}`);
+                    await p1; await p2;
+                    return;
+                }
+                return await this.warn(msg, "channel id is "+(channel_id ?? "<undefined>"));
+            }
+
+            const p1 = this.affirm(msg, `updating channel id to ${new_channel_id}, before it was ${channel_id ?? "<undefined>"}`);
+            const p2 = this.set_module_state(key, new_channel_id);
+            await p1, await p2;
+            return;
+        }
     }
 }
