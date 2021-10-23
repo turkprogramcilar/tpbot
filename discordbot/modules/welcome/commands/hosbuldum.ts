@@ -12,6 +12,7 @@ export const data = new SlashCommandBuilder()
 export const permissions = [
     { id: dcmodule.role_id_hosgeldiniz, type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
     { id: dcmodule.role_id_kidemli,     type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
+    { id: dcmodule.role_id_kurucu,      type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
 ];
 
 export async function execute(interaction : CommandInteraction) {

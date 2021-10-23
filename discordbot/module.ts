@@ -37,6 +37,7 @@ const FORBIDDEN_KEYS : string[] = [MS_DCUSERS, MS_BULK];
 export class dcmodule {
     // some constants
     static readonly guild_id_tp         : string = constants.sid.tpdc;
+    static readonly role_id_kurucu      : string = constants.rid.kurucu;
     static readonly role_id_kidemli     : string = constants.rid.kidemli;
     static readonly role_id_hosgeldiniz : string = constants.rid.hosgeldiniz;
 
