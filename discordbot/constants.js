@@ -35,6 +35,8 @@ groups = {
 // roles
 rid = {
     botlar: "782738487921213461",
+    kidemli: "830478022183616564",
+    hosgeldin: "900647464342790204",
 }
 
 // channel ids
@@ -128,4 +130,5 @@ module.exports = {
     cid,
     uid,
     sid,
+    rid,
 };
