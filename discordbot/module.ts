@@ -232,6 +232,10 @@ export class dcmodule {
     }
     protected async on_interaction_create(interaction : Interaction) {
 
+        // process commands
+        if (this.state.command_support !== true)
+            return;
+
         const user_id = interaction.user.id;
         const user_info = dcmodule.get_user_info(interaction.user);
 
