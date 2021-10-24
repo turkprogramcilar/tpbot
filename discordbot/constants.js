@@ -37,7 +37,7 @@ rid = {
     botlar: "782738487921213461",
     kurucu: "801135743229624320",
     kidemli: "830478022183616564",
-    hosgeldiniz: "900647464342790204",
+    tp_uyesi: "900647464342790204",
 }
 
 // channel ids
@@ -52,6 +52,13 @@ cid = {
     bumperado   : "782742548052574239",
     botkomutlari: consts.env.debug ? "852552268430966824" : "841987730551603200",
     printfscanf : "782713536924221469",
+
+    proje_paylas        : "853361637708136469",
+    istek_oneri_sikayet : "782742512888053790",
+    yazilim_sor         : "826741164643450910",
+    kafamda_deli_sorular: "816861595639611444",
+    kodlama_disi_sor    : "839045810825199626",
+    bir_bak_buraya      : "827892178561925160",
 }
 
 

@@ -6,7 +6,7 @@ import { channel } from "diagnostic_channel";
 import { Message, Client, User, PartialUser, MessageReaction, Presence, GuildManager, Guild, GuildChannel, TextChannel, Interaction, CommandInteraction, Collection, ApplicationCommandData, ApplicationCommandPermissionData, ButtonInteraction } from "discord.js";
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ApplicationCommandOptionTypes, ApplicationCommandPermissionTypes } from 'discord.js/typings/enums';
-import { log } from './log';
+import { log, user_info } from './log';
 // local imports
 const db        = require("../../discordbot/mongodb");
 const tools     = require("../../discordbot/tools");
@@ -24,10 +24,10 @@ export type module_user_state = {[key : string] : user_state_value};
 
 interface command_module {
     data : SlashCommandBuilder,
-    execute : (interaction : CommandInteraction) => Promise<void>,
+    execute : (interaction : CommandInteraction | ButtonInteraction, state : command_user_state) => Promise<boolean>,
     permissions : ApplicationCommandPermissionData[] | undefined,
 };
-interface command_user_state {
+export interface command_user_state {
     command_id : string,
     state : number,
 }
@@ -44,7 +44,16 @@ export class dcmodule {
     static readonly guild_id_tp         : string = constants.sid.tpdc;
     static readonly role_id_kurucu      : string = constants.rid.kurucu;
     static readonly role_id_kidemli     : string = constants.rid.kidemli;
-    static readonly role_id_hosgeldiniz : string = constants.rid.hosgeldiniz;
+    static readonly role_id_tp_uyesi    : string = constants.rid.tp_uyesi;
+    //
+    static readonly channel_id = {
+        proje_paylas         : constants.cid.proje_paylas,
+        istek_oneri_sikayet  : constants.cid.istek_oneri_sikayet,
+        yazilim_sor          : constants.cid.yazilim_sor,
+        kafamda_deli_sorular : constants.cid.kafamda_deli_sorular,
+        kodlama_disi_sor     : constants.cid.kodlama_disi_sor,
+        bir_bak_buraya       : constants.cid.bir_bak_buraya,
+    }
 
     // fields
     protected commands = new Collection<string, command_module>();
@@ -66,6 +75,27 @@ export class dcmodule {
     }
     public is_admin(user_id : string) : boolean {
         return constants.groups.admins.includes(user_id);
+    }
+
+    // static methods
+    static async respond_interaction_failure_to_user(it : CommandInteraction | ButtonInteraction) {
+        try {
+            await it.reply({ content: 'Komut işlenirken hata oluştu. Lütfen bir süre sonra tekrar deneyin. Hatanın devam etmesi durumunda lütfen yetkililer ile iletişime geçin. Teşekkürler!', ephemeral: true });
+        }
+        catch (error) {
+            console.warn("respond to user failure failed with error: "+error)
+        }
+    }
+    static async respond_interaction_failure_to_user_and_log(module_name : string, msg : string, it : CommandInteraction | ButtonInteraction) {
+
+        new log(module_name).error(msg, this.get_user_info(it.user));
+        return this.respond_interaction_failure_to_user(it);
+    }
+    static get_user_info(user : User) : user_info {
+        return {
+            id: user.id,
+            name: user.username,
+        };
     }
 
     // init for module loader system defined in bot.js
@@ -202,36 +232,31 @@ export class dcmodule {
     }
     protected async on_interaction_create(interaction : Interaction) {
 
-        const respond_interaction_failure_to_user = async (it : CommandInteraction | ButtonInteraction) => it.reply({ content: 'Komut işlenirken hata oluştu. Lütfen bir süre sonra tekrar deneyin. Hatanın devam etmesi durumunda lütfen yetkililer ile iletişime geçin. Teşekkürler!', ephemeral: true })
-
         const user_id = interaction.user.id;
-        const user_info = {
-            id: user_id,
-            name: interaction.user.username,
-        };
+        const user_info = dcmodule.get_user_info(interaction.user);
+
+        let command_module;
+        let state;
 
         if (interaction.isCommand()) {
 
             const comm_id = interaction.commandId;
-            const command = this.commands.get(comm_id);
-            if (!command) {
-                this.log.warn(`command id[${comm_id}] is not found in commands`, user_info)
+            command_module = this.commands.get(comm_id);
+            if (!command_module) {
+                this.log.warn(`command id[${comm_id}] is not found in commands when first executing command`, user_info)
                 return;
             }
     
-            try {
-                await command.execute(interaction);
-                
-                // if user_id exists already, it will be overridden with state = 0
-                // so that it pushes user to the first stage of the command
-                this.command_states[user_id] = {
-                    command_id: comm_id,
-                    state: 0,
-                }
-            } catch (error) {
-
-                this.log.error(error, user_info);
-                await respond_interaction_failure_to_user(interaction);
+            // if user already started a command, dont start another one
+            state = this.command_states[user_id] 
+            if (state)
+                return await interaction.reply({content: "Lütfen önceden çalıştırdığınız komutu tamamlayınız.", ephemeral: true });
+            
+            // if user_id exists already, it will be overridden with state = 0
+            // so that it pushes user to the first stage of the command
+            state = this.command_states[user_id] = {
+                command_id: comm_id,
+                state: 0,
             }
         }
         else if (interaction.isButton()) {
@@ -241,13 +266,36 @@ export class dcmodule {
 
             if (!user_state) {
                 this.log.warn("A button interaction's user_state cannot be found.", user_info);
-                await respond_interaction_failure_to_user(interaction);
+                await dcmodule.respond_interaction_failure_to_user(interaction);
+                return;
+            }
+
+            const comm_id = user_state.command_id;
+            command_module = this.commands.get(comm_id);
+            if (!command_module) {
+                this.log.warn(`command id[${comm_id}] is not found in commands when interacting with button`, user_info)
                 return;
             }
             
-            user_state.state += 1; // bakalim referans mi yoksa value type mi gorecegiz :IBOYD:
-            this.log.info(user_state.state+"");
-            interaction.reply({content: "Pong! "+user_state.state, ephemeral: true});
+            state = this.command_states[user_id];
+        }
+        else {
+
+            this.log.warn("An interaction neither button nor command is received", user_info)
+            return;
+        }
+
+        try {
+
+            const command_complete = await command_module.execute(interaction, state);
+
+            if (command_complete) 
+                delete this.command_states[user_id];
+
+        } catch (error) {
+
+            this.log.error(error, user_info);
+            await dcmodule.respond_interaction_failure_to_user(interaction);
         }
     }
     protected async on_message(msg : Message)
