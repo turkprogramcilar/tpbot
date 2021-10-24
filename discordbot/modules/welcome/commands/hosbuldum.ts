@@ -11,7 +11,7 @@ const module_name = "hosbuldum";
 export const data = new SlashCommandBuilder()
     .setName(module_name)
     .setDescription('Türk programcılar onay sistemini başlatır')
-    .setDefaultPermission(true);
+    .setDefaultPermission(false);
 
 export const permissions = [
     { id: dcmodule.role_id_tp_uyesi,    type: ApplicationCommandPermissionTypes.ROLE, permission: false, },
@@ -153,6 +153,7 @@ export async function execute(interaction : CommandInteraction | ButtonInteracti
     
     if (false == await is_in_range_otherwise_send_failure(state.state, Q, "state.state", "Q", interaction)) return true;
 
+    let chosen : number | undefined = undefined;
     let q = state.state as Q;
     const rollback_q = q;
 
@@ -170,6 +171,7 @@ export async function execute(interaction : CommandInteraction | ButtonInteracti
         if (false == await is_in_range_otherwise_send_failure(n, d[q], "state.state", "Q", interaction)) return true;
 
         // transition to next state
+        chosen = n;
         q = state.state = d[q][n];
     }
 
@@ -203,6 +205,19 @@ export async function execute(interaction : CommandInteraction | ButtonInteracti
         await interaction.update(response);
     }
     state.state = q;
+
+    (async (n) => {
+        const dedikodu_channel = await interaction.guild?.channels.fetch(dcmodule.channel_id.yonetim_dedikodu);
+        if (dedikodu_channel?.isText()) {
+            const user = dcmodule.get_user_info(interaction.user)
+            const msg = n !== undefined
+                ? "```css\n"+`[${user.name}] id=${user.id} seçenek seçti = [${state_choices[rollback_q][n]}]`+"```"
+                : "```css\n"+`[${user.name}] id=${user.id} #hosbuldum komutunu başlattı.`+"```"
+                ;
+            await dedikodu_channel.send(msg);
+        }
+    })(chosen);
+
     if (q == Q.bitir) {
         state.state = Q.basla;
         // give user role

@@ -59,6 +59,8 @@ cid = {
     kafamda_deli_sorular: "816861595639611444",
     kodlama_disi_sor    : "839045810825199626",
     bir_bak_buraya      : "827892178561925160",
+
+    yonetim_dedikodu : "880112382662303755",
 }
 
 

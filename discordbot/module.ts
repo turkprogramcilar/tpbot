@@ -53,6 +53,7 @@ export class dcmodule {
         kafamda_deli_sorular : constants.cid.kafamda_deli_sorular,
         kodlama_disi_sor     : constants.cid.kodlama_disi_sor,
         bir_bak_buraya       : constants.cid.bir_bak_buraya,
+        yonetim_dedikodu     : constants.cid.yonetim_dedikodu,
     }
 
     // fields
@@ -195,14 +196,13 @@ export class dcmodule {
             }
 
             const switch_to_ids = new Collection<string, command_module>();
-            let tasks : Promise<void>[] = [];
-            for (const json of res_arr) {
+            let tasks : Promise<void>[] = res_arr.map(async json => {
                 const command_id : string = json.id;
                 const name : string = json.name;
                 const command_module = this.commands.get(name);
                 if (!command_module) {
                     this.log.error(`json response with command name ${name} is not found on our side.`);
-                    break;
+                    return;
                 }
                 switch_to_ids.set(command_id, command_module);
                 // check if command has defined an permissions for its commands
@@ -218,7 +218,7 @@ export class dcmodule {
                         permissions: command_module.permissions
                     });
                 }
-            }
+            });
             await Promise.all(tasks);
 
             this.commands = switch_to_ids;
