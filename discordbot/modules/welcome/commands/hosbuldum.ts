@@ -11,7 +11,7 @@ const module_name = "hosbuldum";
 export const data = new SlashCommandBuilder()
     .setName(module_name)
     .setDescription('Türk programcılar onay sistemini başlatır')
-    .setDefaultPermission(false);
+    .setDefaultPermission(true);
 
 export const permissions = [
     { id: dcmodule.role_id_tp_uyesi,    type: ApplicationCommandPermissionTypes.ROLE, permission: false, },
