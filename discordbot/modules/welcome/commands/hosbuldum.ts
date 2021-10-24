@@ -202,14 +202,14 @@ export async function execute(interaction : CommandInteraction | ButtonInteracti
     state.state = q;
 
     (async (n) => {
-        const dedikodu_channel = await interaction.guild?.channels.fetch(dcmodule.channel_id.yonetim_dedikodu);
-        if (dedikodu_channel?.isText()) {
+        const channel = await interaction.guild?.channels.fetch(dcmodule.channel_id.sohbet);
+        if (channel?.isText()) {
             const user = dcmodule.get_user_info(interaction.user)
             const msg = n !== undefined
                 ? "```css\n"+`[${user.name}] id=${user.id} seçenek seçti = [${state_choices[rollback_q][n]}]`+"```"
                 : "```css\n"+`[${user.name}] id=${user.id} #hosbuldum komutunu başlattı.`+"```"
                 ;
-            await dedikodu_channel.send(msg);
+            await channel.send(msg);
         }
     })(chosen);
 
