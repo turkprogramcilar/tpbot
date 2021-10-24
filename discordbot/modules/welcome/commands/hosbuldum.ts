@@ -176,7 +176,6 @@ export async function execute(interaction : CommandInteraction | ButtonInteracti
     }
 
     // prepare user interface
-    const channel = state_channel[q];
     const question = state_question[q];
     const choices  = state_choices[q];
 
@@ -193,15 +192,11 @@ export async function execute(interaction : CommandInteraction | ButtonInteracti
     state.state = rollback_q;
     if (q == Q.basla) {
         let response : any = { ephemeral: true, embeds: [embed], components: [buttons] };
-        if (channel.length > 0)
-            response.content = channel;
         await interaction.reply(response);
     }
     else {
         interaction = interaction as ButtonInteraction;
         let response : any = { embeds: [embed], components: choices.length == 0 ? [] : [buttons]};
-        if (channel.length > 0)
-            response.content = channel;
         await interaction.update(response);
     }
     state.state = q;
