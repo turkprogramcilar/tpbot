@@ -1,3 +1,4 @@
+import { fail } from 'assert';
 import { expect } from 'chai';
 import { describe } from 'mocha'
 import { cardgame, game_state } from './cardgame';
@@ -91,6 +92,7 @@ describe('tatar ramazan karti', () => {
         const p2was = game.players[2].health;
 
         const damage = cards[tr].flips![0].heads!.attack!.target;
+        if (!damage) fail("kartin hasari yok. olmali");
 
         // 50% sansla vur
         game.play_card(1, tr);

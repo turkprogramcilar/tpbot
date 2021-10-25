@@ -1,4 +1,4 @@
-import { effect, card_no, cards } from "./cardgame.data";
+import { effect, card_no, cards, limit } from "./cardgame.data";
 
 // type definitions
 export enum ability {
@@ -82,15 +82,15 @@ export class cardgame {
         const card = cards[no];
 
         // check if this is a attack card and player has already used one before
-        if (card.is_attack) {
+        if (card.play_limit == limit.attack_category) {
             if (this.used_abilities[ability.attack]) return {OK: false, state: this.state(), reason: "Bu tur içerisinde başka saldırı kartı oynayamazsınız"};
             this.used_abilities[ability.attack] = true;
         }
 
-        // direct damage if any
-        if (card.damage) {
-            this.target_hit(card.damage.target);
-            if (card.damage.self) this.self_hit(card.damage.self);
+        // direct damage if any @TODO instant_damage is removed. iterate each instant_effect
+        if (card.instant_damage) {
+            this.target_hit(card.instant_damage.target);
+            if (card.instant_damage.self) this.self_hit(card.instant_damage.self);
         }
 
         const flips = [];
@@ -118,7 +118,7 @@ export class cardgame {
                 //..
             }
             
-            if (!flip && card.tail_breaks) break;
+            if (!flip && card.tail_break) break;
         }
         
         // remove the card from the deck @TODO

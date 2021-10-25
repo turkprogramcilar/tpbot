@@ -1,85 +1,152 @@
 // type definitions
 
+export enum limit {
+    attack_category,
+    unlimited,
+}
 export interface damage {
     self? : number,
-    target: number,
+    target? : number,
+}
+export enum pick_how {
+    self_random,
+    self_select,
+    enemy_random,
+    enemy_select,
+}
+export enum alive_until {
+    flip_heads,
+    flip_tails,
+}
+export enum trigger {
+    round_begin,
+    round_end
+}
+export interface buff {
+    when : trigger,
+    life : alive_until,
+    effects : effect[],
+}
+export interface modifier {
 }
 export interface effect {
-    attack?: damage,
+    attack? : damage,
+    pick_card? : pick_how,
+    // transforms card into the chosen card. do not destroy other card. replace it with the same as chosen.
+    transform_card? : pick_how,
+
+    // modifiers
+
+    // emits the whole next damaging attack, if number > 1 it is said to have multiple times of this protection
+    protection? : number,
+    reveal_enemy_cards? : boolean,
+}
+export interface flip_coin {
+    heads? : effect,
+    tails? : effect,
 }
 export interface card {
-    is_attack : boolean,
-    damage? : damage,
-    flips? : {heads?: effect, tails?: effect}[]
-    tail_breaks? : boolean,
+    play_limit : limit,
+    instants? : effect[],
+    flips? : flip_coin[],
+    // if true flips[] will be not fully iterated when a coin is tail
+    tail_break? : boolean,
+    buffs? : buff[],
+    // buffs that applied to enemy
+    debuffs? : buff[],
 }
 
 // card database
 
 export enum card_no {
     efsanevi_ataturk = 1, 
-    hasan_mezarci, muzlu_ajdar, koca_isteyen_kari,
-    korkusuz_korkak, kara_murat_benim, yossi_kohen, usta_rakun, zikir_halkasi,
-    erotik_ajdar, yengec_risitas, gozleri_kayan_acun, halay, tivorlu_ismail, 
+    hasan_mezarci, muzlu_ajdar, koca_isteyen_kari, korkusuz_korkak, 
+    kara_murat_benim, yossi_kohen, usta_rakun, zikir_halkasi, 
+    // 10=
+    erotik_ajdar, yengec_risitas, gozleri_kayan_acun, halay, tivorlu_ismail,
+    // 15=
     changerboyle, tatar_ramazan
 }
 export const cards : { [key in card_no] : card } = {
     [card_no.efsanevi_ataturk]: { 
-        is_attack: false
+        play_limit: limit.unlimited
     },
     2: { 
-        is_attack: false
+        play_limit: limit.unlimited
     },
     3: { 
-        is_attack: false
+        play_limit: limit.unlimited
     },
     4: { 
-        is_attack: false
+        play_limit: limit.unlimited
     },
     [card_no.korkusuz_korkak]: { 
-        is_attack: true,
+        play_limit: limit.attack_category,
         flips: Array(5).fill({heads: {attack: {target: 20}}}),
-        tail_breaks: true,
+        tail_break: true,
     },
     6: { 
-        is_attack: false
+        play_limit: limit.unlimited
     },
     7: { 
-        is_attack: false
+        play_limit: limit.unlimited
     },
     8: { 
-        is_attack: false
+        play_limit: limit.unlimited
     },
     9: { 
-        is_attack: false
+        play_limit: limit.unlimited
     },
-    10: { 
-        is_attack: false
+    [card_no.erotik_ajdar]: { 
+        play_limit: limit.unlimited,
+        instants: [
+            {reveal_enemy_cards: true},
+        ]
     },
-    11: { 
-        is_attack: false
+    [card_no.yengec_risitas]: { 
+        play_limit: limit.unlimited,
+        debuffs: [
+            { 
+                when: trigger.round_end, 
+                life: alive_until.flip_heads, 
+                effects: [
+                    { attack: {self: 20} }
+                ] 
+            },
+        ]
     },
-    12: { 
-        is_attack: false
+    [card_no.gozleri_kayan_acun]: { 
+        play_limit: limit.unlimited,
+        instants: [
+            {protection: 1},
+        ],
     },
-    13: { 
-        is_attack: false
+    [card_no.halay]: { 
+        play_limit: limit.unlimited,
+        flips: [
+            {heads: {pick_card: pick_how.self_select }}
+        ],
     },
     [card_no.tivorlu_ismail]: { 
-        is_attack: true,
-        damage: {target: 20},
+        play_limit: limit.attack_category,
+        instants: [
+            {attack: {target: 20}},
+        ],
         flips: [
             {heads: {attack: {target: 10}}},
             {heads: {attack: {target: 10}}},
             {heads: {attack: {target: 10, self: 20}}}
         ],
-        tail_breaks: true,
+        tail_break: true,
     },
     15: { 
-        is_attack: false
+        play_limit: limit.unlimited,
+        flips: [
+            {heads: {transform_card: pick_how.enemy_select }}
+        ],
     },
     [card_no.tatar_ramazan]: { 
-        is_attack: true,
+        play_limit: limit.attack_category,
         flips: [{heads: {attack: {target: 40}}}]
     },
 }
