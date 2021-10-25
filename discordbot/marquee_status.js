@@ -4,7 +4,7 @@ exports.init = (client, status_texts=[
     "Turk programcılar sunucusuna hoşgeldiniz!",
     "Hemen bugün programlama öğrenmeye başla!"]) => {
     // prevent marquee timer from toggling more than once
-    if (marqueeTimer)
+    if (false && marqueeTimer)
     return;
     // marquee status, this also prevents heroku dyno from sleeping
     let   mi = 0;  // marquee index
