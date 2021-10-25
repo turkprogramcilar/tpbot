@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe } from 'mocha'
-import { cardgame } from './cardgame';
-import { card_no, game_state, card_db } from './cardgame.data';
+import { cardgame, game_state } from './cardgame';
+import { card_no, cards } from './cardgame.data';
 
 const tr = card_no.tatar_ramazan;
 
@@ -90,7 +90,7 @@ describe('tatar ramazan karti', () => {
         const p1was = game.players[1].health;
         const p2was = game.players[2].health;
 
-        const damage = card_db[tr].flips![0].heads!.attack!.target;
+        const damage = cards[tr].flips![0].heads!.attack!.target;
 
         // 50% sansla vur
         game.play_card(1, tr);

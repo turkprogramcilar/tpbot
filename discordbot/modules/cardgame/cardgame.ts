@@ -1,5 +1,32 @@
-import { ability, card_db, card_no, effect, game_state, player, round_result } from "./cardgame.data";
+import { effect, card_no, cards } from "./cardgame.data";
 
+// type definitions
+export enum ability {
+    attack,
+}
+export enum game_state {
+    unfinished = -1,
+    draw = 0,
+    win_p1,
+    win_p2,
+}
+export interface round_result {
+    played_player : number,
+    played_cards  : number[],
+    flip_results  : effect[],
+    next_player   : number,
+    game_finished : boolean,
+    game_result   : game_state,
+}
+export interface buff {
+    immunity?: boolean,
+}
+interface player {
+    buffs  : buff[],
+    health : number,
+    cards  : card_no[],
+}
+// default consts
 const default_abilities : { [key in ability] : boolean } = {
     [ability.attack]: false,
 };
@@ -52,7 +79,7 @@ export class cardgame {
         if ([16,5,14].includes(no)==false) throw new Error("Alpha");
 
         // get the card object
-        const card = card_db[no];
+        const card = cards[no];
 
         // check if this is a attack card and player has already used one before
         if (card.is_attack) {
