@@ -1,59 +1,9 @@
-// card-related definitions
+import { ability, card_db, card_no, effect, game_state, player, round_result } from "./cardgame.data";
 
-export enum card_no {
-    efsanevi_ataturk = 1, 
-    hasan_mezarci, muzlu_ajdar, koca_isteyen_kari,
-    korkusuz_korkak, kara_murat_benim, yossi_kohen, usta_rakun, zikir_halkasi,
-    erotik_ajdar, yengec_risitas, gozleri_kayan_acun, halay, tivorlu_ismail, 
-    changerboyle, tatar_ramazan
-}
-interface damage {
-    self? : number,
-    target: number,
-}
-interface effect {
-    attack?: damage,
-}
-interface card {
-    is_attack : boolean,
-    damage? : damage,
-    flips? : {heads?: effect, tails?: effect}[]
-    tail_breaks? : boolean,
-}
-
-// game and round mechanic related definitions
-
-enum ability {
-    attack,
-}
-export enum game_state {
-    unfinished = -1,
-    draw = 0,
-    win_p1,
-    win_p2,
-}
-interface round_result {
-    played_player : number,
-    played_cards  : number[],
-    flip_results  : effect[],
-    next_player   : number,
-    game_finished : boolean,
-    game_result   : game_state,
-}
-interface buff {
-    immunity?: boolean,
-}
-interface player {
-    buffs  : buff[],
-    health : number,
-    cards  : card_no[],
-}
-// constants and fresh constants
-
-const fresh_abilities : { [key in ability] : boolean } = {
+const default_abilities : { [key in ability] : boolean } = {
     [ability.attack]: false,
 };
-const fresh_round_result : round_result = {
+const default_round_result : round_result = {
     played_player: 0,
     played_cards : [],
     flip_results : [],
@@ -61,68 +11,6 @@ const fresh_round_result : round_result = {
     game_finished: false,
     game_result  : game_state.unfinished,
 }
-export const card_db : { [key in card_no] : card } = {
-    [card_no.efsanevi_ataturk]: { 
-        is_attack: false
-    },
-    2: { 
-        is_attack: false
-    },
-    3: { 
-        is_attack: false
-    },
-    4: { 
-        is_attack: false
-    },
-    [card_no.korkusuz_korkak]: { 
-        is_attack: true,
-        flips: Array(5).fill({heads: {attack: {target: 20}}}),
-        tail_breaks: true,
-    },
-    6: { 
-        is_attack: false
-    },
-    7: { 
-        is_attack: false
-    },
-    8: { 
-        is_attack: false
-    },
-    9: { 
-        is_attack: false
-    },
-    10: { 
-        is_attack: false
-    },
-    11: { 
-        is_attack: false
-    },
-    12: { 
-        is_attack: false
-    },
-    13: { 
-        is_attack: false
-    },
-    [card_no.tivorlu_ismail]: { 
-        is_attack: true,
-        damage: {target: 20},
-        flips: [
-            {heads: {attack: {target: 10}}},
-            {heads: {attack: {target: 10}}},
-            {heads: {attack: {target: 10, self: 20}}}
-        ],
-        tail_breaks: true,
-    },
-    15: { 
-        is_attack: false
-    },
-    [card_no.tatar_ramazan]: { 
-        is_attack: true,
-        flips: [{heads: {attack: {target: 40}}}]
-    },
-}
-
-// game state engine class
 
 export class cardgame {
     players : { [key: number]: player };
@@ -130,9 +18,9 @@ export class cardgame {
     round : number = 1;
     //who's turn?
     turn  : number = 1;
-    round_result : round_result = {...fresh_round_result};
+    round_result : round_result = {...default_round_result};
     // current player's abilities
-    used_abilities : { [key in ability]: boolean } = {...fresh_abilities};
+    used_abilities : { [key in ability]: boolean } = {...default_abilities};
 
     // ctor (lol put some green text here as a place holder so it fits nicely as a single line)
     constructor(p1cards : number[], p2cards : number[],
@@ -220,7 +108,7 @@ export class cardgame {
     // ends the round for current player
     public end_round() : round_result {
         this.turn = this.target_of(this.turn);
-        this.used_abilities = {...fresh_abilities};
+        this.used_abilities = {...default_abilities};
         return this.round_result;
     }
 
