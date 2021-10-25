@@ -54,6 +54,7 @@ export class dcmodule {
         kodlama_disi_sor     : constants.cid.kodlama_disi_sor,
         bir_bak_buraya       : constants.cid.bir_bak_buraya,
         yonetim_dedikodu     : constants.cid.yonetim_dedikodu,
+        sohbet               : constants.cid.sohbet,
     }
 
     // fields

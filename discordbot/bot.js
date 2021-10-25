@@ -60,6 +60,7 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
             if (await tools.fs_exists("discordbot/"+ ts_mpath+m+"/"+maints+".js")) {
                 path = ts_mpath+m+"/"+maints;
                 cloned_state.command_support = true;
+                cloned_state.modern_boilerplate = true;
             }
             else {
                 console.error("a modern ts module folder called "+m+" without "+maints+" cannot be loaded.");
@@ -71,7 +72,11 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
             console.error("module not found: "+m);
             exit(1);
         }
-        const loaded = require(path);
+        
+        const loaded = cloned_state.modern_boilerplate == true 
+            ? require(path).m
+            : require(path)
+            ;
         if (!loaded.init)
             throw Error("Module has no init method defined at " +path);
 
