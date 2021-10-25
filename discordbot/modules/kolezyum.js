@@ -202,7 +202,10 @@ const hit = async (msg, gm=false,gmdmg=0) => {
         const newmsg  = await embed_boss(m.name,m.eid,m.hp,m.mhp,
                                          m.lasthits,top3,sorted.splice(-1,1)[0],
                                          drops);
-        const channel = (await state.client.channels.fetch(m.msg.channelID ?? m.msg.channel.id));
+        if (!m.msg.channelId || !m.msg.channel?.id) {
+            console.error(m.msg);
+        }
+        const channel = (await state.client.channels.fetch(m.msg.channelId ?? m.msg.channel.id));
         let mmsg 
         try {
             mmsg = await channel.messages.fetch(m.msg.id);
