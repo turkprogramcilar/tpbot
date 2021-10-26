@@ -40,6 +40,7 @@ const default_round_result : round_result = {
 }
 
 export class cardgame {
+    
     players : { [key: number]: player };
     // total rounds so far
     round : number = 1;

@@ -73,7 +73,10 @@ export interface flip_coin {
     tails? : action,
 }
 export interface card {
+    // applies a certain limit on card play, i.e if thats an attack card
+    // player can only play one attack card per round
     play_limit : limit,
+    // instantaneous actions soon as card is played
     actions? : action[],
     flips? : flip_coin[],
     // if true flips[] will be not fully iterated when a coin is tail
