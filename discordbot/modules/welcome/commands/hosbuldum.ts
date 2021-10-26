@@ -140,18 +140,10 @@ for (const key of get_enum_keys(d)) {
     assert(expected == actual3);
 }
 
-const is_in_range_otherwise_send_failure = async <T extends object>(value : number, enum_t : T, value_name : string, enum_name : string, interaction : CommandInteraction | ButtonInteraction) : Promise<boolean> => {
-    const casted_enum = Object.keys(enum_t) as (keyof T)[];
-    if (typeof casted_enum[value] === 'undefined') {
-        await dcmodule.respond_interaction_failure_to_user_and_log(module_name, `${value_name}[${value}] is out of range in ${enum_name} enum range`, interaction);
-        return false;
-    }
-    return true;
-}
 
 export async function execute(interaction : CommandInteraction | ButtonInteraction, state : command_user_state) : Promise<boolean> {
     
-    if (false == await is_in_range_otherwise_send_failure(state.state, Q, "state.state", "Q", interaction)) return true;
+    if (false == await dcmodule.is_in_range_otherwise_send_failure(module_name, state.state, Q, "state.state", "Q", interaction)) return true;
 
     let chosen : number | undefined = undefined;
     let q = state.state as Q;
@@ -168,7 +160,7 @@ export async function execute(interaction : CommandInteraction | ButtonInteracti
         }
 
         // check if button index is valid for the given state
-        if (false == await is_in_range_otherwise_send_failure(n, d[q], "state.state", "Q", interaction)) return true;
+        if (false == await dcmodule.is_in_range_otherwise_send_failure(module_name, n, d[q], "state.state", "Q", interaction)) return true;
 
         // transition to next state
         chosen = n;
