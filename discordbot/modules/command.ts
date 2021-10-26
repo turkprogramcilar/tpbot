@@ -10,7 +10,7 @@ export abstract class command implements command_module {
     public constructor(command_name: string, description: string, public readonly permissions: ApplicationCommandPermissionData[] | undefined = undefined) {
         
         this.data = new SlashCommandBuilder().setName(command_name).setDescription(description);
-        if (!permissions)
+        if (permissions)
             this.data = this.data.setDefaultPermission(true);
     }
 
