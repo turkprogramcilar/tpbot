@@ -3,9 +3,10 @@ import { ButtonInteraction, CommandInteraction, Interaction, MessageActionRow, M
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { cards, card_no } from "../cardgame.data";
 import { card_text, card_texts, rarity } from "../cardgame.text";
-import { command_user_state, dcmodule } from "../../../module";
+import { command_user_state, dcmodule, known_interactions } from "../../../module";
 import { cardgame } from "../cardgame";
 import { user_info } from "../../../log";
+import { command } from "../../../command";
 
 /*
 
@@ -52,42 +53,49 @@ const card_embed = (no: card_no) => {
         .addField(`\`Kart cinsi: ${rarity[card.rarity]}\``, `No: ${no}\n\n\n`)
         .setColor(rarity_colors[card.rarity]);
 }
-export const data = new SlashCommandBuilder()
-		.setName('deste')
-		.setDescription('Kart oynama panelini açar');
-export async function execute(interaction : Interaction) {
-    
 
-	const menu = new MessageActionRow().addComponents(new MessageSelectMenu()
-		.setCustomId("menu")
-		.setPlaceholder("Kart seç")
-		.addOptions(
-			dcmodule.enum_keys(card_no).map((i: card_no) => {
-				return { label: card_texts[i].title, value: i.toString(), };
-			})
-		),
-	);
-	const buttons = new MessageActionRow().addComponents(new MessageButton()
-		.setCustomId("buttons")
-		.setLabel("Seçili kartı oyna")
-		.setStyle("PRIMARY"),
-	);
-
-	const response: any = { content: "`Deste`", components: [menu, buttons], ephemeral: true };
-
-	if (interaction instanceof CommandInteraction) {
-		await interaction.reply(response);
+export const c = new class deste extends command
+{
+	public constructor() {
+		super(deste.name, "Kart oynama panelini açar");
 	}
-	else if (interaction instanceof SelectMenuInteraction) {
-		const no = Number(interaction.values[0]);
-		if (false == await dcmodule.is_in_range_otherwise_send_failure(module_name, no, card_no, "card_no", "card_no", interaction)) {
-			return;
+
+	public async execute(interaction: known_interactions, state: command_user_state): Promise<command_user_state | null>
+	{
+		const menu = new MessageActionRow().addComponents(new MessageSelectMenu()
+			.setCustomId("menu")
+			.setPlaceholder("Kart seç")
+			.addOptions(
+				dcmodule.enum_keys(card_no).map((i: card_no) => {
+					return { label: card_texts[i].title, value: i.toString(), };
+				})
+			),
+		);
+		const buttons = new MessageActionRow().addComponents(new MessageButton()
+			.setCustomId("buttons")
+			.setLabel("Seçili kartı oyna")
+			.setStyle("PRIMARY"),
+		);
+
+		const response: any = { content: "`Deste`", components: [menu, buttons], ephemeral: true };
+
+		if (interaction instanceof CommandInteraction) {
+			await interaction.reply(response);
 		}
-		response.embeds = [card_embed(no)];
-		await interaction.update(response);
+		else if (interaction instanceof SelectMenuInteraction) {
+			const no = Number(interaction.values[0]);
+			if (false === no in card_no) {
+				this.enum_error(no, "no", "card_no", interaction);
+				return null;
+			}
+			response.embeds = [card_embed(no)];
+			await interaction.update(response);
+		}
+		else if (interaction instanceof ButtonInteraction) {
+			response.content = "```Kart oynandi```";
+			await interaction.update(response);
+		}
+		return state;
 	}
-	else if (interaction instanceof ButtonInteraction) {
-		response.content = "```Kart oynandi```";
-		await interaction.update(response);
-	}
+	
 }

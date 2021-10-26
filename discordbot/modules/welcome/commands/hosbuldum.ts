@@ -5,7 +5,8 @@ import { ApplicationCommandPermissionTypes, MessageButtonStyles } from "discord.
 import { command_user_state, dcmodule, known_interactions } from "../../../module";
 import { assert } from "console";
 import { log } from "../../../log";
-import { command } from "../../command";
+import { command } from "../../../command";
+import { status, click_interaction, dfa_command } from "../../../command.dfa";
 
 // https://en.wikipedia.org/wiki/Deterministic_finite_automaton
 enum Q {
@@ -127,54 +128,42 @@ for (const key of get_enum_keys(d)) {
     assert(expected == actual2);
     assert(expected == actual3);
 }
+export const c = new class hosbuldum extends dfa_command<Q>
+{
 
-
-
-export const c = new class hosbuldum extends command {
-
-    public constructor() {
+    public constructor()
+    {
 
         const permissions = [
             { id: dcmodule.role_id_tp_uyesi, type: ApplicationCommandPermissionTypes.ROLE, permission: false, },
             { id: dcmodule.role_id_kidemli,  type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
             { id: dcmodule.role_id_kurucu,   type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
         ];
-        super(hosbuldum.name, 
+        super(
+            Object(Q),
+            d,
+            Q.basla,
+            hosbuldum.name, 
             "Türk programcılar onay sistemini başlatır",
             permissions);
     }
-    
-    public async execute(interaction : known_interactions, state : command_user_state) {
-    
-        if (false == await dcmodule.is_in_range_otherwise_send_failure(hosbuldum.name, state.state, Q, "state.state", "Q", interaction)) 
-            return null;
 
-        let chosen : number | undefined = undefined;
-        let q = state.state as Q;
-        const rollback_q = q;
-
-        // increment user state if its a button reaction
+    public async get_choice_index(interaction: click_interaction)
+    {
         if (interaction instanceof ButtonInteraction) {
+            const n = this.get_choice_from_custom_id(interaction.customId);
+            if (n !== undefined)
+                return n;
 
-            // try parse customId
-            const n = Number(interaction.customId);
-            if (isNaN(n) || n.toString() != interaction.customId) {
-                await dcmodule.respond_interaction_failure_to_user_and_log(hosbuldum.name, `customId[${interaction.customId}] is not a number`, interaction);
-                return null;
-            }
-
-            // check if button index is valid for the given state
-            if (false == await dcmodule.is_in_range_otherwise_send_failure(hosbuldum.name, n, d[q], "state.state", "Q", interaction)) 
-                return null;
-
-            // transition to next state
-            chosen = n;
-            q = state.state = d[q][n];
+            await this.log_and_reply_user(`customId[${interaction.customId}] is not a number`, interaction);
         }
-
+        return undefined;
+    }
+    public async process_new_state(new_q: Q, old_q: Q, i: Q | null, interaction: known_interactions): Promise<status>
+    {
         // prepare user interface
-        const question = state_question[q];
-        const choices  = state_choices[q];
+        const question = state_question[new_q];
+        const choices  = state_choices[new_q];
 
         let buttons = new MessageActionRow()
             .addComponents(
@@ -185,41 +174,44 @@ export const c = new class hosbuldum extends command {
             .setColor('#0099ff')
             .setDescription(question);
 
-
-        state.state = rollback_q;
-        if (q == Q.basla) {
-            let response : any = { ephemeral: true, embeds: [embed], components: [buttons] };
+        // if its beginning, send panel as reply
+        if (new_q == Q.basla) {
+            const response = { ephemeral: true, embeds: [embed], components: [buttons] };
             await interaction.reply(response);
         }
+        // if its not beginning, send panel as update
         else {
             interaction = interaction as ButtonInteraction;
-            let response : any = { embeds: [embed], components: choices.length == 0 ? [] : [buttons]};
+            const response = { embeds: [embed], components: choices.length == 0 ? [] : [buttons]};
             await interaction.update(response);
         }
-        state.state = q;
-
-        (async (n) => {
-            const channel = await interaction.guild?.channels.fetch(dcmodule.channel_id.sohbet);
+        (async (_i) => {
+            const cid = process.env.DCBOT_DEBUG !== undefined
+                ? dcmodule.channel_id.tpbot_test_odasi
+                : dcmodule.channel_id.sohbet
+                ;
+            const channel = await interaction.guild?.channels.fetch(cid);
             if (channel?.isText()) {
-                const user = dcmodule.get_user_info(interaction.user)
-                const msg = n !== undefined
-                    ? "```css\n"+`[${user.name}] id=${user.id} seçenek seçti = [${state_choices[rollback_q][n]}]`+"```"
+                const user = command.get_user_info(interaction.user)
+                const msg = _i !== null
+                    ? "```css\n"+`[${user.name}] id=${user.id} seçenek seçti = [${state_choices[old_q][_i]}]`+"```"
                     : "```css\n"+`[${user.name}] id=${user.id} #hosbuldum komutunu başlattı.`+"```"
                     ;
                 await channel.send(msg);
             }
-        })(chosen);
+        })(i);
 
-        if (q == Q.bitir) {
-            state.state = Q.basla;
+        // if its end, give user the role
+        if (new_q == Q.bitir) {
             // give user role
             const guild_user = await interaction.guild?.members.fetch(interaction.user);
             if (!guild_user) {
-                return null;
+                this.log.error("Can't fetch guild user at the end of hosbuldum command", command.get_user_info(interaction.user));
+                return status.finished;
             }
             await guild_user.roles.add(dcmodule.role_id_tp_uyesi);
-            return null;
+            return status.finished;
         }
-        return state;
+        return status.in_progress;
     }
 }

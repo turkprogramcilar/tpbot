@@ -1,7 +1,8 @@
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ApplicationCommandData, ApplicationCommandPermissionData, User } from 'discord.js';
-import { log, user_info } from '../log';
-import { command_module, command_user_state, known_interactions } from "../module";
+import { ApplicationCommandPermissionTypes } from 'discord.js/typings/enums';
+import { log, user_info } from './log';
+import { command_module, known_interactions, command_user_state, dcmodule } from './module';
 
 
 export abstract class command implements command_module {
@@ -12,23 +13,38 @@ export abstract class command implements command_module {
 
     public constructor(command_name: string, description: string, public readonly permissions: ApplicationCommandPermissionData[] | undefined = undefined) {
         
+        const DEBUG = process.env.DCBOT_DEBUG;
+        if (DEBUG !== undefined) {
+            command_name = "debug_"+command_name;
+        }
         this.data = new SlashCommandBuilder().setName(command_name).setDescription(description);
-        if (permissions)
+        if (DEBUG !== undefined) {
+            this.data = this.data.setDefaultPermission(false);
+            this.permissions = [
+                { id: dcmodule.role_id_kidemli,  type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
+                { id: dcmodule.role_id_kurucu,   type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
+            ];
+        }
+        else if (permissions)
             this.data = this.data.setDefaultPermission(true);
 
         this.log = new log(command_name);
     }
-
-
-    protected async is_in_range_otherwise_report_failure<T extends object>(value : number, enum_t : T, value_name : string, enum_name : string, interaction : known_interactions) : Promise<boolean> {
+    protected is_in_range<T extends object>(enum_t: T, value: number) {
         const casted_enum = Object.keys(enum_t) as (keyof T)[];
-        if (typeof casted_enum[value] === 'undefined') {
-            await this.respond_interaction_failure_to_user_and_log(`${value_name}[${value}] is out of range in ${enum_name} enum range`, interaction);
-            return false;
-        }
-        return true;
+        return typeof casted_enum[value] !== undefined;
     }
-    protected async respond_interaction_failure_to_user(interaction : known_interactions) {
+
+    protected async enum_error(value : number, value_name : string, enum_name : string, interaction : known_interactions) {
+        await this.log_and_reply_user(`${value_name}[${value}] is out of range in ${enum_name} enum range`, interaction);
+    }
+    protected async log_and_reply_user(msg : string, interaction : known_interactions) 
+    {
+        this.log.error(msg, command.get_user_info(interaction.user));
+        await command.respond_interaction_failure_to_user(interaction);
+    }
+    static async respond_interaction_failure_to_user(interaction : known_interactions)
+    {
         try {
             await interaction.reply({ content: 'Komut işlenirken hata oluştu. Lütfen bir süre sonra tekrar deneyin. Hatanın devam etmesi durumunda lütfen yetkililer ile iletişime geçin. Teşekkürler!', ephemeral: true });
         }
@@ -36,12 +52,8 @@ export abstract class command implements command_module {
             console.warn("respond failure to user failed with error: "+error)
         }
     }
-    protected async respond_interaction_failure_to_user_and_log(msg : string, interaction : known_interactions) {
-
-        this.log.error(msg, this.get_user_info(interaction.user));
-        return this.respond_interaction_failure_to_user(interaction);
-    }
-    protected get_user_info(user : User) : user_info {
+    static get_user_info(user : User) : user_info
+    {
         return {
             id: user.id,
             name: user.username,

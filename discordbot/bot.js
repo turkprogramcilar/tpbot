@@ -69,7 +69,7 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
 
         if (!path) {
             console.error("module not found: "+m);
-            exit(1);
+            process.exit(1);
         }
         
         const loaded = cloned_state.modern_boilerplate == true 

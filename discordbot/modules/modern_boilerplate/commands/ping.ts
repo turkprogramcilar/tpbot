@@ -1,7 +1,6 @@
-import { SlashCommandBuilder } from "@discordjs/builders";
-import { ApplicationCommandPermissionData, CommandInteraction } from "discord.js";
+import { CommandInteraction } from "discord.js";
+import { command } from "../../../command";
 import { known_interactions, command_user_state } from "../../../module";
-import { command } from "../../command";
 
 
 export const c = new class ping extends command {
