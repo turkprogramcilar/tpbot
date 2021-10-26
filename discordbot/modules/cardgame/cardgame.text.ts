@@ -13,7 +13,7 @@ export interface card_text {
     link: string,
     description: string
 }
-const texts: { [key in card_no]: card_text } =
+export const card_texts: { [key in card_no]: card_text } =
 {
     [card_no.efsanevi_ataturk]: {
         rarity: rarity.Destansı,

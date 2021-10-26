@@ -88,11 +88,11 @@ export class cardgame {
             this.used_abilities[ability.attack] = true;
         }
 
-        // direct damage if any @TODO instant_damage is removed. iterate each instant_effect
-        if (card.instant_damage) {
+        // direct damage if any @TODO instant_damage is removed. iterate each instant_effect @FIX
+        /*if (card.instant_damage) {
             this.target_hit(card.instant_damage.target);
             if (card.instant_damage.self) this.self_hit(card.instant_damage.self);
-        }
+        }*/ 
 
         const flips = [];
         // unroll the flips if any
@@ -112,7 +112,7 @@ export class cardgame {
             if (action != null) {
                 // test if this effect has attack ability
                 if (action.attack) {
-                    this.target_hit(action.attack.target);
+                    //this.target_hit(action.attack.target); @TODO FIX THIS @FIX
                     if (action.attack.self) this.self_hit(action.attack.self);
                 }
                 // test other cases
