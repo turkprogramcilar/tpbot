@@ -22,7 +22,7 @@ const constants = require("../../discordbot/constants");
 export type user_state_value = string | number | boolean | undefined;
 export type module_user_state = {[key : string] : user_state_value};
 
-interface command_module {
+export interface command_module {
     data : SlashCommandBuilder,
     execute : (interaction : CommandInteraction | ButtonInteraction, state : command_user_state) => Promise<boolean>,
     permissions : ApplicationCommandPermissionData[] | undefined,
@@ -176,7 +176,7 @@ export class dcmodule {
             const commandFiles = commands_folder_files.filter(file => file.endsWith('.js'));
 
             for (const file of commandFiles) {
-                const command : command_module = require("../../"+root+file.substring(0, file.length-3));
+                const command : command_module = require("../../"+root+file.substring(0, file.length-3)).c;
                 // Set a new item in the Collection
                 // With the key as the command name and the value as the exported module
                 this.commands.set(command.data.name, command);
