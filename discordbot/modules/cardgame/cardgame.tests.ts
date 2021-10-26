@@ -6,13 +6,13 @@ import { card_no, cards } from './cardgame.data';
 
 const tr = card_no.tatar_ramazan;
 
-const basicgame = () => new cardgame([tr,tr,tr], [tr,tr,tr]);
-const rng : (states : boolean[]) => () => boolean = (states : boolean[]) => {
+const basicgame = () => new cardgame([tr, tr, tr], [tr, tr, tr]);
+const rng: (states: boolean[]) => () => boolean = (states: boolean[]) => {
     let i = 0;
     return () => states[i++];
 }
 
-const card_test = (card : card_no, false_at : number, p1damage : number, p2damage : number) => () => {
+const card_test = (card: card_no, false_at: number, p1damage: number, p2damage: number) => () => {
     let booleans = Array(10).fill(true);
     booleans[false_at] = false;
 
@@ -37,7 +37,7 @@ describe('kart oyunu', () => {
     it("birden fazla saldiri kartini ayni tur icerisinde kullanilmasina izin vermez", () => {
         const game = basicgame();
         const saldiri_karti = tr; // tatar ramazan bir saldiri kartidir
-        
+
         // birinci oyuncu icin kontrol
         expect(game.play_card(1, saldiri_karti).OK).to.be.true;
         expect(game.play_card(1, saldiri_karti).OK).to.be.false;
@@ -49,8 +49,8 @@ describe('kart oyunu', () => {
     });
 
     it("bir oyuncunun cani 0a duserse oyunu diger oyuncu kazanir", () => {
-        
-        let game = new cardgame([tr,tr,tr], [tr,tr,tr], rng([true, true, true, true, true, true]));
+
+        let game = new cardgame([tr, tr, tr], [tr, tr, tr], rng([true, true, true, true, true, true]));
 
         game.play_card(1, tr);
         game.end_round();
@@ -63,8 +63,8 @@ describe('kart oyunu', () => {
         expect(game.play_card(1, tr).state).equals(game_state.win_p1);
         expect(game.players[1].health, "geri kalan cani, eger bozulursa belki hasarlar degistirilmistir").equals(40);
         expect(game.players[2].health, "geri kalan cani, eger bozulursa belki hasarlar degistirilmistir").equals(0);
-        
-        game = new cardgame([tr,tr,tr], [tr,tr,tr], rng([true, true, true, true, true, true]));
+
+        game = new cardgame([tr, tr, tr], [tr, tr, tr], rng([true, true, true, true, true, true]));
 
         //game.play_card(1, tr);
         game.end_round();
@@ -86,7 +86,7 @@ describe('kart oyunu', () => {
 describe('tatar ramazan karti', () => {
 
     it("50% sansla karsi tarafa hasar verir", () => {
-        const game = new cardgame([tr,tr,tr], [tr,tr,tr], rng([true, false]));
+        const game = new cardgame([tr, tr, tr], [tr, tr, tr], rng([true, false]));
 
         const p1was = game.players[1].health;
         const p2was = game.players[2].health;
@@ -112,16 +112,16 @@ describe('tatar ramazan karti', () => {
 });
 describe('korkusuz korkak karti', () => {
 
-    for (let i = 0; i <= 5; i++) 
-        it(`${i} kere yazi gelme sonucu ${i*20} hasar verir`, card_test(card_no.korkusuz_korkak, i, 0, i*20));
+    for (let i = 0; i <= 5; i++)
+        it(`${i} kere yazi gelme sonucu ${i * 20} hasar verir`, card_test(card_no.korkusuz_korkak, i, 0, i * 20));
 
-    it(`5 kere yazi gelme sonucu sistem durur ve 100 hasar verir sistem`, card_test(card_no.korkusuz_korkak, 7, 0, 5*20));
+    it(`5 kere yazi gelme sonucu sistem durur ve 100 hasar verir sistem`, card_test(card_no.korkusuz_korkak, 7, 0, 5 * 20));
 });
 
 describe('tivorlu ismail karti', () => {
 
     it("direkt olarak 20 hasar verir", card_test(card_no.tivorlu_ismail, 0, 0, 20));
-    it("1 yazida 30 hasar verir",      card_test(card_no.tivorlu_ismail, 1, 0, 30));
-    it("2 yazida 40 hasar verir",      card_test(card_no.tivorlu_ismail, 2, 0, 40));
+    it("1 yazida 30 hasar verir", card_test(card_no.tivorlu_ismail, 1, 0, 30));
+    it("2 yazida 40 hasar verir", card_test(card_no.tivorlu_ismail, 2, 0, 40));
     it("3 yazida 50 hasar verir fakat oyuncu 20 hasar alir", card_test(card_no.tivorlu_ismail, 3, 20, 50));
 });
