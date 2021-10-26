@@ -2,22 +2,10 @@ import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, Messa
 
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ApplicationCommandPermissionTypes, MessageButtonStyles } from "discord.js/typings/enums";
-import { command_user_state, dcmodule } from "../../../module";
+import { command_user_state, dcmodule, known_interactions } from "../../../module";
 import { assert } from "console";
 import { log } from "../../../log";
-
-const module_name = "hosbuldum";
-
-export const data = new SlashCommandBuilder()
-    .setName(module_name)
-    .setDescription('Türk programcılar onay sistemini başlatır')
-    .setDefaultPermission(true);
-
-export const permissions = [
-    { id: dcmodule.role_id_tp_uyesi,    type: ApplicationCommandPermissionTypes.ROLE, permission: false, },
-    { id: dcmodule.role_id_kidemli,     type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
-    { id: dcmodule.role_id_kurucu,      type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
-];
+import { command } from "../../command";
 
 // https://en.wikipedia.org/wiki/Deterministic_finite_automaton
 enum Q {
@@ -141,79 +129,97 @@ for (const key of get_enum_keys(d)) {
 }
 
 
-export async function execute(interaction : CommandInteraction | ButtonInteraction, state : command_user_state) : Promise<boolean> {
+
+export const c = new class hosbuldum extends command {
+
+    public constructor() {
+
+        const permissions = [
+            { id: dcmodule.role_id_tp_uyesi, type: ApplicationCommandPermissionTypes.ROLE, permission: false, },
+            { id: dcmodule.role_id_kidemli,  type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
+            { id: dcmodule.role_id_kurucu,   type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
+        ];
+        super(hosbuldum.name, 
+            "Türk programcılar onay sistemini başlatır",
+            permissions);
+    }
     
-    if (false == await dcmodule.is_in_range_otherwise_send_failure(module_name, state.state, Q, "state.state", "Q", interaction)) return true;
+    public async execute(interaction : known_interactions, state : command_user_state) {
+    
+        if (false == await dcmodule.is_in_range_otherwise_send_failure(hosbuldum.name, state.state, Q, "state.state", "Q", interaction)) 
+            return null;
 
-    let chosen : number | undefined = undefined;
-    let q = state.state as Q;
-    const rollback_q = q;
+        let chosen : number | undefined = undefined;
+        let q = state.state as Q;
+        const rollback_q = q;
 
-    // increment user state if its a button reaction
-    if (interaction instanceof ButtonInteraction) {
+        // increment user state if its a button reaction
+        if (interaction instanceof ButtonInteraction) {
 
-        // try parse customId
-        const n = Number(interaction.customId);
-        if (isNaN(n) || n.toString() != interaction.customId) {
-            await dcmodule.respond_interaction_failure_to_user_and_log(module_name, `customId[${interaction.customId}] is not a number`, interaction);
-            return true;
+            // try parse customId
+            const n = Number(interaction.customId);
+            if (isNaN(n) || n.toString() != interaction.customId) {
+                await dcmodule.respond_interaction_failure_to_user_and_log(hosbuldum.name, `customId[${interaction.customId}] is not a number`, interaction);
+                return null;
+            }
+
+            // check if button index is valid for the given state
+            if (false == await dcmodule.is_in_range_otherwise_send_failure(hosbuldum.name, n, d[q], "state.state", "Q", interaction)) 
+                return null;
+
+            // transition to next state
+            chosen = n;
+            q = state.state = d[q][n];
         }
 
-        // check if button index is valid for the given state
-        if (false == await dcmodule.is_in_range_otherwise_send_failure(module_name, n, d[q], "state.state", "Q", interaction)) return true;
+        // prepare user interface
+        const question = state_question[q];
+        const choices  = state_choices[q];
 
-        // transition to next state
-        chosen = n;
-        q = state.state = d[q][n];
-    }
+        let buttons = new MessageActionRow()
+            .addComponents(
+                choices.map((x, i) => new MessageButton().setCustomId(i+"").setLabel(x).setStyle(MessageButtonStyles.PRIMARY))
+            );
 
-    // prepare user interface
-    const question = state_question[q];
-    const choices  = state_choices[q];
-
-    let buttons = new MessageActionRow()
-        .addComponents(
-            choices.map((x, i) => new MessageButton().setCustomId(i+"").setLabel(x).setStyle(MessageButtonStyles.PRIMARY))
-        );
-
-    const embed = new MessageEmbed()
-        .setColor('#0099ff')
-        .setDescription(question);
+        const embed = new MessageEmbed()
+            .setColor('#0099ff')
+            .setDescription(question);
 
 
-    state.state = rollback_q;
-    if (q == Q.basla) {
-        let response : any = { ephemeral: true, embeds: [embed], components: [buttons] };
-        await interaction.reply(response);
-    }
-    else {
-        interaction = interaction as ButtonInteraction;
-        let response : any = { embeds: [embed], components: choices.length == 0 ? [] : [buttons]};
-        await interaction.update(response);
-    }
-    state.state = q;
-
-    (async (n) => {
-        const channel = await interaction.guild?.channels.fetch(dcmodule.channel_id.sohbet);
-        if (channel?.isText()) {
-            const user = dcmodule.get_user_info(interaction.user)
-            const msg = n !== undefined
-                ? "```css\n"+`[${user.name}] id=${user.id} seçenek seçti = [${state_choices[rollback_q][n]}]`+"```"
-                : "```css\n"+`[${user.name}] id=${user.id} #hosbuldum komutunu başlattı.`+"```"
-                ;
-            await channel.send(msg);
+        state.state = rollback_q;
+        if (q == Q.basla) {
+            let response : any = { ephemeral: true, embeds: [embed], components: [buttons] };
+            await interaction.reply(response);
         }
-    })(chosen);
-
-    if (q == Q.bitir) {
-        state.state = Q.basla;
-        // give user role
-        const guild_user = await interaction.guild?.members.fetch(interaction.user);
-        if (!guild_user) {
-            return true;
+        else {
+            interaction = interaction as ButtonInteraction;
+            let response : any = { embeds: [embed], components: choices.length == 0 ? [] : [buttons]};
+            await interaction.update(response);
         }
-        await guild_user.roles.add(dcmodule.role_id_tp_uyesi);
-        return true;
+        state.state = q;
+
+        (async (n) => {
+            const channel = await interaction.guild?.channels.fetch(dcmodule.channel_id.sohbet);
+            if (channel?.isText()) {
+                const user = dcmodule.get_user_info(interaction.user)
+                const msg = n !== undefined
+                    ? "```css\n"+`[${user.name}] id=${user.id} seçenek seçti = [${state_choices[rollback_q][n]}]`+"```"
+                    : "```css\n"+`[${user.name}] id=${user.id} #hosbuldum komutunu başlattı.`+"```"
+                    ;
+                await channel.send(msg);
+            }
+        })(chosen);
+
+        if (q == Q.bitir) {
+            state.state = Q.basla;
+            // give user role
+            const guild_user = await interaction.guild?.members.fetch(interaction.user);
+            if (!guild_user) {
+                return null;
+            }
+            await guild_user.roles.add(dcmodule.role_id_tp_uyesi);
+            return null;
+        }
+        return state;
     }
-    return false;
 }

@@ -25,7 +25,7 @@ export type module_user_state = {[key : string] : user_state_value};
 export type known_interactions = CommandInteraction | ButtonInteraction | SelectMenuInteraction
 export interface command_module {
     data : SlashCommandBuilder,
-    execute : (interaction : known_interactions, state : command_user_state) => Promise<boolean>,
+    execute : (interaction : known_interactions, state : command_user_state) => Promise<command_user_state | null>,
     permissions : ApplicationCommandPermissionData[] | undefined,
 };
 export interface command_user_state {
@@ -307,7 +307,7 @@ export class dcmodule {
 
         try {
 
-            const command_complete = await command_module.execute(interaction, state);
+            const command_complete = await command_module.execute(interaction, state) == null;
 
             if (command_complete) 
                 delete this.command_states[user_id];
