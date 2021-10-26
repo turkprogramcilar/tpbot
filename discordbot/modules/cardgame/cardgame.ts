@@ -1,4 +1,4 @@
-import { effect, card_no, cards, limit } from "./cardgame.data";
+import { action, card_no, cards, limit } from "./cardgame.data";
 
 // type definitions
 export enum ability {
@@ -13,7 +13,7 @@ export enum game_state {
 export interface round_result {
     played_player : number,
     played_cards  : number[],
-    flip_results  : effect[],
+    flip_results  : action[],
     next_player   : number,
     game_finished : boolean,
     game_result   : game_state,
@@ -97,7 +97,7 @@ export class cardgame {
         // unroll the flips if any
         for (const {heads, tails} of card.flips ?? []) {
 
-            let action : effect | null;
+            let action : action | null;
 
             const flip = this.flipper();
             flips.push(flip);
