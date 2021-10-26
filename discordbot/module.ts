@@ -3,7 +3,7 @@ import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 import { assert } from "console";
 import { channel } from "diagnostic_channel";
-import { Message, Client, User, PartialUser, MessageReaction, Presence, GuildManager, Guild, GuildChannel, TextChannel, Interaction, CommandInteraction, Collection, ApplicationCommandData, ApplicationCommandPermissionData, ButtonInteraction } from "discord.js";
+import { Message, Client, User, PartialUser, MessageReaction, Presence, GuildManager, Guild, GuildChannel, TextChannel, Interaction, CommandInteraction, Collection, ApplicationCommandData, ApplicationCommandPermissionData, ButtonInteraction, SelectMenuInteraction } from "discord.js";
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ApplicationCommandOptionTypes, ApplicationCommandPermissionTypes } from 'discord.js/typings/enums';
 import { log, user_info } from './log';
@@ -22,9 +22,10 @@ const constants = require("../../discordbot/constants");
 export type user_state_value = string | number | boolean | undefined;
 export type module_user_state = {[key : string] : user_state_value};
 
+export type known_interactions = CommandInteraction | ButtonInteraction | SelectMenuInteraction
 export interface command_module {
     data : SlashCommandBuilder,
-    execute : (interaction : CommandInteraction | ButtonInteraction, state : command_user_state) => Promise<boolean>,
+    execute : (interaction : known_interactions, state : command_user_state) => Promise<boolean>,
     permissions : ApplicationCommandPermissionData[] | undefined,
 };
 export interface command_user_state {
@@ -80,7 +81,21 @@ export class dcmodule {
     }
 
     // static methods
-    static async respond_interaction_failure_to_user(it : CommandInteraction | ButtonInteraction) {
+    static enum_keys<T extends Object>(enum_t : T) : number[] {
+        let o = Object.keys(enum_t);
+        o = o.filter(x => !isNaN(Number(x)) ) ;
+        console.log(o);
+        return  o as unknown[] as number[];
+    }
+    static async is_in_range_otherwise_send_failure<T extends object>(module_name : string, value : number, enum_t : T, value_name : string, enum_name : string, interaction : known_interactions) : Promise<boolean> {
+        const casted_enum = Object.keys(enum_t) as (keyof T)[];
+        if (typeof casted_enum[value] === 'undefined') {
+            await dcmodule.respond_interaction_failure_to_user_and_log(module_name, `${value_name}[${value}] is out of range in ${enum_name} enum range`, interaction);
+            return false;
+        }
+        return true;
+    }
+    static async respond_interaction_failure_to_user(it : known_interactions) {
         try {
             await it.reply({ content: 'Komut işlenirken hata oluştu. Lütfen bir süre sonra tekrar deneyin. Hatanın devam etmesi durumunda lütfen yetkililer ile iletişime geçin. Teşekkürler!', ephemeral: true });
         }
@@ -88,7 +103,7 @@ export class dcmodule {
             console.warn("respond to user failure failed with error: "+error)
         }
     }
-    static async respond_interaction_failure_to_user_and_log(module_name : string, msg : string, it : CommandInteraction | ButtonInteraction) {
+    static async respond_interaction_failure_to_user_and_log(module_name : string, msg : string, it : known_interactions) {
 
         new log(module_name).error(msg, this.get_user_info(it.user));
         return this.respond_interaction_failure_to_user(it);
@@ -240,8 +255,8 @@ export class dcmodule {
         const user_id = interaction.user.id;
         const user_info = dcmodule.get_user_info(interaction.user);
 
-        let command_module;
-        let state;
+        let command_module: command_module | undefined;
+        let state: command_user_state;
 
         if (interaction.isCommand()) {
 
@@ -254,8 +269,8 @@ export class dcmodule {
     
             // if user already started a command, dont start another one
             state = this.command_states[user_id] 
-            if (state)
-                return await interaction.reply({content: "Lütfen önceden çalıştırdığınız komutu tamamlayınız.", ephemeral: true });
+            //if (state)
+              //  return await interaction.reply({content: "Lütfen önceden çalıştırdığınız komutu tamamlayınız.", ephemeral: true });
             
             // if user_id exists already, it will be overridden with state = 0
             // so that it pushes user to the first stage of the command
@@ -264,13 +279,13 @@ export class dcmodule {
                 state: 0,
             }
         }
-        else if (interaction.isButton()) {
+        else if (interaction.isButton() || interaction.isSelectMenu()) {
             
             // assuming button is always triggered from a command
             const user_state = this.command_states[user_id];
 
             if (!user_state) {
-                this.log.warn("A button interaction's user_state cannot be found.", user_info);
+                this.log.warn("A button or select menu interaction's user_state cannot be found.", user_info);
                 await dcmodule.respond_interaction_failure_to_user(interaction);
                 return;
             }
@@ -278,7 +293,7 @@ export class dcmodule {
             const comm_id = user_state.command_id;
             command_module = this.commands.get(comm_id);
             if (!command_module) {
-                this.log.warn(`command id[${comm_id}] is not found in commands when interacting with button`, user_info)
+                this.log.warn(`command id[${comm_id}] is not found in commands when interacting with button or select menu`, user_info)
                 return;
             }
             
@@ -286,7 +301,7 @@ export class dcmodule {
         }
         else {
 
-            this.log.warn("An interaction neither button nor command is received", user_info)
+            this.log.warn("An interaction neither button, select menu nor command is received", user_info)
             return;
         }
 
