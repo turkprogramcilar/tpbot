@@ -5,7 +5,6 @@ const fs      = require("fs").promises;
 const php     = require("./php.js");
 const tools   = require("./tools.js");
 const parser  = require("./cmdparser.js");
-const status  = require("./marquee_status.js");
 
 const Discord = require('discord.js');
 const htmlp   = require('node-html-parser');
@@ -70,7 +69,7 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
 
         if (!path) {
             console.error("module not found: "+m);
-            exit(1);
+            process.exit(1);
         }
         
         const loaded = cloned_state.modern_boilerplate == true 
@@ -90,7 +89,8 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
         for (const m of modules) 
             m.on_event('ready', {});
 
-        status.init(client, msg_status);
+        
+            require("./marquee_status.js").init(client, msg_status);
     });
 
     for (const evt of ['presenceUpdate']) {
