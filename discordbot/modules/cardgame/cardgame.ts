@@ -1,9 +1,5 @@
-import { action, card_no, cards, limit } from "./cardgame.data";
+import { action, card_no, cards, limit, card } from "./cardgame.data";
 
-// type definitions
-export enum ability {
-    attack,
-}
 export enum game_state {
     unfinished = -1,
     draw = 0,
@@ -26,10 +22,11 @@ interface player {
     health: number,
     cards: card_no[],
 }
-// default consts
-const default_abilities: { [key in ability]: boolean } = {
-    [ability.attack]: false,
-};
+
+const a = {
+    [limit.attack_category]: true,
+    300: false
+}
 const default_round_result: round_result = {
     played_player: 0,
     played_cards: [],
@@ -47,8 +44,7 @@ export class cardgame {
     //who's turn?
     turn: number = 1;
     round_result: round_result = { ...default_round_result };
-    // current player's abilities
-    used_abilities: { [key in ability]: boolean } = { ...default_abilities };
+    // current round limits
 
     // ctor (lol put some green text here as a place holder so it fits nicely as a single line)
     constructor(p1cards: number[], p2cards: number[],
@@ -72,20 +68,19 @@ export class cardgame {
     // plays the given card for the player, since player can play theoritically all cards
     // in hands this method could be called more than once
     public play_card(player: number, no: card_no): { OK: boolean, state: game_state, flips?: boolean[], reason?: string } {
+
         if (this.turn != player) throw new Error("Illegal operation on play_card. Turn is not equal to player number");
 
         //@TODO check if player has the card?! at index probably
 
-        //@TODO alpha version constraint here, remove it when its no longer needed
-        if ([16, 5, 14].includes(no) == false) throw new Error("Alpha");
 
         // get the card object
         const card = cards[no];
 
         // check if this is a attack card and player has already used one before
         if (card.play_limit == limit.attack_category) {
-            if (this.used_abilities[ability.attack]) return { OK: false, state: this.state(), reason: "Bu tur içerisinde başka saldırı kartı oynayamazsınız" };
-            this.used_abilities[ability.attack] = true;
+            if (this.limits[limit.attack]) return { OK: false, state: this.state(), reason: "Bu tur içerisinde başka saldırı kartı oynayamazsınız" };
+            this.limits[limit.attack] = true;
         }
 
         // direct damage if any @TODO instant_damage is removed. iterate each instant_effect @FIX
@@ -94,18 +89,25 @@ export class cardgame {
             if (card.instant_damage.self) this.self_hit(card.instant_damage.self);
         }*/ 
 
-        const flips = [];
         // unroll the flips if any
-        for (const { heads, tails } of card.flips ?? []) {
+        this.flip_coins(card);
+        
+
+        // remove the card from the deck @TODO
+        return { OK: true, state: this.state(), flips: flips };
+    }
+    private flip_coins(card: card) {
+        const flips: boolean[] =  [];
+        for (const { heads: heads_action, tails: tails_action } of card.flips ?? []) {
 
             let action: action | null;
 
-            const flip = this.flipper();
-            flips.push(flip);
-            if (flip && heads != undefined)
-                action = heads;
-            else if (tails != undefined)
-                action = tails;
+            const heads = this.flipper();
+            flips.push(heads);
+            if (heads && heads_action !== undefined)
+                action = heads_action;
+            else if (tails_action !== undefined)
+                action = tails_action;
             else
                 action = null;
 
@@ -119,11 +121,9 @@ export class cardgame {
                 //..
             }
 
-            if (!flip && card.tail_break) break;
+            if (!heads && card.tail_break) break;
         }
-
-        // remove the card from the deck @TODO
-        return { OK: true, state: this.state(), flips: flips };
+        return flips;
     }
 
     private state(): game_state {
@@ -136,7 +136,7 @@ export class cardgame {
     // ends the round for current player
     public end_round(): round_result {
         this.turn = this.target_of(this.turn);
-        this.used_abilities = { ...default_abilities };
+        this.limits = { ...default_abilities };
         return this.round_result;
     }
 
