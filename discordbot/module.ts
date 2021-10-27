@@ -41,10 +41,11 @@ const FORBIDDEN_KEYS : string[] = [MS_DCUSERS, MS_BULK];
 
 export class dcmodule {
     // some constants
-    static readonly guild_id_tp         : string = constants.sid.tpdc;
-    static readonly role_id_kurucu      : string = constants.rid.kurucu;
-    static readonly role_id_kidemli     : string = constants.rid.kidemli;
-    static readonly role_id_tp_uyesi    : string = constants.rid.tp_uyesi;
+    static readonly guild_id_tp     : string = constants.sid.tpdc;
+    static readonly role_id_kurucu  : string = constants.rid.kurucu;
+    static readonly role_id_kidemli : string = constants.rid.kidemli;
+    static readonly role_id_tp_uyesi: string = constants.rid.tp_uyesi;
+    static readonly role_id_gozalti : string = constants.rid.gozalti;
     //
     static readonly channel_id = {
         proje_paylas         : constants.cid.proje_paylas,
@@ -53,6 +54,7 @@ export class dcmodule {
         kafamda_deli_sorular : constants.cid.kafamda_deli_sorular,
         kodlama_disi_sor     : constants.cid.kodlama_disi_sor,
         bir_bak_buraya       : constants.cid.bir_bak_buraya,
+        roller               : constants.cid.roller,
         yonetim_dedikodu     : constants.cid.yonetim_dedikodu,
         sohbet               : constants.cid.sohbet,
 

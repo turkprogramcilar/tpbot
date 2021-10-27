@@ -14,36 +14,37 @@ enum Q {
     yardim, sohbet, proje, reklam,
     acil, sabirli,
     yazilim, bilgisayar, diger,
-    bitir,
+    roller, bitir
 }
 const d : { [key in Q]: Q[] } = {
     [Q.basla] : [Q.yardim, Q.sohbet, Q.proje, Q.reklam],
 
     [Q.yardim]: [Q.yazilim, Q.bilgisayar, Q.diger],
-    [Q.sohbet]: [Q.bitir],
-    [Q.proje] : [Q.bitir],
-    [Q.reklam]: [Q.bitir],
+    [Q.sohbet]: [Q.roller],
+    [Q.proje] : [Q.roller],
+    [Q.reklam]: [Q.roller],
 
     [Q.yazilim]   : [Q.acil, Q.sabirli],
     [Q.bilgisayar]: [Q.acil, Q.sabirli],
-    [Q.diger]     : [Q.bitir],
+    [Q.diger]     : [Q.roller],
 
-    [Q.acil]   : [Q.bitir],
-    [Q.sabirli]: [Q.bitir],
+    [Q.acil]   : [Q.roller],
+    [Q.sabirli]: [Q.roller],
 
+    [Q.roller]: [Q.bitir],
     [Q.bitir]: [],
 };
-const label_bitir = ["Teşekkürler"];
-const label_topics = [
+const choice_thanks = ["Teşekkürler"];
+const choice_topics = [
     "Yazılım ile ilgili",
     "Bilgisayar, donanım, teknik veya bir arıza ile ilgili",
     "Yazılıma başlangıç tavsiyesi, üniversiteler veya başka merak ettiğim bir konu",
 ];
-const label_priorities = [
+const choice_priorities = [
     "Durumum acil",
     "Sabırlıyım teşekkürler.",
 ];
-const state_choices : { [key in Q]: string[] } = {
+const choice_labels : { [key in Q]: string[] } = {
     [Q.basla]: [
         "Yardıma ihtiyacım var",
         "Sohbet",
@@ -51,21 +52,22 @@ const state_choices : { [key in Q]: string[] } = {
         "Reklam veya partnerlik",
     ],
     
-    [Q.yardim]: label_topics,
-    [Q.sohbet]: label_bitir,
-    [Q.proje] : label_bitir,
-    [Q.reklam]: label_bitir,
+    [Q.yardim]: choice_topics,
+    [Q.sohbet]: choice_thanks,
+    [Q.proje] : choice_thanks,
+    [Q.reklam]: choice_thanks,
 
-    [Q.yazilim]   : label_priorities,
-    [Q.bilgisayar]: label_priorities,
-    [Q.diger]     : label_bitir,
+    [Q.yazilim]   : choice_priorities,
+    [Q.bilgisayar]: choice_priorities,
+    [Q.diger]     : choice_thanks,
 
-    [Q.acil]   : label_bitir,
-    [Q.sabirli]: label_bitir,
+    [Q.acil]   : choice_thanks,
+    [Q.sabirli]: choice_thanks,
 
+    [Q.roller]  : choice_thanks,
     [Q.bitir]  : [],
 };
-const state_channel : { [key in Q]: string } = {
+const channel_mentions : { [key in Q]: string } = {
     [Q.basla]: "",
     
     [Q.yardim]: "",
@@ -77,35 +79,75 @@ const state_channel : { [key in Q]: string } = {
     [Q.bilgisayar]: `<#${dcmodule.channel_id.kodlama_disi_sor}>`,
     [Q.diger]     : `<#${dcmodule.channel_id.kafamda_deli_sorular}>`,
 
-    [Q.acil]   : `<#${dcmodule.channel_id.bir_bak_buraya}>`,
-    [Q.sabirli]: `<#${dcmodule.channel_id.bir_bak_buraya}>`,
+    [Q.acil]   : ``,
+    [Q.sabirli]: ``,
 
-    [Q.bitir]  : `<#${dcmodule.channel_id.bir_bak_buraya}>`,
+    [Q.roller]: `<#${dcmodule.channel_id.roller}> ve <#${dcmodule.channel_id.bir_bak_buraya}>`,
+    [Q.bitir]: ``,
 };
+
 const holy_title = "Türk Programcılar Discord Sunucusu";
 const priority_question = "Durumunuzun aciliyeti var mıdır?";
-const priority_response = `Soru sormadan önce ${state_channel[Q.acil]} kanalındaki \`YARDIM ISTERKEN\` kısmınızı okumanız gerekmektedir. Bu sizin yardım alma sürecinizi bir hayli hızlandıracaktır.`;
-const state_question : { [key in Q]: string } = {
+const priority_response = `Soru sormadan önce lütfen aşağıdakilere önem gösterin. Bu sizin yardım alma sürecinizi bir hayli hızlandıracaktır.`+
+"```diff"+`
+- "Falan dili bilen var mı?", "Yardım edebilecek var mı?", "Yardım edebilir misiniz?" gibi sorular sormaktansa sorunuzu "Soru Sor" kategorisi altındaki uygun ve müsait kanallarda direk olarak sorabilirsiniz.
+
+# Soruları gelişi güzel sormak veya konu ile ilgili çok az detay vermek cozum surecini uzatabilir
+
+# Kodunuzu, aldığınız hatayı ve ne yapmak istediğinizi detaylı ve anlaşılır bir dil ile belirtin.
+
+# Kodunuzu ekran görüntüsü olarak değil düzgün ve formatlı bir şekilde aldığınız hata ile paylaşın.
+
+# Üstte belirtilen işlemleri yaptıktan sonra sabırla yardım bekleyin. Başka kanallarda "Falan kanaldaki soruya bakar mısınız?" şeklinde mesajlar atmayın.
+
+# Size yardımcı olan kişilere sizde yardımcı olun. Size yönelttikleri sorulara düzgün cevaplar verin. Sizden denemenizi istedikleri şeyleri gerçekten deneyin.
+`+"```";
+
+const embed_bodies : { [key in Q]: string } = {
+
     [Q.basla]: `${holy_title}'na hoşgeldin. 
 Sana birkaç sorumuz olacak. 
 Bu seni en doğru şekilde hızlı yönlendirebilmemiz için gerekli. 
 Ziyaret amacınız aşağıdakilerin hangisine en yakın?`,
     
-    [Q.yardim]: "Ne konuda yardıma ihtiyacınız var?",
+    [Q.yardim]: "Yasak olan eylemler:```diff"+`
+- Baskasinin sinavina girmek ve bu konuda yardim istemek
+# Sunucu üyelerini özelden rahatsız etmek\n`+
+"```"+"Ne konuda yardıma ihtiyacınız var?",
     [Q.sohbet]: "Birbirimizi motive ettiğimiz, her gün yeni birşeyler öğrenmeye teşvik ettiğimiz sunucumuzda; kodlama yarışmaları ve eğlenceli birçok diğer aktiviteleri de keşvedebilirsin.",
     [Q.proje] : `${holy_title}'nda kendi geliştirdiğiniz projeleri açık kaynaklı, github/gitlab gibi platformlardan olma koşulu ile paylaşabilirsiniz.
 Bunun dışındaki paylaşımlara izin verilmemektedir.
-${state_channel[Q.proje]} kanalından paylaşımınızı yapabilirsiniz.`,
-    [Q.reklam]: `Partnerlik veya reklam için ${state_channel[Q.reklam]} kanalına mesaj bırakınız. Yetkililier sizinle iletişime geçecektir.`,
+${channel_mentions[Q.proje]} kanalından paylaşımınızı yapabilirsiniz.`,
+    [Q.reklam]: `Partnerlik veya reklam için ${channel_mentions[Q.reklam]} kanalına mesaj bırakınız. Yetkililier sizinle iletişime geçecektir.`,
 
-    [Q.yazilim]   : `Yazılım soruları için \`SORULAR\` kategorisi altındaki ${state_channel[Q.yazilim]} kanalını kullanınız. ` + priority_question,
-    [Q.bilgisayar]: `Konu ile ilgili sorunuzu \`SORULAR\` kategorisi altındaki ${state_channel[Q.bilgisayar]} kanalına sorunuz. ` + priority_question,
-    [Q.diger]     : `Konu ile ilgili sorunuzu \`SORULAR\` kategorisi altındaki ${state_channel[Q.diger]} kanalına sorunuz. `,
+    [Q.yazilim]   : `Yazılım soruları için \`SORULAR\` kategorisi altındaki ${channel_mentions[Q.yazilim]} kanalını kullanınız. ` + priority_question,
+    [Q.bilgisayar]: `Konu ile ilgili sorunuzu \`SORULAR\` kategorisi altındaki ${channel_mentions[Q.bilgisayar]} kanalına sorunuz. ` + priority_question,
+    [Q.diger]     : `Konu ile ilgili sorunuzu \`SORULAR\` kategorisi altındaki ${channel_mentions[Q.diger]} kanalına sorunuz. `,
 
     [Q.acil]   : priority_response,
     [Q.sabirli]: priority_response,
 
-    [Q.bitir]  : `Son olarak ${state_channel[Q.bitir]} kanalına`+" gözatmayı unutmayın. Keyifli bir vakit geçirmeniz dileğiyle.```Onay sistemi sonlandırıldı.```",
+    [Q.roller]: `Son olarak rol almak için ${channel_mentions[Q.roller]} kanalına`+" gözatmayı unutmayın.",
+    [Q.bitir]: " Keyifli bir vakit geçirmeniz dileğiyle.```Onay sistemi sonlandırıldı.```",
+}
+const images: { [key in Q]: string | undefined} =
+{
+    [Q.basla]: undefined,
+
+    [Q.yardim]: undefined,
+    [Q.sohbet]: "https://cdn.discordapp.com/attachments/851031980250103888/902865735100026910/unknown.png",
+    [Q.proje]: "https://cdn.discordapp.com/attachments/851031980250103888/902871153364840458/unknown.png",
+    [Q.reklam]: "https://cdn.discordapp.com/attachments/851031980250103888/902865828163244062/unknown.png",
+
+    [Q.yazilim]: "https://cdn.discordapp.com/attachments/851031980250103888/902829309960531989/unknown.png",
+    [Q.bilgisayar]: "https://cdn.discordapp.com/attachments/851031980250103888/902833500657426452/unknown.png",
+    [Q.diger]     : "https://cdn.discordapp.com/attachments/851031980250103888/902832985542373397/unknown.png",
+
+    [Q.acil]   : undefined,
+    [Q.sabirli]: undefined,
+
+    [Q.roller]  : "https://cdn.discordapp.com/attachments/851031980250103888/902905690014769162/unknown.png",
+    [Q.bitir]: "https://cdn-longterm.mee6.xyz/plugins/commands/images/698972054740795453/e62465793edaaf32a86f446e22526d715bf02d00cecfdc2b6fbd99e30c603988.gif",
 }
 
 // a little assertion that would eliminate headache of unsynchronized d table and state_labels
@@ -115,15 +157,15 @@ const get_enum_keys = <T extends object>(enum_t : T) : (keyof T)[] => {
 }
 for (const key of get_enum_keys(d)) {
     const expected = d[key].length;
-    const actual   = state_choices[key].length;
+    const actual   = choice_labels[key].length;
     assert(expected == actual);
 }
 // empty scope
 {
     const expected = get_enum_keys(d).length;
-    const actual   = get_enum_keys(state_question).length;
-    const actual2  = get_enum_keys(state_choices).length;
-    const actual3  = get_enum_keys(state_channel).length;
+    const actual   = get_enum_keys(embed_bodies).length;
+    const actual2  = get_enum_keys(choice_labels).length;
+    const actual3  = get_enum_keys(channel_mentions).length;
     assert(expected == actual);
     assert(expected == actual2);
     assert(expected == actual3);
@@ -136,6 +178,7 @@ export const c = new class hosbuldum extends dfa_command<Q>
 
         const permissions = [
             { id: dcmodule.role_id_tp_uyesi, type: ApplicationCommandPermissionTypes.ROLE, permission: false, },
+            { id: dcmodule.role_id_gozalti,  type: ApplicationCommandPermissionTypes.ROLE, permission: false, },
             { id: dcmodule.role_id_kidemli,  type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
             { id: dcmodule.role_id_kurucu,   type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
         ];
@@ -162,8 +205,8 @@ export const c = new class hosbuldum extends dfa_command<Q>
     public async process_new_state(new_q: Q, old_q: Q, i: Q | null, interaction: known_interactions): Promise<status>
     {
         // prepare user interface
-        const question = state_question[new_q];
-        const choices  = state_choices[new_q];
+        const question = embed_bodies[new_q];
+        const choices  = choice_labels[new_q];
 
         let buttons = new MessageActionRow()
             .addComponents(
@@ -173,6 +216,14 @@ export const c = new class hosbuldum extends dfa_command<Q>
         const embed = new MessageEmbed()
             .setColor('#0099ff')
             .setDescription(question);
+
+        const image_path = images[new_q];
+        if (image_path !== undefined) {
+            if (new_q == Q.bitir)
+                embed.setThumbnail(image_path);
+            else
+                embed.setImage(image_path);
+        }
 
         // if its beginning, send panel as reply
         if (new_q == Q.basla) {
@@ -194,8 +245,8 @@ export const c = new class hosbuldum extends dfa_command<Q>
             if (channel?.isText()) {
                 const user = command.get_user_info(interaction.user)
                 const msg = _i !== null
-                    ? "```css\n"+`[${user.name}] id=${user.id} seçenek seçti = [${state_choices[old_q][_i]}]`+"```"
-                    : "```css\n"+`[${user.name}] id=${user.id} #hosbuldum komutunu başlattı.`+"```"
+                    ? "```css\n"+`[${user.name}] seçenek seçti [${choice_labels[old_q][_i]}] id=${user.id} `+"```"
+                    : "```css\n"+`[${user.name}] #hosbuldum komutunu başlattı.  id=${user.id}`+"```"
                     ;
                 await channel.send(msg);
             }
