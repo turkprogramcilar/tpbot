@@ -1,4 +1,7 @@
+import { helper } from "../../helper";
 import { action, card_no, cards, limit, card } from "./cardgame.data";
+import { attack_cooldown, player } from "./cardgame.player";
+import { card_texts } from "./cardgame.text";
 
 export enum game_state {
     unfinished = -1,
@@ -17,16 +20,6 @@ export interface round_result {
 export interface buff {
     immunity?: boolean,
 }
-interface player {
-    buffs: buff[],
-    health: number,
-    cards: card_no[],
-}
-
-const a = {
-    [limit.attack_category]: true,
-    300: false
-}
 const default_round_result: round_result = {
     played_player: 0,
     played_cards: [],
@@ -38,6 +31,8 @@ const default_round_result: round_result = {
 
 export class cardgame {
 
+    private readonly roll_scale = 
+        helper.get_enum_keys(card_no).map(x => card_texts[x as card_no].rarity as number)
     players: { [key: number]: player };
     // total rounds so far
     round: number = 1;
@@ -47,40 +42,42 @@ export class cardgame {
     // current round limits
 
     // ctor (lol put some green text here as a place holder so it fits nicely as a single line)
-    constructor(p1cards: number[], p2cards: number[],
+    constructor(
+        p1cards?: number[],
+        p2cards?: number[],
         private flipper: (() => boolean) = () => (Math.random() < .5),
-        private logger: (msg: string) => void = (s) => { }) {
-        const starting_health = 120;
+        private logger: (msg: string) => void = (s) => { }) 
+    {
         this.players = {
-            1: {
-                health: starting_health,
-                cards: p1cards,
-                buffs: [],
-            },
-            2: {
-                health: starting_health,
-                cards: p2cards,
-                buffs: [],
-            },
+            1: new player(p1cards as card_no[]),
+            2: new player(p2cards as card_no[]),
         }
     }
 
     // plays the given card for the player, since player can play theoritically all cards
     // in hands this method could be called more than once
-    public play_card(player: number, no: card_no): { OK: boolean, state: game_state, flips?: boolean[], reason?: string } {
+    public play_card(player: number, index: number): { OK: boolean, state: game_state, flips?: boolean[], reason?: string } {
 
-        if (this.turn != player) throw new Error("Illegal operation on play_card. Turn is not equal to player number");
-
-        //@TODO check if player has the card?! at index probably
-
+        if (this.turn != player) {
+            return this.result(false, "Illegal operation on play_card. Turn is not equal to player number");
+        }
+        // get current player
+        const current_player = this.players[this.turn];
 
         // get the card object
+        const no: card_no | undefined = current_player.cards[index];
+        if (no === undefined) {
+            return this.result(false);
+        }
         const card = cards[no];
 
         // check if this is a attack card and player has already used one before
         if (card.play_limit == limit.attack_category) {
-            if (this.limits[limit.attack]) return { OK: false, state: this.state(), reason: "Bu tur içerisinde başka saldırı kartı oynayamazsınız" };
-            this.limits[limit.attack] = true;
+
+            if (current_player.has_buff(attack_cooldown)) 
+                return this.result(false, "Bu tur içerisinde başka saldırı kartı oynayamazsınız");
+
+            current_player.buff(attack_cooldown);
         }
 
         // direct damage if any @TODO instant_damage is removed. iterate each instant_effect @FIX
@@ -88,15 +85,22 @@ export class cardgame {
             this.target_hit(card.instant_damage.target);
             if (card.instant_damage.self) this.self_hit(card.instant_damage.self);
         }*/ 
+        for (const action of card.actions ?? [])
+            this.do_card_action(action);
 
         // unroll the flips if any
-        this.flip_coins(card);
+        this.flip_card_coins(card);
         
 
         // remove the card from the deck @TODO
         return { OK: true, state: this.state(), flips: flips };
     }
-    private flip_coins(card: card) {
+    private result(r: boolean, s: string = "")
+    {
+        return { OK: r, state: this.state(), reason: s };
+    }
+    // card-related processing methods @TODO might separate responsibility into card class
+    private flip_card_coins(card: card) {
         const flips: boolean[] =  [];
         for (const { heads: heads_action, tails: tails_action } of card.flips ?? []) {
 
@@ -125,7 +129,6 @@ export class cardgame {
         }
         return flips;
     }
-
     private state(): game_state {
         if (this.players[1].health == 0 && this.players[2].health == 0) return game_state.draw;
         if (this.players[1].health == 0) return game_state.win_p2;

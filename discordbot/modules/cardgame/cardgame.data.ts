@@ -27,17 +27,18 @@ export enum trigger {
 export enum target {
     self, enemy, both
 }
+export enum buff_category {
+    healing,
+    harming,
+    status,
+}
 export interface buff {
-    healing: boolean,
+    healing: buff_category,
     aim: target,
-    when: trigger,
+    // determined when the actions of this buff procs
+    when?: trigger,
     life: alive_until,
     actions: action[],
-}
-export interface modifier {
-}
-export enum effedct {
-
 }
 export interface action {
     attack?: damage,
@@ -108,7 +109,7 @@ export const cards: { [key in card_no]: card } = {
         play_limit: limit.unlimited,
         buffs: [
             {
-                healing: false,
+                healing: buff_category.harming,
                 aim: target.enemy,
                 when: trigger.round_begin,
                 life: alive_until.round_ends,
@@ -174,7 +175,7 @@ export const cards: { [key in card_no]: card } = {
         play_limit: limit.unlimited,
         buffs: [
             {
-                healing: false,
+                healing: buff_category.harming,
                 aim: target.enemy,
                 when: trigger.round_end,
                 life: alive_until.flip_heads,
