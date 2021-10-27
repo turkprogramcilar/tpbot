@@ -29,7 +29,7 @@ const default_round_result: round_result = {
     game_result: game_state.unfinished,
 }
 
-export class cardgame {
+export class game {
 
     private readonly roll_scale = 
         helper.get_enum_keys(card_no).map(x => card_texts[x as card_no].rarity as number)
