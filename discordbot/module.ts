@@ -83,13 +83,6 @@ export class dcmodule {
         return constants.groups.admins.includes(user_id);
     }
 
-    // static methods
-    static enum_keys<T extends Object>(enum_t : T) : number[] {
-        let o = Object.keys(enum_t);
-        o = o.filter(x => !isNaN(Number(x)) ) ;
-        return  o as unknown[] as number[];
-    }
-
     // init for module loader system defined in bot.js
     public async init(refState: any) {
 
