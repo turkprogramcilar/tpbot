@@ -7,6 +7,7 @@ import { command_user_state, dcmodule, known_interactions } from "../../../modul
 import { cardgame } from "../cardgame";
 import { user_info } from "../../../log";
 import { command } from "../../../command";
+import { helper } from "../../../helper";
 
 /*
 
@@ -66,7 +67,7 @@ export const c = new class deste extends command
 			.setCustomId("menu")
 			.setPlaceholder("Kart seç")
 			.addOptions(
-				dcmodule.enum_keys(card_no).map((i: card_no) => {
+				helper.get_enum_keys(card_no).map((i: card_no) => {
 					return { label: card_texts[i].title, value: i.toString(), };
 				})
 			),
