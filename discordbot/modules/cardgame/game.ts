@@ -1,7 +1,7 @@
 import { helper } from "../../helper";
-import { action, card_no, cards, limit, card } from "./cardgame.data";
-import { attack_cooldown, player } from "./cardgame.player";
-import { card_texts } from "./cardgame.text";
+import { action, card_no, cards, limit, card } from "./data";
+import { attack_cooldown, player } from "./player";
+import { card_texts } from "./texts";
 
 export enum game_state {
     unfinished = -1,

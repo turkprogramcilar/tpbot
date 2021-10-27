@@ -1,8 +1,8 @@
 import { fail } from 'assert';
 import { expect } from 'chai';
 import { describe } from 'mocha'
-import { cardgame, game_state } from './cardgame';
-import { card_no, cards } from './cardgame.data';
+import { cardgame, game_state } from './game';
+import { card_no, cards } from './data';
 
 const tr = card_no.tatar_ramazan;
 
