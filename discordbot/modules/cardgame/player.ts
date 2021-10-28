@@ -17,6 +17,12 @@ export class player
 
     }
 
+    public hit(amount: number, percentage: boolean) {
+        this.change_health(-amount, percentage);
+    }
+    public heal(amount: number, percentage: boolean) {
+        this.change_health(amount, percentage);
+    }
     public buff(buff: buff) {
         this.buffs.push(buff);
     }
@@ -24,4 +30,11 @@ export class player
         return this.buffs.includes(buff);
     }
 
+    private change_health(amount: number, percentage: boolean) {
+
+        if (percentage) {
+            amount = this.max_health * amount;
+        }
+        this.health += amount;
+    }
 }

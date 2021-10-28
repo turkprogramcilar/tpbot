@@ -69,7 +69,7 @@ export interface action {
     // paralyze
     paralyze?: boolean,
 }
-export interface flip_coin {
+export interface coin_action {
     heads?: action,
     tails?: action,
 }
@@ -79,7 +79,7 @@ export interface card {
     play_limit: limit,
     // instantaneous actions soon as card is played
     actions?: action[],
-    flips?: flip_coin[],
+    flips?: coin_action[],
     // if true flips[] will be not fully iterated when a coin is tail
     tail_break?: boolean,
     buffs?: buff[],

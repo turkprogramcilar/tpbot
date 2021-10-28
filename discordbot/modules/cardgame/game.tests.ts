@@ -1,12 +1,12 @@
 import { fail } from 'assert';
 import { expect } from 'chai';
 import { describe } from 'mocha'
-import { game, game_state } from './game';
+import { cardgame, game_state } from './game';
 import { card_no, cards } from './data';
 
 const tr = card_no.tatar_ramazan;
 
-const basicgame = () => new game([tr, tr, tr], [tr, tr, tr]);
+const basicgame = () => new cardgame([tr, tr, tr], [tr, tr, tr]);
 const rng: (states: boolean[]) => () => boolean = (states: boolean[]) => {
     let i = 0;
     return () => states[i++];
@@ -16,7 +16,7 @@ const card_test = (card: card_no, false_at: number, p1damage: number, p2damage: 
     let booleans = Array(10).fill(true);
     booleans[false_at] = false;
 
-    const game = new game([card], [], rng(booleans));
+    const game = new cardgame([card], [], rng(booleans));
 
     const p1was = game.players[1].health;
     const p2was = game.players[2].health;
@@ -48,9 +48,14 @@ describe('kart oyunu', () => {
         expect(game.play_card(2, saldiri_karti).OK).to.be.false;
     });
 
+    it("birinci tur saldiri karti oynanir ikincisi oynanamaz ve ikinci tur saldiri karti oynanabilir tekrardan", () => {
+
+        fail("yapilacak");
+    });
+
     it("bir oyuncunun cani 0a duserse oyunu diger oyuncu kazanir", () => {
 
-        let game = new game([tr, tr, tr], [tr, tr, tr], rng([true, true, true, true, true, true]));
+        let game = new cardgame([tr, tr, tr], [tr, tr, tr], rng([true, true, true, true, true, true]));
 
         game.play_card(1, tr);
         game.end_round();
@@ -64,7 +69,7 @@ describe('kart oyunu', () => {
         expect(game.players[1].health, "geri kalan cani, eger bozulursa belki hasarlar degistirilmistir").equals(40);
         expect(game.players[2].health, "geri kalan cani, eger bozulursa belki hasarlar degistirilmistir").equals(0);
 
-        game = new game([tr, tr, tr], [tr, tr, tr], rng([true, true, true, true, true, true]));
+        game = new cardgame([tr, tr, tr], [tr, tr, tr], rng([true, true, true, true, true, true]));
 
         //game.play_card(1, tr);
         game.end_round();
@@ -86,7 +91,7 @@ describe('kart oyunu', () => {
 describe('tatar ramazan karti', () => {
 
     it("50% sansla karsi tarafa hasar verir", () => {
-        const game = new game([tr, tr, tr], [tr, tr, tr], rng([true, false]));
+        const game = new cardgame([tr, tr, tr], [tr, tr, tr], rng([true, false]));
 
         const p1was = game.players[1].health;
         const p2was = game.players[2].health;

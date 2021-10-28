@@ -1,5 +1,5 @@
 import { helper } from "../../helper";
-import { action, card_no, cards, limit, card } from "./data";
+import { action, card_no, cards, limit, card, target, damage } from "./data";
 import { attack_cooldown, player } from "./player";
 import { card_texts } from "./texts";
 
@@ -29,7 +29,7 @@ const default_round_result: round_result = {
     game_result: game_state.unfinished,
 }
 
-export class game {
+export class cardgame {
 
     private readonly roll_scale = 
         helper.get_enum_keys(card_no).map(x => card_texts[x as card_no].rarity as number)
@@ -61,18 +61,18 @@ export class game {
         if (this.turn != player) {
             return this.result(false, "Illegal operation on play_card. Turn is not equal to player number");
         }
-        // get current player
+        // set players
         const current_player = this.players[this.turn];
-
+        const target_player = this.players[this.target_of(this.turn)];
         // get the card object
         const no: card_no | undefined = current_player.cards[index];
         if (no === undefined) {
             return this.result(false);
         }
-        const card = cards[no];
+        const played_card = cards[no];
 
         // check if this is a attack card and player has already used one before
-        if (card.play_limit == limit.attack_category) {
+        if (played_card.play_limit == limit.attack_category) {
 
             if (current_player.has_buff(attack_cooldown)) 
                 return this.result(false, "Bu tur içerisinde başka saldırı kartı oynayamazsınız");
@@ -80,55 +80,58 @@ export class game {
             current_player.buff(attack_cooldown);
         }
 
-        // direct damage if any @TODO instant_damage is removed. iterate each instant_effect @FIX
-        /*if (card.instant_damage) {
-            this.target_hit(card.instant_damage.target);
-            if (card.instant_damage.self) this.self_hit(card.instant_damage.self);
-        }*/ 
-        for (const action of card.actions ?? [])
-            this.do_card_action(action);
+        // instant actions
+        for (const action of played_card.actions ?? []) {
 
-        // unroll the flips if any
-        this.flip_card_coins(card);
+            this.process_action(action, current_player, target_player);
+        }
+
+        // flip the coins if any
+        this.flip_card_coins(played_card, current_player, target_player);
         
-
         // remove the card from the deck @TODO
-        return { OK: true, state: this.state(), flips: flips };
+        return { OK: true, state: this.state(), flips: [] };
     }
     private result(r: boolean, s: string = "")
     {
         return { OK: r, state: this.state(), reason: s };
     }
     // card-related processing methods @TODO might separate responsibility into card class
-    private flip_card_coins(card: card) {
+    private flip_card_coins(card: card, current_player: player, target_player: player) {
         const flips: boolean[] =  [];
         for (const { heads: heads_action, tails: tails_action } of card.flips ?? []) {
 
-            let action: action | null;
-
-            const heads = this.flipper();
-            flips.push(heads);
-            if (heads && heads_action !== undefined)
-                action = heads_action;
-            else if (tails_action !== undefined)
-                action = tails_action;
-            else
-                action = null;
-
-            if (action != null) {
-                // test if this effect has attack ability
-                if (action.attack) {
-                    //this.target_hit(action.attack.target); @TODO FIX THIS @FIX
-                    if (action.attack.self) this.self_hit(action.attack.self);
-                }
-                // test other cases
-                //..
+            const flip = this.flipper();
+            flips.push(flip);
+            
+            if (flip /*heads*/) {
+                if (heads_action !== undefined)
+                    this.process_action(heads_action, current_player, target_player);
             }
+            else {
+                if (tails_action !== undefined)
+                    this.process_action(tails_action, current_player, target_player);
 
-            if (!heads && card.tail_break) break;
+                if (card.tail_break)
+                    break;
+            }
         }
         return flips;
     }
+    private process_action(action: action, current_player: player, target_player: player) {
+        
+        // attack
+        this.process_damage(action.attack, current_player, target_player, (p) => p.hit)
+        // heal
+        this.process_damage(action.heal, current_player, target_player, (p) => p.heal)
+
+    }
+    private process_damage(damage: damage | undefined, current_player: player, target_player: player, get_function: (p: player) => ((amount: number, percentage: boolean) => void))
+    {
+        get_function(current_player)(damage?.self   ?? 0, damage?.percentage ?? false);
+        get_function(target_player) (damage?.target ?? 0, damage?.percentage ?? false);
+    }
+
     private state(): game_state {
         if (this.players[1].health == 0 && this.players[2].health == 0) return game_state.draw;
         if (this.players[1].health == 0) return game_state.win_p2;
@@ -139,7 +142,6 @@ export class game {
     // ends the round for current player
     public end_round(): round_result {
         this.turn = this.target_of(this.turn);
-        this.limits = { ...default_abilities };
         return this.round_result;
     }
 

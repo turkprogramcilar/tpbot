@@ -4,7 +4,7 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import { cards, card_no } from "../data";
 import { card_text, card_texts, rarity } from "../texts";
 import { command_user_state, dcmodule, known_interactions } from "../../../module";
-import { game } from "../game";
+import { cardgame } from "../game";
 import { user_info } from "../../../log";
 import { command } from "../../../command";
 import { helper } from "../../../helper";
@@ -28,7 +28,7 @@ interface cardgame_user_state extends command_user_state {
 	is_owner: boolean,
 	self: user_info,
 	enemy: user_info | undefined,
-	engine_state: game | undefined,
+	engine_state: cardgame | undefined,
 }
 const module_name = "deste";
 const rarity_colors: {[key in rarity]: readonly[number,number,number] } = {
