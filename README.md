@@ -57,7 +57,7 @@ Bu modülün de tek bir görevi vardır ve jsden `TypeScript` geçişi sırasın
 ### Boilerplate.ts (legacy ts)
 Bu modül `boilerplate` denilen başlangıçta modül oluştururken kullanılan bir iskelet dosyasıdır. Basit bir ping pong örneği. Bu `TypeScript` ile varılmak istenen mimari için oluşturulmuş bir modüldür. `v13`e kadar son mimari yapısını temsil etmiştir. Bu kategoride `coderstatus.ts` modülü bir başka örnek olarak gösterilebilir.
 
-### modern_boilerplate (modern ts)
+### ping ve pong (modern ts)
 Bu mimari `v13` için yeni geliştirilmiş ve özellikle `command` yapısına destek sağlamak amacıyla klasör altında modül geliştirme imkanı sunmuştur. Modül klasörü altında bir `main.ts` dosyası bulunur ve bu dosya tamamen `legacy ts` mimarisini kullanarak modülün diğer tüm fonksiyonalitesini sağlarken aynı zamanda `support_commands` bayrağı modül tanıma sistemi tarafından otomatik kaldırıldığından dolayı içerisinde bulunan commands klasöründeki tüm komut dosyalarını tarayarak haznesine kayıt eder ve işletilmesini sağlar. Bu iskelet yapısında örnek olarak `/ping` komutu işlenmiştir.
 
 ### Özel amaç için geliştirilmiş diğer mimariler

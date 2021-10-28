@@ -1,9 +1,9 @@
 import { Message, MessageReaction, PartialUser, Presence, User } from "discord.js";
 import { dcmodule } from "../../module";
 
-export const m = new class modern_boilerplate extends dcmodule {
+export const m = new class pong extends dcmodule {
     
-    constructor() { super(modern_boilerplate.name, false); }
+    constructor() { super(pong.name, false); }
     
     public async after_init() { }
     public async on_message(msg : Message) {
