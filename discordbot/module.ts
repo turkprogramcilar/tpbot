@@ -58,7 +58,7 @@ export class dcmodule {
         sohbet: constants.cid.sohbet,
         istek_oneri_sikayet: constants.cid.istek_oneri_sikayet,
         // tp oyunlari
-        sicardo_nvidia: "829256056156586044",
+        sicardo_nvidia: "782713536924221469",
         // paylasimlar
         proje_paylas: constants.cid.proje_paylas,
         // yonetim
