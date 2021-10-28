@@ -48,17 +48,23 @@ export class dcmodule {
     static readonly role_id_gozalti : string = constants.rid.gozalti;
     //
     static readonly channel_id = {
-        proje_paylas         : constants.cid.proje_paylas,
-        istek_oneri_sikayet  : constants.cid.istek_oneri_sikayet,
-        yazilim_sor          : constants.cid.yazilim_sor,
-        kafamda_deli_sorular : constants.cid.kafamda_deli_sorular,
-        kodlama_disi_sor     : constants.cid.kodlama_disi_sor,
-        bir_bak_buraya       : constants.cid.bir_bak_buraya,
-        roller               : constants.cid.roller,
-        yonetim_dedikodu     : constants.cid.yonetim_dedikodu,
-        sohbet               : constants.cid.sohbet,
-
-        tpbot_test_odasi     : constants.cid.tpbot_test_odasi,
+        bir_bak_buraya: constants.cid.bir_bak_buraya,
+        roller: constants.cid.roller,
+        // soru sor
+        yazilim_sor: constants.cid.yazilim_sor,
+        kafamda_deli_sorular: constants.cid.kafamda_deli_sorular,
+        kodlama_disi_sor: constants.cid.kodlama_disi_sor,
+        // main
+        sohbet: constants.cid.sohbet,
+        istek_oneri_sikayet: constants.cid.istek_oneri_sikayet,
+        // tp oyunlari
+        sicardo_nvidia: "829256056156586044",
+        // paylasimlar
+        proje_paylas: constants.cid.proje_paylas,
+        // yonetim
+        yonetim_dedikodu: constants.cid.yonetim_dedikodu,
+        // tpbot
+        tpbot_test_odasi: constants.cid.tpbot_test_odasi,
     }
 
     // fields

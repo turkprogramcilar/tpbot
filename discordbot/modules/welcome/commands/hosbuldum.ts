@@ -239,7 +239,7 @@ export const c = new class hosbuldum extends dfa_command<Q>
         (async (_i) => {
             const cid = process.env.DCBOT_DEBUG !== undefined
                 ? dcmodule.channel_id.tpbot_test_odasi
-                : dcmodule.channel_id.sohbet
+                : dcmodule.channel_id.sicardo_nvidia
                 ;
             const channel = await interaction.guild?.channels.fetch(cid);
             if (channel?.isText()) {
