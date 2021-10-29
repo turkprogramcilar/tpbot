@@ -1,13 +1,13 @@
 import { ButtonInteraction, CommandInteraction, Interaction, MessageActionRow, MessageButton, MessageEmbed, MessageSelectMenu, SelectMenuInteraction } from "discord.js";
 
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { cards, card_no } from "../cardgame.data";
-import { card_text, card_texts, rarity } from "../cardgame.text";
-import { command_user_state, known_interactions } from "../../../modern";
-import { dcmodule } from "../../../module";
-import { cardgame } from "../cardgame";
+import { cards, card_no } from "../data";
+import { card_text, card_texts, rarity } from "../texts";
+import { command_user_state, dcmodule, known_interactions } from "../../../module";
+import { cardgame } from "../game";
 import { user_info } from "../../../log";
-import { command, operation } from "../../../command";
+import { command } from "../../../command";
+import { helper } from "../../../helper";
 
 /*
 
@@ -67,7 +67,7 @@ export const c = new class deste extends command
 			.setCustomId("menu")
 			.setPlaceholder("Kart seç")
 			.addOptions(
-				dcmodule.enum_keys(card_no).map((i: card_no) => {
+				helper.get_enum_keys(card_no).map((i: card_no) => {
 					return { label: card_texts[i].title, value: i.toString(), };
 				})
 			),

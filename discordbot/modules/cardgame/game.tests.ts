@@ -1,8 +1,8 @@
 import { fail } from 'assert';
 import { expect } from 'chai';
 import { describe } from 'mocha'
-import { cardgame, game_state } from './cardgame';
-import { card_no, cards } from './cardgame.data';
+import { cardgame, game_state } from './game';
+import { card_no, cards } from './data';
 
 const tr = card_no.tatar_ramazan;
 
@@ -46,6 +46,11 @@ describe('kart oyunu', () => {
         // ikinci oyuncu icin kontrol
         expect(game.play_card(2, saldiri_karti).OK).to.be.true;
         expect(game.play_card(2, saldiri_karti).OK).to.be.false;
+    });
+
+    it("birinci tur saldiri karti oynanir ikincisi oynanamaz ve ikinci tur saldiri karti oynanabilir tekrardan", () => {
+
+        fail("yapilacak");
     });
 
     it("bir oyuncunun cani 0a duserse oyunu diger oyuncu kazanir", () => {
