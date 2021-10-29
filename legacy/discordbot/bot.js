@@ -9,10 +9,6 @@ const parser  = require("./cmdparser.js");
 const Discord = require('discord.js');
 const htmlp   = require('node-html-parser');
 
-const mpath = "./modules/";
-const ts_mpath = "../build/discordbot/modules/"
-const maints = "main";
-
 exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
     
     const client  = new Discord.Client({ intents: [32767] });
@@ -40,29 +36,36 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
     const promises = [];
     for (const m of mods) {
 
-        let path = null;
+        let path = null, test = null;
         let cloned_state = {...state};
 
-        // is this a legacy js module?
-        if (await tools.fs_exists("discordbot/"+ mpath+m+".js")) {
-            path = mpath+m;
+        const legacy_loader = async (test) => {
+            if (await tools.fs_exists(test)) {
+                path = test.substring(0, test.length - 3);
+                return true;
+            } 
+            else
+                return false;
         }
 
+        // is this a legacy js module?
+        if (await legacy_loader(`./legacy/discordbot/modules/${m}.js`)){
+
+        }
         // is this a legacy ts module?
-        else if (await tools.fs_exists("discordbot/"+ ts_mpath+m+".js")) {
-            path = ts_mpath+m;
+        else if (await legacy_loader(`./build/legacy/discordbot/modules/${m}.js`)){
+
         }
 
         // is this a modern ts folder module?
-        else if (await tools.fs_exists("discordbot/"+ ts_mpath+m)) {
+        else if (await tools.fs_exists("./build/legacy/discordbot/modules/"+m)) {
 
-            if (await tools.fs_exists("discordbot/"+ ts_mpath+m+"/"+maints+".js")) {
-                path = ts_mpath+m+"/"+maints;
+            if (await legacy_loader(`./build/legacy/discordbot/modules/${m}/main.js`)) {
                 cloned_state.command_support = true;
                 cloned_state.modern_boilerplate = true;
             }
             else {
-                console.error("a modern ts module folder called "+m+" without "+maints+" cannot be loaded.");
+                console.error("a modern ts module folder called "+m+" without main.ts cannot be loaded.");
                 continue;
             }
         }
@@ -73,8 +76,8 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
         }
         
         const loaded = cloned_state.modern_boilerplate == true 
-            ? require(path).m
-            : require(path)
+            ? require("./../."+path).m
+            : require("./../."+path)
             ;
         if (!loaded.init)
             throw Error("Module has no init method defined at " +path);

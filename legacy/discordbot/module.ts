@@ -7,10 +7,10 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import { log } from './log';
 import { command } from './command';
 // local imports
-const db        = require("../../discordbot/mongodb");
-const tools     = require("../../discordbot/tools");
-const parser    = require("../../discordbot/cmdparser");
-const constants = require("../../discordbot/constants");
+const db        = require("../../../legacy/discordbot/mongodb");
+const tools     = require("../../../legacy/discordbot/tools");
+const parser    = require("../../../legacy/discordbot/cmdparser");
+const constants = require("../../../legacy/discordbot/constants");
 
 /**
  * 
@@ -167,12 +167,12 @@ export class dcmodule {
         try {
             this.log.info('Started refreshing application (/) commands.');
 
-            const root = `build/discordbot/modules/${this.module_name}/commands/`;
+            const root = `build/legacy/discordbot/modules/${this.module_name}/commands/`;
             const commands_folder_files : string[] = tools.get_files_sync(root);
             const commandFiles = commands_folder_files.filter(file => file.endsWith('.js'));
 
             for (const file of commandFiles) {
-                const command : command_module = require("../../"+root+file.substring(0, file.length-3)).c;
+                const command : command_module = require("../../../"+root+file.substring(0, file.length-3)).c;
                 // Set a new item in the Collection
                 // With the key as the command name and the value as the exported module
                 this.commands.set(command.data.name, command);

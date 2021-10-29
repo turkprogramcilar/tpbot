@@ -2,12 +2,12 @@
   "name": "turk-programcilar-bot",
   "version": "2.0",
   "description": "",
-  "main": "main.ts",
+  "main": "start.ts",
   "engines": {
     "node": "16.x"
   },
   "scripts": {
-    "start": "node main.js",
+    "start": "node start.ts",
     "build": "tsc",
     "postinstall": "npm run build",
     "test": "mocha -r ts-node/register **/*.tests.ts"

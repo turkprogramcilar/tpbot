@@ -1,10 +1,10 @@
 // package imports
 import { Message, Client, Channel } from "discord.js";
 // local imports
-const constants = require("../../../discordbot/constants");
-const parser    = require("../../../discordbot/cmdparser");
-const db        = require("../../../discordbot/mongodb");
-const tools     = require("../../../discordbot/tools");
+const constants = require("../../../../legacy/discordbot/constants");
+const parser    = require("../../../../legacy/discordbot/cmdparser");
+const db        = require("../../../../legacy/discordbot/mongodb");
+const tools     = require("../../../../legacy/discordbot/tools");
 import { log } from '../log';
 
 const nvidia_link : string = "https://tenor.com/view/linus-linus-torvalds-nvidia-fuck-you-gif-18053606";

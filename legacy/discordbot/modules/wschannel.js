@@ -9,9 +9,7 @@ exports.on_event = async (evt, msg) => {
         if (msg.content.length <= 0) 
             return;
 
-        let guild = msg.guild;
-        let member = guild.member(msg.author);
-        let nickname = member ? member.displayName : msg.author.username;
+        let nickname = msg.member.nickname;
         sendmsg = `${nickname}: ${msg.content}`;
         console.log(sendmsg);
         state.ws.send_all(sendmsg);

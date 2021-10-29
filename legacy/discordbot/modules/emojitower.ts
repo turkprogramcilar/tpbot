@@ -11,14 +11,15 @@ const this_dcmodule = class emojitower extends dcmodule {
     public async after_init(){
         //const compression = require('compression');
         const PORT = process.env.PORT || process.env.DCBOT_WSPORT || 3000;
-        const INDEX = 'webserver/www/index.html';
+        const INDEX = 'legacy/webserver/www/index.html';
 
         // https server
         const express = require('express');
         const app = express();
         //server.use(compression());
-        app.use(express.static(process.env.WEB_UNITY));
-        app.get('/test.html', (req : any, res : any) => res.sendFile(INDEX, { root: __dirname }));
+        app.use(express.static(__dirname+"/../../../../"+process.env.WEB_UNITY));
+        // to test websocket server comment out the following line and connect on /test.html
+        //app.get('/test.html', (req : any, res : any) => res.sendFile(INDEX, { root: __dirname+"../../../../../" }));
         const httpServer = app.listen(PORT, () => this.log.info(`Listening on ${PORT}`));
 
 

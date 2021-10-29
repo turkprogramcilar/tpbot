@@ -16,9 +16,9 @@ DCBOT_DEBUG            Status mesajını farklı gösterir ve kolezyum kanalı o
 DCBOT_NOKOLEZYUM          Emoji bulunan mesajlarda kolezyumda otomatik mega yaratma 
                        özelliğin kapatır (tanımlı olması yeter)
 DCBOT_PREFIX           komut öntakısı (bulunmazsa % varsayılan)
-DCBOT_WEBSERVER        true, false: true ise WS özelliğini çalıştırır
-DCBOT_WSPORT           WS portu (bulunmazsa varsayılan 3000)
-WEB_UNITY              Unity WebGL oyunun bulunduğu dizin (default yapılması gereken tanımlama: webserver\\unity)
+DCBOT_WSCHANNEL        true, false: true ise wschannel modulu icin webhost özelliğini çalıştırır (DİKKAT! emojitower ile wschannel modülleri aynı anda çalışamayabilir)
+DCBOT_WSPORT           WS portu (bulunmazsa varsayılan 3000) (hem emojitower hem wschannel modülü bu portu kullanır)
+WEB_UNITY              Unity WebGL oyunun bulunduğu dizin (default yapılması gereken tanımlama: legacy/webserver/unity NOT: windows \\ kullanır)
 ```
 `tanımlı olması yeter` ifadesi geçen değerlerin tanımlı olması yeterlidir.
 Değeri önemsizdir. 1 yazabilirsiniz illaki değer tanımlamanız gerekiyorsa. 
@@ -198,6 +198,8 @@ kullanabilirsiniz.
 ```
 
 ![Ünity oyunu önizlemesi](.markdown/emojitower.gif)
+
+`/turk-programcilar-bot/legacy/unity/Assets/Scripts/WebSocketClient.cs` dosyası içerisinde adresi kendi sunucunuza yapılandırmanız ve ardından unity üzerinden compile etmeniz gerekmektedir.
 
 ### Şu anda kodluyor
 ```diff

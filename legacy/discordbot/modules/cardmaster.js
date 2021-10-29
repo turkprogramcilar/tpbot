@@ -14,7 +14,7 @@ const db     = require("../mongodb.js");
 const Discord = require("discord.js");
 
 // typescript compiled library
-const { cardgame, game_state } = require("../../build/discordbot/cardgame");
+const { cardgame, game_state } = require("../../../build/legacy/discordbot/modules/cardgame/cardgame");
 
 // @TODO: move into db? perhaps?
 const rarity = {
