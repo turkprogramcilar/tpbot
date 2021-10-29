@@ -1,8 +1,8 @@
 {
-  "name": "dcbotjs",
-  "version": "1.0.0",
+  "name": "turk-programcilar-bot",
+  "version": "2.0",
   "description": "",
-  "main": "main.js",
+  "main": "main.ts",
   "engines": {
     "node": "16.x"
   },
