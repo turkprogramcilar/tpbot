@@ -1,5 +1,5 @@
-import { dcmodule } from "../../module";
-export const m = new class welcome extends dcmodule {
+import { modern } from "../../modern";
+export const m = new class welcome extends modern {
     
     constructor() { super(welcome.name, false); }
 }

@@ -3,10 +3,11 @@ import { ButtonInteraction, CommandInteraction, Interaction, MessageActionRow, M
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { cards, card_no } from "../cardgame.data";
 import { card_text, card_texts, rarity } from "../cardgame.text";
-import { command_user_state, dcmodule, known_interactions } from "../../../module";
+import { command_user_state, known_interactions } from "../../../modern";
+import { dcmodule } from "../../../module";
 import { cardgame } from "../cardgame";
 import { user_info } from "../../../log";
-import { command } from "../../../command";
+import { command, operation } from "../../../command";
 
 /*
 
@@ -60,7 +61,7 @@ export const c = new class deste extends command
 		super(deste.name, "Kart oynama panelini açar");
 	}
 
-	public async execute(interaction: known_interactions, state: command_user_state): Promise<command_user_state | null>
+	public async execute(interaction: known_interactions, state: command_user_state): Promise<operation<command_user_state | null>>
 	{
 		const menu = new MessageActionRow().addComponents(new MessageSelectMenu()
 			.setCustomId("menu")
@@ -86,7 +87,7 @@ export const c = new class deste extends command
 			const no = Number(interaction.values[0]);
 			if (false === no in card_no) {
 				this.enum_error(no, "no", "card_no", interaction);
-				return null;
+				return operation.complete;
 			}
 			response.embeds = [card_embed(no)];
 			await interaction.update(response);
@@ -95,7 +96,7 @@ export const c = new class deste extends command
 			response.content = "```Kart oynandi```";
 			await interaction.update(response);
 		}
-		return state;
+		return operation.on(state);
 	}
 	
 }

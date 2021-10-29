@@ -1,11 +1,8 @@
 // package imports
-import { REST } from '@discordjs/rest';
-import { Routes } from 'discord-api-types/v9';
 import { assert } from "console";
-import { Message, Client, User, PartialUser, MessageReaction, Presence, Guild, TextChannel, Interaction, CommandInteraction, Collection, ApplicationCommandPermissionData, ButtonInteraction, SelectMenuInteraction } from "discord.js";
-import { SlashCommandBuilder } from '@discordjs/builders';
+import { Message, Client, User, PartialUser, MessageReaction, Presence, Guild, TextChannel, Interaction } from "discord.js";
 import { log } from './log';
-import { command } from './command';
+
 // local imports
 const db        = require("../../discordbot/mongodb");
 const tools     = require("../../discordbot/tools");
@@ -21,17 +18,6 @@ const constants = require("../../discordbot/constants");
 export type user_state_value = string | number | boolean | undefined;
 export type module_user_state = {[key : string] : user_state_value};
 
-export type known_interactions = CommandInteraction | ButtonInteraction | SelectMenuInteraction
-export interface command_module {
-    data : SlashCommandBuilder,
-    execute : (interaction : known_interactions, state : command_user_state) => Promise<command_user_state | null>,
-    permissions : ApplicationCommandPermissionData[] | undefined,
-};
-export interface command_user_state {
-    command_id : string,
-    state : number,
-}
-type user_id = string;
 
 const UNNAMED_MODULE : string = "unnamed_module";
 // module state users for dc users
@@ -68,10 +54,8 @@ export class dcmodule {
     }
 
     // fields
-    protected commands = new Collection<string, command_module>();
     protected db_fetch_start : Date | undefined = new Date();
     protected state: any;
-    private command_states : { [key: user_id] : command_user_state } = {};
     private promises_module_state_queue : Promise<void>[] = [];
 
     // public readonly fields
@@ -152,149 +136,10 @@ export class dcmodule {
         }
     }
     protected async on_ready() {
-        // load commands
-        if (this.state.command_support !== true)
-            return;
-
-        const id = this.get_client().user?.id;
-        const token = this.get_client().token;
-        if (!id || !token) {
-            throw new Error("can't register commands. id or token is null");
-        }
-        const tpid = dcmodule.guild_id_tp
-        const rest = new REST({ version: '9' }).setToken(token);
-        (async () => {
-        try {
-            this.log.info('Started refreshing application (/) commands.');
-
-            const root = `build/discordbot/modules/${this.module_name}/commands/`;
-            const commands_folder_files : string[] = tools.get_files_sync(root);
-            const commandFiles = commands_folder_files.filter(file => file.endsWith('.js'));
-
-            for (const file of commandFiles) {
-                const command : command_module = require("../../"+root+file.substring(0, file.length-3)).c;
-                // Set a new item in the Collection
-                // With the key as the command name and the value as the exported module
-                this.commands.set(command.data.name, command);
-                this.log.info("Require/Loading command file: "+file);
-            }
-            const response = await rest.put(
-                Routes.applicationGuildCommands(id, tpid),
-                { body: this.commands.map(x => x.data.toJSON()) },
-            );
-
-            const res_arr = response as any[];
-            if (!response || !res_arr) {
-                throw Error("invalid response");
-            }
-
-            if (commandFiles.length != res_arr.length) {
-                throw Error("response doesn't match with command length we sent.");
-            }
-
-            const switch_to_ids = new Collection<string, command_module>();
-            let tasks : Promise<void>[] = res_arr.map(async json => {
-                const command_id : string = json.id;
-                const name : string = json.name;
-                const command_module = this.commands.get(name);
-                if (!command_module) {
-                    this.log.error(`json response with command name ${name} is not found on our side.`);
-                    return;
-                }
-                switch_to_ids.set(command_id, command_module);
-                // check if command has defined an permissions for its commands
-                if (command_module.permissions) {
-
-                    const client = this.get_client(); 
-                    if (!client.application?.owner) await client.application?.fetch();
-
-                    const app_command = await client.guilds.cache.get(dcmodule.guild_id_tp)?.commands.fetch(command_id);
-                    if (!app_command) throw Error ("Can't fetch application command");
-                    
-                    await app_command.permissions.set({
-                        permissions: command_module.permissions
-                    });
-                }
-            });
-            await Promise.all(tasks);
-
-            this.commands = switch_to_ids;
-
-            this.log.info('Successfully reloaded application (/) commands.');
-        }
-        catch (error) {
-            this.log.error(error);
-            throw Error("Can't register commands in module.ts body");
-        }})();
+        
     }
     protected async on_interaction_create(interaction : Interaction) {
 
-        // process commands
-        if (this.state.command_support !== true)
-            return;
-
-        const user_id = interaction.user.id;
-        const user_info = command.get_user_info(interaction.user);
-
-        let command_module: command_module | undefined;
-        let state: command_user_state;
-
-        if (interaction instanceof CommandInteraction) {
-
-            const comm_id = interaction.commandId;
-            command_module = this.commands.get(comm_id);
-            if (!command_module) {
-                this.log.warn(`command id[${comm_id}] is not found in commands when first executing command`, user_info)
-                return;
-            }
-    
-            // if user already started a command, dont start another one
-            state = this.command_states[user_id] 
-            if (state)
-                return await interaction.reply({content: "Lütfen önceden çalıştırdığınız komutu tamamlayınız.", ephemeral: true });
-            
-            // if user_id exists already, it will be overridden with state = 0
-            // so that it pushes user to the first stage of the command
-            state = this.command_states[user_id] = {
-                command_id: comm_id,
-                state: 0,
-            }
-        }
-        else if (interaction.isButton() || interaction.isSelectMenu()) {
-            
-            // assuming button is always triggered from a command
-            const user_state = this.command_states[user_id];
-
-            if (undefined === user_state) {
-                this.log.warn("A button or select menu interaction's user_state cannot be found.", user_info);
-                await command.respond_interaction_failure_to_user(interaction);
-                return;
-            }
-
-            const comm_id = user_state.command_id;
-            command_module = this.commands.get(comm_id);
-            if (undefined === command_module) {
-                this.log.warn(`command id[${comm_id}] is not found in commands when interacting with button or select menu`, user_info)
-                return;
-            }
-            
-            state = this.command_states[user_id];
-        }
-        else {
-
-            this.log.error("An interaction neither button, select menu nor command is received", user_info)
-            return;
-        }
-
-        try {
-            const command_complete = await command_module.execute(interaction, state) === null;
-            if (command_complete) 
-                delete this.command_states[user_id];
-
-        } catch (error) {
-            this.log.error(error, user_info);
-            await command.respond_interaction_failure_to_user(interaction);
-        }
     }
     protected async on_message(msg : Message)
     {
