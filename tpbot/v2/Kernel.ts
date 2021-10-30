@@ -27,8 +27,8 @@ export class Kernel extends Summoner
         }
         const loop = () => {
             bot = this.summon("Bot", "Beta", { token: botToken }, errorCallback);
-            bot.when("message", str => {
-                this.print.info(str);
+            bot.when("message", message => {
+                this.print.from(bot.descriptiveName).info(message);
                 bot.emit("message", "Pong");
             });
             
