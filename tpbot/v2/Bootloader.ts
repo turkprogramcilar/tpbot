@@ -19,3 +19,4 @@ if (legacyEnabled) {
 
 print.info("Initialize Kernel...");
 const kernel = new Kernel();
+print.info("Finalize Bootloading...");
