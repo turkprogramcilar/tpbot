@@ -4,13 +4,17 @@ import { Summoner } from "./Summoner";
 import { Module } from "./Module";
 import { Print } from "./Print";
 import { Minion } from "./Minion";
-const a = workerData.emit;
-class BotManager// extends Summoner
+// tslint:disable-next-line: no-unused-expression
+new class BotManager extends Summoner
 {
     print: Print = new Print(BotManager.name);
     constructor()
     {
-        //super(print);
+        super(new Print(BotManager.name));
+        Minion.fromSummoner(parentPort, "message", this.print.from("Summoner").info.bind(this.print));
+        Minion.fromSummoner(parentPort, "updateSummonerName", this.print.from("updateSummonerName: ").info.bind(this.print));
+        Minion.toSummoner(parentPort, "risen");
+        this.login(workerData.token).catch(this.print.exception);
     }
     public login(token: string, intent: number = 32767)
     {
@@ -34,9 +38,4 @@ class BotManager// extends Summoner
         return client.login(token);
     }
     // public Logoff(token: string) { }
-}
-const print = new Print(BotManager.name);
-Minion.fromSummoner(parentPort, "message", print.from("Summoner").info.bind(print));
-Minion.fromSummoner(parentPort, "updateSummonerName", print.from("updateSummonerName: ").info.bind(print));
-Minion.toSummoner(parentPort, "risen");
-new BotManager().login(workerData.token).catch(print.exception);
+}();
