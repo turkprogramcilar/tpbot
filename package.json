@@ -6,7 +6,7 @@
     "node": "16.x"
   },
   "scripts": {
-    "start": "ts-node ./tpbot/v2/Bootloader.ts",
+    "start": "ts-node ./build/tpbot/v2/Bootloader.js",
     "build": "tsc",
     "postinstall": "npm run build",
     "test": "mocha -r ts-node/register **/*.tests.ts"

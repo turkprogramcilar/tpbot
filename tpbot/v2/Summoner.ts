@@ -8,7 +8,9 @@ export abstract class Summoner
 
     public summon(file: string, minionName: string, summonerName: string, data: any, errorCallback: (error: Error | unknown) => void)
     {
-        const minion = new Minion(minionName, path.resolve(__dirname, file), data, errorCallback);
+        const fullpath = path.resolve(__dirname, file);
+        this.print.info("Loading file at "+fullpath);
+        const minion = new Minion(minionName, fullpath, data, errorCallback);
 
         minion.when("risen", () => {
             minion.emit("updateSummonerName", summonerName);
