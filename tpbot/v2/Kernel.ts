@@ -1,8 +1,8 @@
-import { Worker } from "worker_threads";
 import { Print } from "./Print";
-import path from "path";
 import { Summoner } from "./Summoner";
 import { Minion } from "./Minion";
+
+import readline from 'readline';
 
 // const keyss = keys<ClientEvents>;
 export class Kernel extends Summoner
@@ -25,7 +25,7 @@ export class Kernel extends Summoner
 
             this.print.error(`Exception level: Bot[${bot.name}]`);
             this.print.exception(error);
-            loop();
+            //loop();
         }
         const loop = () => {
 
@@ -37,5 +37,20 @@ export class Kernel extends Summoner
         };
 
         loop();
+
+        // this.awaitStdin();
+    }
+
+    private awaitStdin() {
+
+        const rl = readline.createInterface({
+            input: process.stdin,
+            output: process.stdout
+        });
+        
+        rl.question('What do you think of Node.js? ', (answer) => {
+            console.log(`Thank you for your valuable feedback: ${answer}`);
+            rl.close();
+        });
     }
 }
