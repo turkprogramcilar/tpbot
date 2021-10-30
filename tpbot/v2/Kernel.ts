@@ -10,6 +10,7 @@ export class Kernel extends Summoner
     public constructor()
     {
         super(new Print(Kernel.name));
+        this.print.info("Initializing...");
 
         if (undefined === process.env.TPBOT) {
             this.print.warn("TPBOT environment variable is undefined.");
