@@ -18,9 +18,4 @@ if (legacyEnabled) {
 }
 
 print.Info("Initialize Kernel...");
-const kernel = new Kernel()// .Start()
-    // .finally(print.Info.bind(print, "Finally clause"))
-    // .catch(print.Exception);
-// this end of file is always reached soon after new kernel line
-// therefore start operation is async in parallel
-print.Info("End of file");
+const kernel = new Kernel();

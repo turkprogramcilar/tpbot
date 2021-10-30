@@ -1,58 +1,38 @@
 import { Worker } from "worker_threads";
 import { Print } from "./Print";
 import path from "path";
+import { Summoner } from "./Manager";
+import { Minion } from "./Subordinate";
 
 // const keyss = keys<ClientEvents>;
-export class Kernel
+export class Kernel extends Summoner
 {
-    private print = new Print(Kernel.name);
-
     public constructor()
     {
+        super(new Print(Kernel.name));
+
         if (undefined === process.env.TPBOT) {
             this.print.Warn("TPBOT environment variable is undefined.");
         }
 
         // const tpbotJson = JSON.parse(process.env.TPBOT);
-        const token: string | undefined = process.env.TPBOT; // for the moment, we get token directly
-        this.Start(token!, "Beta");
-    }
+        const botToken: string | undefined = process.env.TPBOT; // for the moment, we get token directly
+        const botName = "Beta";
+        const bot = this.Start("Bot", botName, { token: botToken });
 
-    public Start(botToken: string, botName: string)
-    {
-        let descriptiveName = botName;
-        const worker = new Worker(
-            path.resolve(__dirname, 'Bot'),
-            {
-                workerData: {
-                    token: botToken
-                }
-            },
-        );
+        const loop = (minion: Minion) => {
 
-        worker.on("error", e => {
+            minion.listen("message", str => {
+                this.print.Info(str);
+                minion.raise("message", "Pong");
+            });
 
-            this.print.Exception(e, descriptiveName);
-            this.Start(botToken, descriptiveName);
-        });
-        worker.on("message", tag => {
-
-            this.print.Info(`Renamed "${descriptiveName}" to "${tag}"`);
-            descriptiveName = tag;
-        });
-        this.print.Info("Start() End of function");
-    }
-
-    public Kill(botId?: number, botName?: string): void
-    {
-        if (botId !== undefined) {
-
-        }
-        else if (botName !== undefined) {
-
-        }
-        else {
-            this.print.Warn
-        }
+            minion.on("error", (error) => {
+                this.print.Error(`Exception level: Bot[${bot.descriptiveName}]`);
+                this.print.Exception(error);
+                loop(this.Start("Bot", "Beta", { token: botToken }));
+            });
+        };
+        loop(bot);
     }
 }

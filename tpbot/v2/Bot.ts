@@ -1,11 +1,17 @@
 import { Client } from "discord.js";
 import { parentPort, workerData } from "worker_threads";
+import { Summoner } from "./Manager";
+import { Module } from "./Module";
 import { Print } from "./Print";
-
-class Bot
+import { Minion } from "./Subordinate";
+const a = workerData.emit;
+class BotManager// extends Summoner
 {
-    private print = new Print(Bot.name);
-
+    print: Print = new Print(BotManager.name);
+    constructor()
+    {
+        //super(print);
+    }
     public Login(token: string, intent: number = 32767)
     {
         const client = new Client({intents: [intent]});
@@ -14,26 +20,22 @@ class Bot
             this.print.Error(error);
         });
         client.on("ready", () => {
-            parentPort?.postMessage(client.user?.tag);
-            this.print.Info(`Logged in [${client.user?.tag}]`);
-        })
-        client.on("messageCreate", async message => {
-            try {
-                if (message.author.username === "0xdeadc0de") {
-                    await this.crusher(client);
-                }
-            }
-            catch (error) {
-                this.print.Exception(error);
-            }
-        })
-        return client.login(token);
-    }
 
-    private async crusher(client: Client) {
-        client.guilds.fetch("asdasd");;
+            if (client.user !== undefined && client.user !== null) {
+                // process.emit("updateDescriptiveName", client.user.tag);
+            }
+            else {
+                this.print.Warn("Can't update descriptive name because client.user is either null or undefined");
+            }
+            this.print.Info(`Logged in [${client.user?.tag}]`);
+            const m = new Module(client);
+        })
+
+        return client.login(token);
     }
     // public Logoff(token: string) { }
 }
-
-new Bot().Login(workerData.token);
+const print = new Print(BotManager.name);
+Minion.fromSummoner(parentPort, "message", print.Info.bind(print));
+Minion.toSummoner(parentPort, "message", "Ping");
+new BotManager().Login(workerData.token).catch(print.Exception);

@@ -2,7 +2,6 @@
   "name": "turk-programcilar-bot",
   "version": "v2",
   "description": "Türk Programcılar Discord Sunucusu Üyeleri tarafından geliştirilen bot",
-  "main": "start.ts",
   "engines": {
     "node": "16.x"
   },

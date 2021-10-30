@@ -1,6 +1,7 @@
 {
     "extends": "tslint:recommended",
     "rules": {
-        "no-floating-promises": true
+        "no-floating-promises": true,
+        "no-trailing-whitespace": false
     }
 }
