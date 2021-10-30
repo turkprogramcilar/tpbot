@@ -1,9 +1,9 @@
 import { Client } from "discord.js";
 import { parentPort, workerData } from "worker_threads";
-import { Summoner } from "./Manager";
+import { Summoner } from "./Summoner";
 import { Module } from "./Module";
 import { Print } from "./Print";
-import { Minion } from "./Subordinate";
+import { Minion } from "./Minion";
 const a = workerData.emit;
 class BotManager// extends Summoner
 {

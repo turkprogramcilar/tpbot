@@ -1,8 +1,8 @@
 import { Worker } from "worker_threads";
 import { Print } from "./Print";
 import path from "path";
-import { Summoner } from "./Manager";
-import { Minion } from "./Subordinate";
+import { Summoner } from "./Summoner";
+import { Minion } from "./Minion";
 
 // const keyss = keys<ClientEvents>;
 export class Kernel extends Summoner

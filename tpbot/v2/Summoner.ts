@@ -1,6 +1,6 @@
 import path from "path";
 import { Print } from "./Print";
-import { Minion } from "./Subordinate";
+import { Minion } from "./Minion";
 
 export class Summoner
 {
