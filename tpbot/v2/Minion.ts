@@ -4,17 +4,12 @@ import { MessagePort, Worker } from "worker_threads";
 import { Print } from "./Print";
 
 export interface Events {
-    error: [Error],
     message: [string],
+    /** Used for exchanging module names */
+    handshake: [string],
     updateDescriptiveName: [string],
 }
-
-export declare interface Minion
-{
-    on<E extends keyof Events>(event: E, listener: (...args: Events[E]) => Awaitable<void>): this
-    emit<E extends keyof Events>(event: E, ...args: Events[E]): boolean;
-}
-export class Minion extends EventEmitter
+export class Minion
 {
     static toSummoner<E extends keyof Events>(parentPort: MessagePort | null, event: E, ...args: Events[E])
     {
@@ -31,14 +26,13 @@ export class Minion extends EventEmitter
     }
 
     private worker: Worker;
-    public constructor(private print: Print, public readonly descriptiveName: string, path: string, data: any)
+    public constructor(public descriptiveName: string, path: string, data: any, errorCallback: (error: Error) => void)
     {
-        super();
         this.worker = new Worker(path, { workerData: data });
-        this.worker.on("error", e => this.emit("error", e));
+        this.worker.on("error", errorCallback);
     }
 
-    public listen<E extends keyof Events>(event: E, listener: (...args: Events[E]) => Awaitable<void>)
+    public when<E extends keyof Events>(event: E, listener: (...args: Events[E]) => Awaitable<void>)
     {
         this.worker.on("message", (pair) => {
 
@@ -49,7 +43,7 @@ export class Minion extends EventEmitter
             }
         });
     }
-    public raise<E extends keyof Events>(event: E, ...args: Events[E])
+    public emit<E extends keyof Events>(event: E, ...args: Events[E])
     {
         return this.worker.postMessage([event, ...args]);
     }

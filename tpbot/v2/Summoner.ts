@@ -6,19 +6,19 @@ export class Summoner
 {
     public constructor(protected print: Print) { }
 
-    public start(file: string, name: string, data: any, descriptiveName?: string)
+    public summon(file: string, name: string, data: any, errorCallback: (error: Error | unknown) => void, descriptiveName?: string)
     {
         if (undefined === descriptiveName)
             descriptiveName = name;
 
-        const sub = new Minion(this.print, descriptiveName, path.resolve(__dirname, file), data);
+        const minion = new Minion(descriptiveName, path.resolve(__dirname, file), data, errorCallback);
 
-        sub.on("updateDescriptiveName", newName => {
+        minion.when("updateDescriptiveName", newName => {
             this.print.info(`Renamed "${descriptiveName}" to "${newName}"`);
-            descriptiveName = newName;
+            minion.descriptiveName = descriptiveName = newName;
         })
 
-        return sub;
+        return minion;
     }
 
     /*public UpdateSubDescriptiveName()

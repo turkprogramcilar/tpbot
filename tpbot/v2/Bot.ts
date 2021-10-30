@@ -22,7 +22,7 @@ class BotManager// extends Summoner
         client.on("ready", () => {
 
             if (client.user !== undefined && client.user !== null) {
-                // process.emit("updateDescriptiveName", client.user.tag);
+                Minion.toSummoner(parentPort, "updateDescriptiveName", client.user.tag);
             }
             else {
                 this.print.warn("Can't update descriptive name because client.user is either null or undefined");
@@ -36,6 +36,6 @@ class BotManager// extends Summoner
     // public Logoff(token: string) { }
 }
 const print = new Print(BotManager.name);
-Minion.fromSummoner(parentPort, "message", print.info.bind(print));
+Minion.fromSummoner(parentPort, "message", print.from("Summoner").info.bind(print));
 Minion.toSummoner(parentPort, "message", "Ping");
 new BotManager().login(workerData.token).catch(print.exception);

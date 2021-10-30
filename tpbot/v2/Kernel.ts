@@ -18,21 +18,20 @@ export class Kernel extends Summoner
         // const tpbotJson = JSON.parse(process.env.TPBOT);
         const botToken: string | undefined = process.env.TPBOT; // for the moment, we get token directly
         const botName = "Beta";
-        const bot = this.start("Bot", botName, { token: botToken });
-
-        const loop = (minion: Minion) => {
-
-            minion.listen("message", str => {
+        let bot: Minion;
+        const errorCallback = (error: Error | unknown) => {
+            this.print.error(`Exception level: Bot[${bot.descriptiveName}]`);
+            this.print.exception(error);
+            loop();
+        }
+        const loop = () => {
+            bot = this.summon("Bot", "Beta", { token: botToken }, errorCallback);
+            bot.when("message", str => {
                 this.print.info(str);
-                minion.raise("message", "Pong");
+                bot.emit("message", "Pong");
             });
-
-            minion.on("error", (error) => {
-                this.print.error(`Exception level: Bot[${bot.descriptiveName}]`);
-                this.print.exception(error);
-                loop(this.start("Bot", "Beta", { token: botToken }));
-            });
+            
         };
-        loop(bot);
+        loop();
     }
 }
