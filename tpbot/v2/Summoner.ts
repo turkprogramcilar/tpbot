@@ -6,7 +6,7 @@ export class Summoner
 {
     public constructor(protected print: Print) { }
 
-    public Start(file: string, name: string, data: any, descriptiveName?: string)
+    public start(file: string, name: string, data: any, descriptiveName?: string)
     {
         if (undefined === descriptiveName)
             descriptiveName = name;
@@ -14,7 +14,7 @@ export class Summoner
         const sub = new Minion(this.print, descriptiveName, path.resolve(__dirname, file), data);
 
         sub.on("updateDescriptiveName", newName => {
-            this.print.Info(`Renamed "${descriptiveName}" to "${newName}"`);
+            this.print.info(`Renamed "${descriptiveName}" to "${newName}"`);
             descriptiveName = newName;
         })
 

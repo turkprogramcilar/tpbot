@@ -12,12 +12,12 @@ class BotManager// extends Summoner
     {
         //super(print);
     }
-    public Login(token: string, intent: number = 32767)
+    public login(token: string, intent: number = 32767)
     {
         const client = new Client({intents: [intent]});
 
         client.on("error", (error) => {
-            this.print.Error(error);
+            this.print.error(error);
         });
         client.on("ready", () => {
 
@@ -25,9 +25,9 @@ class BotManager// extends Summoner
                 // process.emit("updateDescriptiveName", client.user.tag);
             }
             else {
-                this.print.Warn("Can't update descriptive name because client.user is either null or undefined");
+                this.print.warn("Can't update descriptive name because client.user is either null or undefined");
             }
-            this.print.Info(`Logged in [${client.user?.tag}]`);
+            this.print.info(`Logged in [${client.user?.tag}]`);
             const m = new Module(client);
         })
 
@@ -36,6 +36,6 @@ class BotManager// extends Summoner
     // public Logoff(token: string) { }
 }
 const print = new Print(BotManager.name);
-Minion.fromSummoner(parentPort, "message", print.Info.bind(print));
+Minion.fromSummoner(parentPort, "message", print.info.bind(print));
 Minion.toSummoner(parentPort, "message", "Ping");
-new BotManager().Login(workerData.token).catch(print.Exception);
+new BotManager().login(workerData.token).catch(print.exception);
