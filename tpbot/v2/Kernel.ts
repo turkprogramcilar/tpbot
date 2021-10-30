@@ -13,7 +13,7 @@ export class Kernel
     public async Start()
     {
         if (undefined === process.env.TPBOT) {
-            this.print.warn("TPBOT environment variable is undefined.");
+            this.print.Warn("TPBOT environment variable is undefined.");
         }
 
         // const tpbotJson = JSON.parse(process.env.TPBOT);
@@ -22,7 +22,7 @@ export class Kernel
             let name = t;
             const worker = new Worker(path.resolve(__dirname, 'Bot'), { workerData: { token: t } });
             worker.on("error", e => {
-                this.print.exception(e, name);
+                this.print.Exception(e, name);
                 ouroborus();
             });
             worker.on("message", tag => {
@@ -30,6 +30,6 @@ export class Kernel
             });
         };
         ouroborus();
-        this.print.info("Start(): Line end");
+        this.print.Info("Start(): Line end");
     }
 }

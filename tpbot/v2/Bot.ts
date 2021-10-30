@@ -11,11 +11,11 @@ export class Bot
         const client = new Client({intents: [intent]});
 
         client.on("error", (error) => {
-            this.print.error(error);
+            this.print.Error(error);
         });
         client.on("ready", () => {
             parentPort?.postMessage(client.user?.tag);
-            this.print.info(`Logged in [${client.user?.tag}]`);
+            this.print.Info(`Logged in [${client.user?.tag}]`);
         })
         client.on("messageCreate", async message => {
             try {
@@ -24,7 +24,7 @@ export class Bot
                 }
             }
             catch (error) {
-                this.print.exception(error);
+                this.print.Exception(error);
             }
         })
         return client.login(token);
