@@ -2,9 +2,7 @@ import { Kernel } from "./Kernel";
 import { Print } from "./Print";
 
 const print = new Print("Bootloader");
-process.on('uncaughtException', e => {
-    print.Exception(e);
-});
+process.on('uncaughtException', print.Exception);
 
 const legacyEnabled = false;
 // check if we need to load legacy codebase
@@ -18,11 +16,11 @@ if (legacyEnabled) {
         print.Error("Could not load legacy bots because DCBOT_JSON is undefined");
     }
 }
-const c = print.Info.bind(print, "Finally clause");
+
 print.Info("Initialize Kernel...");
-new Kernel().Start()
-    .finally(c)
-    .catch(print.Exception);
+const kernel = new Kernel()// .Start()
+    // .finally(print.Info.bind(print, "Finally clause"))
+    // .catch(print.Exception);
 // this end of file is always reached soon after new kernel line
 // therefore start operation is async in parallel
-print.Info("Last line");
+print.Info("End of file");

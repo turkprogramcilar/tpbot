@@ -2,7 +2,7 @@ import { Client } from "discord.js";
 import { parentPort, workerData } from "worker_threads";
 import { Print } from "./Print";
 
-export class Bot
+class Bot
 {
     private print = new Print(Bot.name);
 
