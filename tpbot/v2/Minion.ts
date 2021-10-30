@@ -5,9 +5,9 @@ import { Print } from "./Print";
 
 export interface Events {
     message: [string],
-    /** Used for exchanging module names */
-    handshake: [string],
-    updateDescriptiveName: [string],
+    /** Used by minion to inform summoner that its fully initialized and listening events */
+    risen: [string],
+    updateMinionName: [string],
 }
 export class Minion
 {
@@ -26,7 +26,7 @@ export class Minion
     }
 
     private worker: Worker;
-    public constructor(public descriptiveName: string, path: string, data: any, errorCallback: (error: Error) => void)
+    public constructor(public name: string, path: string, data: any, errorCallback: (error: Error) => void)
     {
         this.worker = new Worker(path, { workerData: data });
         this.worker.on("error", errorCallback);

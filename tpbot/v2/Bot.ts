@@ -22,7 +22,7 @@ class BotManager// extends Summoner
         client.on("ready", () => {
 
             if (client.user !== undefined && client.user !== null) {
-                Minion.toSummoner(parentPort, "updateDescriptiveName", client.user.tag);
+                Minion.toSummoner(parentPort, "updateMinionName", client.user.tag);
             }
             else {
                 this.print.warn("Can't update descriptive name because client.user is either null or undefined");
