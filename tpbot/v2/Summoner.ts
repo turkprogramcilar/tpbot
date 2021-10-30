@@ -2,7 +2,7 @@ import path from "path";
 import { Print } from "./Print";
 import { Minion } from "./Minion";
 
-export class Summoner
+export abstract class Summoner
 {
     public constructor(protected print: Print) { }
 
