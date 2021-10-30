@@ -6,11 +6,11 @@ export abstract class Summoner
 {
     public constructor(protected print: Print) { }
 
-    public summon(file: string, minionName: string, summonerName: string, data: any, errorCallback: (error: Error | unknown) => void)
+    public summon(file: string, minionName: string, summonerName: string, errorCallback: (error: Error | unknown) => void, data?: any)
     {
         const fullpath = path.resolve(__dirname, file);
         this.print.info("Loading file at "+fullpath);
-        const minion = new Minion(minionName, fullpath, data, errorCallback);
+        const minion = new Minion(minionName, fullpath, errorCallback, data);
 
         minion.when("risen", () => {
             minion.emit("updateSummonerName", summonerName);

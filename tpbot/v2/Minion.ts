@@ -27,7 +27,7 @@ export class Minion
     }
 
     private worker: Worker;
-    public constructor(public name: string, path: string, data: any, errorCallback: (error: Error) => void)
+    public constructor(public name: string, path: string, errorCallback: (error: Error) => void, public data?: any)
     {
         this.worker = new Worker(path, { workerData: data });
         this.worker.on("error", errorCallback);
