@@ -1,20 +1,26 @@
 {
   "name": "turk-programcilar-bot",
-  "version": "2.0",
-  "description": "",
+  "version": "v2",
+  "description": "Türk Programcılar Discord Sunucusu Üyeleri tarafından geliştirilen bot",
   "main": "start.ts",
   "engines": {
     "node": "16.x"
   },
   "scripts": {
-    "start": "node start.ts",
+    "start": "ts-node ./tpbot/v2/Bootloader.ts",
     "build": "tsc",
     "postinstall": "npm run build",
     "test": "mocha -r ts-node/register **/*.tests.ts"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": [
+    "Türk",
+    "Programcılar",
+    "Discord",
+    "Sunucusu",
+    "Bot"
+  ],
+  "author": "0xdeadc0de (https://github.com/0xdeadc0de)",
+  "license": "GPL-3.0-or-later",
   "dependencies": {
     "@discordjs/builders": "^0.7.0",
     "@discordjs/rest": "^0.1.0-canary.0",
@@ -25,6 +31,7 @@
     "jimp": "^0.16.1",
     "mongodb": "^3.7.3",
     "node-html-parser": "^3.3.6",
+    "tslint": "^6.1.3",
     "utf-8-validate": "^5.0.7",
     "ws": "^7.5.5",
     "xss": "^1.0.10"
@@ -35,7 +42,7 @@
     "@types/node": "^15.14.9",
     "chai": "^4.3.4",
     "mocha": "^9.1.3",
-    "ts-node": "^10.3.0",
+    "ts-node": "^10.4.0",
     "typescript": "^4.4.4"
   }
 }
