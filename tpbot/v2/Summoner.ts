@@ -6,14 +6,17 @@ export abstract class Summoner
 {
     public constructor(protected print: Print) { }
 
-    public summon(file: string, minionName: string, data: any, errorCallback: (error: Error | unknown) => void)
+    public summon(file: string, minionName: string, summonerName: string, data: any, errorCallback: (error: Error | unknown) => void)
     {
         const minion = new Minion(minionName, path.resolve(__dirname, file), data, errorCallback);
 
+        minion.when("risen", () => {
+            minion.emit("updateSummonerName", summonerName);
+        });
         minion.when("updateMinionName", newName => {
             this.print.info(`Renamed "${minionName}" to "${newName}"`);
             minion.name = minionName = newName;
-        })
+        });
 
         return minion;
     }

@@ -29,13 +29,13 @@ export class Kernel extends Summoner
         }
         const loop = () => {
 
-            bot = this.summon("Bot", "Beta", { token: botToken }, errorCallback);
+            bot = this.summon("Bot", "Beta", Kernel.name, { token: botToken }, errorCallback);
             bot.when("message", message => {
                 this.print.from(bot.name).info(message);
                 bot.emit("message", "Pong");
             });
         };
-        
+
         loop();
     }
 }

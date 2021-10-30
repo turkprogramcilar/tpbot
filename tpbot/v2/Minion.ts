@@ -6,8 +6,9 @@ import { Print } from "./Print";
 export interface Events {
     message: [string],
     /** Used by minion to inform summoner that its fully initialized and listening events */
-    risen: [string],
+    risen: [void],
     updateMinionName: [string],
+    updateSummonerName: [string],
 }
 export class Minion
 {

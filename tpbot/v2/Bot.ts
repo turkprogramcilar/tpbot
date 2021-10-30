@@ -37,5 +37,6 @@ class BotManager// extends Summoner
 }
 const print = new Print(BotManager.name);
 Minion.fromSummoner(parentPort, "message", print.from("Summoner").info.bind(print));
-Minion.toSummoner(parentPort, "message", "Ping");
+Minion.fromSummoner(parentPort, "updateSummonerName", print.from("updateSummonerName: ").info.bind(print));
+Minion.toSummoner(parentPort, "risen");
 new BotManager().login(workerData.token).catch(print.exception);
