@@ -10,7 +10,7 @@ export abstract class mod_command {
 
     public readonly data: ContextMenuCommandBuilder;
 	
-	public constructor(private command_name: string, public permissions: ApplicationCommandPermissionData[])
+	public constructor(protected command_name: string, public permissions: ApplicationCommandPermissionData[])
 	{
 		const DEBUG = process.env.DCBOT_DEBUG;
         if (DEBUG !== undefined) {
