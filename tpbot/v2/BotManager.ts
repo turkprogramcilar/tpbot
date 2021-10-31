@@ -4,6 +4,7 @@ import { Print } from "./Print";
 import { Minion } from "./Minion";
 import { Crasher } from "./modules/Crasher";
 import { BotData } from "./Kernel";
+
 // tslint:disable-next-line: no-unused-expression
 new class BotManager
 {
@@ -11,13 +12,12 @@ new class BotManager
     constructor()
     {
         const data: BotData = workerData;
-        Minion.fromSummoner(parentPort, "message", this.print.from("Summoner").info.bind(this.print));
-        Minion.fromSummoner(parentPort, "updateSummonerName", this.print.from("updateSummonerName: ").info.bind(this.print));
+        Minion.fromSummoner(parentPort, "message", this.print.info.bind(this.print));
+        Minion.fromSummoner(parentPort, "updateSummonerName", summonerName => { this.print.from(summonerName); });
         Minion.toSummoner(parentPort, "risen");
-
         // following is an auto-login, normally this must be configured
         // or started manually @TODO
-        this.login(workerData.token).catch(this.print.exception);
+        this.login(data.token).catch(this.print.exception);
     }
     public login(token: string, intent: number = 32767)
     {

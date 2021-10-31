@@ -11,7 +11,7 @@ export interface BotData
 }
 export class Kernel extends Summoner
 {
-    private readonly botManagerPath = "Bot";
+    private readonly botManagerPath = "BotManager";
 
     public constructor()
     {
