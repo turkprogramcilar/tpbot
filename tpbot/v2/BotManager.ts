@@ -6,13 +6,11 @@ import { Print } from "./Print";
 import { Minion } from "./Minion";
 import { Crasher } from "./modules/Crasher";
 // tslint:disable-next-line: no-unused-expression
-new class BotManager extends Summoner
+new class BotManager
 {
     print: Print = new Print(BotManager.name);
     constructor()
     {
-        super(new Print(BotManager.name));
-
         Minion.fromSummoner(parentPort, "message", this.print.from("Summoner").info.bind(this.print));
         Minion.fromSummoner(parentPort, "updateSummonerName", this.print.from("updateSummonerName: ").info.bind(this.print));
         Minion.toSummoner(parentPort, "risen");
