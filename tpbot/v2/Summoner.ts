@@ -2,15 +2,15 @@ import path from "path";
 import { Print } from "./Print";
 import { Minion } from "./Minion";
 
-export abstract class Summoner
+export abstract class Summoner<T>
 {
     public constructor(protected print: Print) { }
 
-    public summon(file: string, minionName: string, summonerName: string, errorCallback: (error: Error | unknown) => void, data?: any)
+    public summon(file: string, minionName: string, summonerName: string, errorCallback: (error: Error | unknown) => void, data: T)
     {
         const fullpath = path.resolve(__dirname, file);
         this.print.info("Loading file at "+fullpath);
-        const minion = new Minion(minionName, fullpath, errorCallback, data);
+        const minion = new Minion<T>(minionName, fullpath, errorCallback, data);
 
         minion.when("risen", () => {
             minion.emit("updateSummonerName", summonerName);

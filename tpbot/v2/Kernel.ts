@@ -4,14 +4,46 @@ import { Minion } from "./Minion";
 
 import readline from 'readline';
 
+export type timestamp = number;
+export interface CrashInfo
+{
+    count: number,
+    /** Crashes `per minute` */
+    perMinute: number,
+    lastTimestamp: timestamp | null
+}
 export interface BotData
 {
     token: string,
-    crashes: number,
+    crash?: CrashInfo,
 }
-export class Kernel extends Summoner
+export class Kernel extends Summoner<BotData>
 {
-    private readonly botManagerPath = "BotManager";
+    static Increase(before: CrashInfo | undefined): CrashInfo
+    {
+        if (undefined === before) {
+            before = {
+                count: 0,
+                perMinute: 0,
+                lastTimestamp: null
+            }
+        }
+        if (null === before.lastTimestamp) {
+            before.lastTimestamp = new Date().getTime();
+            before.perMinute = Infinity;
+            before.count = 1;
+        }
+        else { 
+            before.perMinute /= before.count++;
+            const now = new Date().getTime();
+            before.perMinute = 1/(1/before.perMinute + (now - before.lastTimestamp)/60000);
+            before.perMinute *= before.count;
+            before.lastTimestamp = now;
+        }
+        return before;
+    }
+
+    private readonly botManagerPath = "BotManagers";
 
     public constructor()
     {
@@ -31,10 +63,10 @@ export class Kernel extends Summoner
         // this.awaitStdin();
     }
 
-    private summonBotManager(botToken: string, botName: string, crashCount: number = 0)
+    private summonBotManager(botToken: string, botName: string, crashInfo?: CrashInfo)
     {
         let bot: Minion<BotData>;
-        bot = this.summon(this.botManagerPath, botName, Kernel.name, (error) => this.whenBotManagerCrashes(bot, error), { token: botToken, crashes: crashCount });
+        bot = this.summon(this.botManagerPath, botName, Kernel.name, (error) => this.whenBotManagerCrashes(bot, error), { token: botToken, crash: crashInfo });
         bot.when("message", message => {
             this.print.from(bot.name).info(message);
             bot.emit("message", "Pong");
@@ -43,9 +75,10 @@ export class Kernel extends Summoner
 
     private whenBotManagerCrashes(bot: Minion<BotData>, error: Error | unknown)
     {
-        this.print.error(`Exception level: BotManager[name=${bot.name},crashes=${++bot.data.crashes}]`);
+        bot.data.crash = Kernel.Increase(bot.data.crash);
+        this.print.error(`Exception level: BotManager[name=${bot.name},crashes=${bot.data.crash.perMinute}/m]`);
         this.print.exception(error);
-        this.summonBotManager(bot.data.token, bot.name, bot.data.crashes);
+        this.summonBotManager(bot.data.token, bot.name, bot.data.crash);
     }
 
     private awaitStdin()
