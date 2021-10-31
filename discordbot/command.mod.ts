@@ -9,9 +9,9 @@ import { known_interactions, command_user_state, dcmodule } from "./module";
 export abstract class mod_command {
 
     public readonly data: ContextMenuCommandBuilder;
-	;
-	public constructor(private command_name: string, public permissions: ApplicationCommandPermissionData[]) {
-
+	
+	public constructor(private command_name: string, public permissions: ApplicationCommandPermissionData[])
+	{
 		const DEBUG = process.env.DCBOT_DEBUG;
         if (DEBUG !== undefined) {
             this.command_name = "debug_"+this.command_name;
@@ -28,7 +28,7 @@ export abstract class mod_command {
             ];
         }
         else if (this.permissions)
-            this.data = this.data.setDefaultPermission(true);
+            this.data = this.data.setDefaultPermission(false);
 		else
 			throw new Error("Permissions is not set for a command that has a moderation power.");
 	}
