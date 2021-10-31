@@ -17,9 +17,10 @@ export abstract class dfa_command<Q extends number> extends command
         private readonly start_q : Q,
         command_name: string, 
         description: string, 
-        permissions?: ApplicationCommandPermissionData[])
+        permissions?: ApplicationCommandPermissionData[],
+        everyone: boolean = false)
     {
-        super(command_name, description, permissions);
+        super(command_name, description, permissions, everyone);
     }
 
     public abstract get_choice_index(interaction: click_interaction): Promise<Q | undefined>

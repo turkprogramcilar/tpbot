@@ -188,7 +188,8 @@ export const c = new class hosbuldum extends dfa_command<Q>
             Q.basla,
             hosbuldum.name, 
             "Türk programcılar onay sistemini başlatır",
-            permissions);
+            permissions,
+            true);
     }
 
     public async get_choice_index(interaction: click_interaction)

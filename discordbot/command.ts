@@ -11,7 +11,7 @@ export abstract class command implements command_module {
 
     public readonly data: SlashCommandBuilder;
 
-    public constructor(command_name: string, description: string, public readonly permissions: ApplicationCommandPermissionData[] | undefined = undefined) {
+    public constructor(command_name: string, description: string, public readonly permissions: ApplicationCommandPermissionData[] | undefined = undefined, everyone: boolean = false) {
         
         const DEBUG = process.env.DCBOT_DEBUG;
         if (DEBUG !== undefined) {
@@ -26,7 +26,7 @@ export abstract class command implements command_module {
             ];
         }
         else if (permissions)
-            this.data = this.data.setDefaultPermission(true);
+            this.data = this.data.setDefaultPermission(everyone);
 
         this.log = new log(command_name);
     }
