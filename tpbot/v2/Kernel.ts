@@ -4,7 +4,7 @@ import { Minion } from "./Minion";
 
 import readline from 'readline';
 
-interface BotData
+export interface BotData
 {
     token: string,
     crashes: number,

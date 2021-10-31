@@ -1,16 +1,16 @@
 import { Client } from "discord.js";
 import { parentPort, workerData } from "worker_threads";
-import { Summoner } from "./Summoner";
-import { Module } from "./Module";
 import { Print } from "./Print";
 import { Minion } from "./Minion";
 import { Crasher } from "./modules/Crasher";
+import { BotData } from "./Kernel";
 // tslint:disable-next-line: no-unused-expression
 new class BotManager
 {
     print: Print = new Print(BotManager.name);
     constructor()
     {
+        const data: BotData = workerData;
         Minion.fromSummoner(parentPort, "message", this.print.from("Summoner").info.bind(this.print));
         Minion.fromSummoner(parentPort, "updateSummonerName", this.print.from("updateSummonerName: ").info.bind(this.print));
         Minion.toSummoner(parentPort, "risen");
