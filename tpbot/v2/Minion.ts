@@ -10,7 +10,7 @@ export interface Events {
     updateMinionName: [string],
     updateSummonerName: [string],
 }
-export class Minion
+export class Minion<T>
 {
     static toSummoner<E extends keyof Events>(parentPort: MessagePort | null, event: E, ...args: Events[E])
     {
@@ -27,7 +27,7 @@ export class Minion
     }
 
     private worker: Worker;
-    public constructor(public name: string, path: string, errorCallback: (error: Error) => void, public data?: any)
+    public constructor(public name: string, path: string, errorCallback: (error: Error) => void, public data: T)
     {
         this.worker = new Worker(path, { workerData: data });
         this.worker.on("error", errorCallback);

@@ -6,7 +6,8 @@ import readline from 'readline';
 
 interface BotData
 {
-    
+    token: string,
+    crashes: number,
 }
 export class Kernel extends Summoner
 {
@@ -32,7 +33,7 @@ export class Kernel extends Summoner
 
     private summonBotManager(botToken: string, botName: string, crashCount: number = 0)
     {
-        let bot: Minion;
+        let bot: Minion<BotData>;
         bot = this.summon(this.botManagerPath, botName, Kernel.name, (error) => this.whenBotManagerCrashes(bot, error), { token: botToken, crashes: crashCount });
         bot.when("message", message => {
             this.print.from(bot.name).info(message);
@@ -40,7 +41,7 @@ export class Kernel extends Summoner
         });
     }
 
-    private whenBotManagerCrashes(bot: Minion, error: Error | unknown)
+    private whenBotManagerCrashes(bot: Minion<BotData>, error: Error | unknown)
     {
         this.print.error(`Exception level: BotManager[name=${bot.name},crashes=${++bot.data.crashes}]`);
         this.print.exception(error);
