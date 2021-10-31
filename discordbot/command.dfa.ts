@@ -1,8 +1,8 @@
-import { ApplicationCommandPermissionData, ButtonInteraction, CommandInteraction, SelectMenuInteraction } from "discord.js";
+import { ApplicationCommandPermissionData, ButtonInteraction, CommandInteraction, ContextMenuInteraction, SelectMenuInteraction } from "discord.js";
 import { command } from "./command";
 import { command_user_state, known_interactions } from "./module";
 
-export type click_interaction = ButtonInteraction | SelectMenuInteraction;
+export type click_interaction = ButtonInteraction | SelectMenuInteraction | ContextMenuInteraction;
 
 export enum status {
     in_progress,

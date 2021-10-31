@@ -2,7 +2,7 @@
 import { REST } from '@discordjs/rest';
 import { Routes } from 'discord-api-types/v9';
 import { assert } from "console";
-import { Message, Client, User, PartialUser, MessageReaction, Presence, Guild, TextChannel, Interaction, CommandInteraction, Collection, ApplicationCommandPermissionData, ButtonInteraction, SelectMenuInteraction } from "discord.js";
+import { Message, Client, User, PartialUser, MessageReaction, Presence, Guild, TextChannel, Interaction, CommandInteraction, Collection, ApplicationCommandPermissionData, ButtonInteraction, SelectMenuInteraction, ContextMenuInteraction } from "discord.js";
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { log } from './log';
 import { command } from './command';
@@ -20,8 +20,9 @@ const constants = require("../../discordbot/constants");
 
 export type user_state_value = string | number | boolean | undefined;
 export type module_user_state = {[key : string] : user_state_value};
-
-export type known_interactions = CommandInteraction | ButtonInteraction | SelectMenuInteraction
+export type first_interactions = CommandInteraction | ContextMenuInteraction
+export type second_interactions = ButtonInteraction | SelectMenuInteraction
+export type known_interactions = CommandInteraction | ButtonInteraction | SelectMenuInteraction | ContextMenuInteraction
 export interface command_module {
     data : SlashCommandBuilder,
     execute : (interaction : known_interactions, state : command_user_state) => Promise<command_user_state | null>,
@@ -43,6 +44,7 @@ export class dcmodule {
     // some constants
     static readonly guild_id_tp     : string = constants.sid.tpdc;
     static readonly role_id_kurucu  : string = constants.rid.kurucu;
+    static readonly role_id_koruyucu: string = "782712917900525628";
     static readonly role_id_kidemli : string = constants.rid.kidemli;
     static readonly role_id_tp_uyesi: string = constants.rid.tp_uyesi;
     static readonly role_id_gozalti : string = constants.rid.gozalti;
@@ -62,7 +64,10 @@ export class dcmodule {
         // paylasimlar
         proje_paylas: constants.cid.proje_paylas,
         // yonetim
+        yetkili_komutlari: "851031980250103888",
         yonetim_dedikodu: constants.cid.yonetim_dedikodu,
+        // gozalti
+        gozalti: "836521603319595008",
         // tpbot
         tpbot_test_odasi: constants.cid.tpbot_test_odasi,
     }
@@ -227,6 +232,8 @@ export class dcmodule {
             throw Error("Can't register commands in module.ts body");
         }})();
     }
+    static is_first_interaction(obj: Interaction): obj is first_interactions { return (obj as first_interactions).commandId !== undefined; }
+    static is_second_interaction(obj: Interaction): obj is second_interactions { return (obj as second_interactions).customId !== undefined; }
     protected async on_interaction_create(interaction : Interaction) {
 
         // process commands
@@ -239,7 +246,7 @@ export class dcmodule {
         let command_module: command_module | undefined;
         let state: command_user_state;
 
-        if (interaction instanceof CommandInteraction) {
+        if (dcmodule.is_first_interaction(interaction)) {
 
             const comm_id = interaction.commandId;
             command_module = this.commands.get(comm_id);
@@ -260,7 +267,7 @@ export class dcmodule {
                 state: 0,
             }
         }
-        else if (interaction.isButton() || interaction.isSelectMenu()) {
+        else if (dcmodule.is_second_interaction(interaction)) {
             
             // assuming button is always triggered from a command
             const user_state = this.command_states[user_id];
