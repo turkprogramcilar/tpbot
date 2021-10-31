@@ -84,7 +84,11 @@ export class dcmodule {
     // ctor
     constructor(
         protected module_name : string = UNNAMED_MODULE, 
-        protected administative_commands : boolean = false) { }
+        protected administative_commands : boolean = false,
+        private has_commands: boolean = true) 
+    {
+
+    }
     
     // props
     public get_client() : Client { 
@@ -159,6 +163,9 @@ export class dcmodule {
     protected async on_ready() {
         // load commands
         if (this.state.command_support !== true)
+            return;
+
+        if (false === this.has_commands)
             return;
 
         const id = this.get_client().user?.id;
