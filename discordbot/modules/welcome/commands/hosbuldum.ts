@@ -34,7 +34,8 @@ const d : { [key in Q]: Q[] } = {
     [Q.roller]: [Q.bitir],
     [Q.bitir]: [],
 };
-const choice_thanks = ["Teşekkürler"];
+const choice_alright = ["Anlaşıldı"];
+const choice_thanks  = ["Teşekkürler"];
 const choice_topics = [
     "Yazılım ile ilgili",
     "Bilgisayar, donanım, teknik veya bir arıza ile ilgili",
@@ -53,16 +54,16 @@ const choice_labels : { [key in Q]: string[] } = {
     ],
     
     [Q.yardim]: choice_topics,
-    [Q.sohbet]: choice_thanks,
-    [Q.proje] : choice_thanks,
-    [Q.reklam]: choice_thanks,
+    [Q.sohbet]: choice_alright,
+    [Q.proje] : choice_alright,
+    [Q.reklam]: choice_alright,
 
     [Q.yazilim]   : choice_priorities,
     [Q.bilgisayar]: choice_priorities,
-    [Q.diger]     : choice_thanks,
+    [Q.diger]     : choice_alright,
 
-    [Q.acil]   : choice_thanks,
-    [Q.sabirli]: choice_thanks,
+    [Q.acil]   : choice_alright,
+    [Q.sabirli]: choice_alright,
 
     [Q.roller]  : choice_thanks,
     [Q.bitir]  : [],
