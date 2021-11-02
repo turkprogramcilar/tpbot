@@ -89,11 +89,25 @@ export const c = new class deste extends command
 				return null;
 			}
 			response.embeds = [card_embed(no)];
+			state.state = no;
 			await interaction.update(response);
 		}
 		else if (interaction instanceof ButtonInteraction) {
-			response.content = "```Kart oynandi```";
+			const no = state.state;
+			if (false === no in card_no) {
+				this.enum_error(no, "no", "card_no", interaction);
+				return null;
+			}
+			response.embeds = [new MessageEmbed().setDescription("```Kart oynandi```")];
+			response.components = [];
 			await interaction.update(response);
+			await (await interaction.channel?.fetch())?.isText()
+				? interaction.channel?.send({
+					content: "`"+`${interaction.user.username} bir kart oynadı.`+"`",
+					embeds: [card_embed(no)]})
+				: Promise.resolve();
+
+			return null;
 		}
 		return state;
 	}

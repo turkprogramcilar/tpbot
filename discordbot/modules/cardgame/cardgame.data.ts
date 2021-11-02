@@ -93,7 +93,11 @@ export enum card_no {
     // 10=
     erotik_ajdar, yengec_risitas, gozleri_kayan_acun, halay, tivorlu_ismail,
     // 15=
-    changerboyle, tatar_ramazan
+    changerboyle, tatar_ramazan, tp_moderatorlerin_gazabi, inshallah, le_umut_peace,
+    // 20=
+    kralin_soytari_gifi, kufurbaz_kral, tempolu_gunaydin, iboy, hainboyle,
+    // 25=
+    ins_cnm_ya
 }
 export const cards: { [key in card_no]: card } = {
     [card_no.efsanevi_ataturk]: {
@@ -217,5 +221,35 @@ export const cards: { [key in card_no]: card } = {
     [card_no.tatar_ramazan]: {
         play_limit: limit.attack_category,
         flips: [{ heads: { attack: { target: 40 } } }]
+    },
+    // 17=
+    [card_no.tp_moderatorlerin_gazabi]: {
+        play_limit: limit.unlimited
+    },
+    [card_no.inshallah]: {
+        play_limit: limit.unlimited
+    },
+    [card_no.le_umut_peace]: {
+        play_limit: limit.unlimited
+    },
+    // 20=
+    [card_no.kralin_soytari_gifi]: {
+        play_limit: limit.unlimited
+    },
+    [card_no.kufurbaz_kral]: {
+        play_limit: limit.unlimited
+    },
+    [card_no.tempolu_gunaydin]: {
+        play_limit: limit.unlimited
+    },
+    [card_no.iboy]: {
+        play_limit: limit.unlimited
+    },
+    [card_no.hainboyle]: {
+        play_limit: limit.unlimited
+    },
+    // 25=
+    [card_no.ins_cnm_ya]: {
+        play_limit: limit.unlimited
     },
 }

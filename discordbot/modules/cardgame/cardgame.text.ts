@@ -99,6 +99,7 @@ export const card_texts: { [key in card_no]: card_text } =
         link: "https://media.discordapp.net/attachments/829256056156586044/840294047314739210/tumblr_m38mn15UyX1qfltf6o1_r2_2501.gif",
         description: "Tivorlu Ismail Hela Vela Velvela adli eserini canlandirmaya baslar. Hay Masallah dedikten sonra Zih der ve Aaaa diye yukselmeye baslar. Rakip 20 hasar alir. Tivorlu Ismail Aaaaa nakaratini tekrarladikca oyuncu yazi tura atar. Her yazi ardina tekrar yazi tura atar ve rakibine 10 hasar verir. Oyuncu yazi turayi 3 kere kombolama hakkinda sahiptir. Eger oyuncu 3 kere yazi tutturursa Ismail Hay masallah fakirim diyip parcasini bitirir ve Oyuncu kendine 20 hasar verir."
     },
+    // 15=
     [card_no.changerboyle]: {
         rarity: rarity.Destansı,
         title: "ChangerBoyle",
@@ -110,5 +111,61 @@ export const card_texts: { [key in card_no]: card_text } =
         title: "Tatar Ramazan",
         link: "https://cdn.discordapp.com/attachments/842470001155899430/855528889660997692/insanlarin-uzerine-sag-tiklayip-ozellik-gormek_205223.png",
         description: "Yazi tura at. Yazi gelirse dusmana 40 hasar yapistir."
+    },
+    [card_no.tp_moderatorlerin_gazabi]: {
+        rarity: rarity.Destansı,
+        title: "TP Moderatörlerin gazabı",
+        link: "https://media3.giphy.com/media/XaLLCvwgRxpwlnnzkh/giphy.gif?cid=790b7611438c6d6c0cfddbdb168cc8b86b99d49cac4b7a29&rid=giphy.gif&ct=g",
+        description: "TP Discord sunucusunu moderatörleri bir araya gelerek üyeler üzerinde yetkilerini kullanma suretiyle sunucuda terör estirmeye başlarlar. Korku içerisinde kalan rakip ne yapamayacağını bilemez ve 2 tur boyunca oyundan banlanır, kart çekemez."
+    },
+    [card_no.inshallah]: {
+        rarity: rarity.Güzide,
+        title: "Inshallah",
+        link: "https://c.tenor.com/wnuXIUDfJLsAAAAC/ron-swanson-nick-offerman.gif",
+        description: "Türk programcı yazılım geliştirme yaparken takıldığı noktaları ve sorunları TP Discord sunucusunda paylaşır. Sunucu bireyleri oyuncuya destek olarak sorununu çözer, yardımcı olur ve inşallah gifi atarlar. Bunun sonunda motive olmuş üye kod yazmaya devam eder ve iki tur boyunca 20 iyileştirme alır."
+    },
+    [card_no.le_umut_peace]: {
+        rarity: rarity.Esrarengiz,
+        title: "Le Umut Peace",
+        link: "https://c.tenor.com/xjz_SE0yqXQAAAAC/peace-disappear.gif",
+        description: "Sunucuda Umut sohbetin tam ortasında durduk yere peace gifi atar ve ortadan kaybolur. Bunun sonucunda sunucu üyeleri afallar ve rakip 1 el boyunca hedefini ortada bulamaz."
+    },
+    // 20=
+    [card_no.kralin_soytari_gifi]: {
+        rarity: rarity.İhtişamlı,
+        title: "Kralın Soytarı gifi",
+        link: "https://c.tenor.com/a5d4lrIx9rIAAAAd/jimin-bye-jimin-bts.gif",
+        description: "TP Kralı sunucuda Umutun peace gifi üzerine Soytarı Peace gifi atar. Oyuncu ortadan kaybolur ve rakip 1 el boyunca hedefini ortada bulamaz. Eğer herhangi bir oyuncu önceden Le Umut Peace kartı atmışsa bunun üzerine oynanan bu kart kombo etkisi yaratır ve ansızın modsuz kalan sunucuda kaos ortamı oluşur. İki oyuncu rastgele birer kart kaybeder ve 20 hasar puanı alırlar."
+    },
+    [card_no.kufurbaz_kral]: {
+        rarity: rarity.Destansı,
+        title: "Küfürbaz Kral",
+        link: "https://media.giphy.com/media/PL4yLaVxeYreemo2kY/giphy.gif",
+        description: "TP Kralı sunucudan uzun bir süre uzakta kalır ve geri geldiğinde notification fırtınasına uğrar. Bunun sonucunda sinirlenir ve notification sayısı kadar düşmana hasar verir. Bu saldırı koruyucu büyüler tarafından engellenemez."
+    },
+    [card_no.tempolu_gunaydin]: {
+        rarity: rarity.Esrarengiz,
+        title: "Tempolu Günaydın",
+        link: "https://c.tenor.com/_1z9JvYh7dwAAAAC/goose-silly.gif",
+        description: "Oyuncu güne iyi başlar ve her round başı yazı tura atar. Yazı gelmesi durumunda tur başı çektiği kartın üzerine fazla bir kart çeker. Bu büyü uç tur sürer."
+    },
+    [card_no.iboy]: {
+        rarity: rarity.Güzide,
+        title: ":IBOY:",
+        link: "https://cdn.discordapp.com/attachments/842470001155899430/902335657274376192/unknown.png",
+        description: "Oyuncu TP sunucusunda en çok kullanılan emojiyi atar 1 kart çeker ve rakip 10 hasar alır. Oyuncu :IBOY: kartını ard ardına spamlaması durumunda her bir oynayış başı kartın hasarı 10 artar. Kart en fazla 30 hasara ulaşabilir."
+    },
+    [card_no.hainboyle]: {
+        rarity: rarity.Destansı,
+        title: "HainBöyle",
+        link: "https://c.tenor.com/Rbfv2Nbq_u4AAAAC/swinging-chilling.gif",
+        description: "RabirtBoyle TP Discord sunucunun sahibi olmak için hain planlar yapar ve bu emeller içinde oyuncuya aynı tur içerisinde ikinci bir saldırı kartı oynama ayrıcalığı verir."
+    },
+    // 25=
+    [card_no.ins_cnm_ya]: {
+        rarity: rarity.Güzide,
+        title: "İnş cnm ya :)",
+        link: "https://media4.giphy.com/media/ob44JUxIej8jJEeEgp/giphy.gif?cid=790b7611a4c4375931ff92ee0e899e0c390702526109de29&rid=giphy.gif&ct=g",
+        description: "Belirsizliğin ortasında kalınıldığında sunucuda inş cnm ya gifi atılır. Ne olacağı belli olmayan bu durumda sorun yaşayan oyuncu ya 30 sağlık puanı kaybeder yada rakibine 30 hasar verir."
     }
 }
