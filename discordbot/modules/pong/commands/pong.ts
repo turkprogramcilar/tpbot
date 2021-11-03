@@ -1,5 +1,6 @@
 import { CommandInteraction } from "discord.js";
-import { slash_command, operation } from "../../../command.slash";
+import { operation } from "../../../command";
+import { slash_command } from "../../../command.slash";
 import { known_interactions, command_user_state } from "../../../modern";
 
 

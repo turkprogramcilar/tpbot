@@ -5,9 +5,10 @@ import { cards, card_no } from "../data";
 import { card_text, card_texts, rarity } from "../texts";
 import { cardgame } from "../game";
 import { user_info } from "../../../log";
-import { slash_command, operation } from "../../../command.slash";
+import { slash_command } from "../../../command.slash";
 import { helper } from "../../../helper";
 import { command_user_state, known_interactions } from "../../../modern";
+import { operation } from "../../../command";
 
 /*
 

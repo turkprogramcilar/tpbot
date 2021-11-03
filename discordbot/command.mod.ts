@@ -2,23 +2,25 @@ import { ContextMenuCommandBuilder } from "@discordjs/builders";
 import { ApplicationCommandType } from "discord-api-types";
 import { ApplicationCommandPermissionData, ContextMenuInteraction, Message, MessageEmbed } from "discord.js";
 import { ApplicationCommandPermissionTypes } from "discord.js/typings/enums";
+import { command, operation } from "./command";
 import { slash_command } from "./command.slash";
 import { known_interactions, command_user_state } from "./modern";
 import { dcmodule } from "./module";
 
 
-export abstract class mod_command extends slash_command {
+export abstract class mod_command extends command 
+{
+    public data: ContextMenuCommandBuilder;
 	
-	public constructor(protected command_name: string, public permissions: ApplicationCommandPermissionData[])
+	public constructor(command_name: string, public permissions: ApplicationCommandPermissionData[])
 	{
-		const DEBUG = process.env.DCBOT_DEBUG;
-        if (DEBUG !== undefined) {
-            this.command_name = "debug_"+this.command_name;
-        }
+		super(command_name);
+		
         this.data = new ContextMenuCommandBuilder()
 			.setName(this.command_name)
 			.setType(ApplicationCommandType.Message)
 			;
+		const DEBUG = process.env.DCBOT_DEBUG;
         if (DEBUG !== undefined) {
             this.data = this.data.setDefaultPermission(false);
             this.permissions = [
@@ -46,7 +48,7 @@ export abstract class mod_command extends slash_command {
 			 || !(target_message = await target_channel.messages.fetch(interaction.targetId))) {
 
 				await slash_command.respond_interaction_failure_to_user(interaction);
-				return null;
+				return operation.complete;
 			}
 			const gozalti = dcmodule.channel_id.gozalti;
 			const mod_command = `\`${this.command_name}`;
@@ -70,6 +72,6 @@ export abstract class mod_command extends slash_command {
 			await p1, p2;
 		}
 		
-		return null;
+		return operation.complete;
 	}
 }
