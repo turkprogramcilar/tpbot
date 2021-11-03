@@ -8,12 +8,12 @@ export abstract class slash_command extends command
 {
     public data: SlashCommandBuilder;
 
-    public constructor(public command_name: string, description: string, public readonly permissions: ApplicationCommandPermissionData[] | undefined = undefined, everyone: boolean = false)
+    public constructor(command_name: string, description: string, public readonly permissions: ApplicationCommandPermissionData[] | undefined = undefined, everyone: boolean = false)
     {
         super(command_name);
         
         this.data = new SlashCommandBuilder()
-            .setName(command_name)
+            .setName(this.command_name)
             .setDescription(description)
             ;
         const DEBUG = process.env.DCBOT_DEBUG;
