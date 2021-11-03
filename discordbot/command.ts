@@ -23,7 +23,7 @@ export abstract class command
 
     public readonly data: SlashCommandBuilder;
 
-    public constructor(command_name: string, description: string, public readonly permissions: ApplicationCommandPermissionData[] | undefined = undefined, everyone: boolean = false) {
+    public constructor(public command_name: string, description: string, public readonly permissions: ApplicationCommandPermissionData[] | undefined = undefined, everyone: boolean = false) {
         
         const DEBUG = process.env.DCBOT_DEBUG;
         if (DEBUG !== undefined) {

@@ -92,8 +92,6 @@ export class modern extends dcmodule
             return undefined;
         
         try {
-            this.log.info('Started refreshing application (/) commands.');
-
             const root = `build/discordbot/modules/${this.module_name}/commands/`;
             const commands_folder_files : string[] = tools.get_files_sync(root);
             const command_files = commands_folder_files.filter(file => file.endsWith('.js'));
