@@ -2,7 +2,8 @@ import { ContextMenuInteraction, Message, MessageEmbed } from "discord.js";
 import { ApplicationCommandPermissionTypes } from "discord.js/typings/enums";
 import { command } from "../../../command";
 import { mod_command } from "../../../command.mod";
-import { command_user_state, dcmodule, known_interactions } from "../../../module";
+import { command_user_state, known_interactions } from "../../../modern";
+import { dcmodule } from "../../../module";
 
 export const c = new class dedikodu extends mod_command
 {

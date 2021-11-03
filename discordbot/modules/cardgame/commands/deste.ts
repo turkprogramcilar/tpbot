@@ -3,11 +3,11 @@ import { ButtonInteraction, CommandInteraction, Interaction, MessageActionRow, M
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { cards, card_no } from "../data";
 import { card_text, card_texts, rarity } from "../texts";
-import { command_user_state, dcmodule, known_interactions } from "../../../module";
 import { cardgame } from "../game";
 import { user_info } from "../../../log";
-import { command } from "../../../command";
+import { command, operation } from "../../../command";
 import { helper } from "../../../helper";
+import { command_user_state, known_interactions } from "../../../modern";
 
 /*
 
@@ -97,7 +97,7 @@ export const c = new class deste extends command
 			const no = state.state;
 			if (false === no in card_no) {
 				this.enum_error(no, "no", "card_no", interaction);
-				return null;
+				return operation.complete;
 			}
 			response.embeds = [new MessageEmbed().setDescription("```Kart oynandi```")];
 			response.components = [];
@@ -108,7 +108,7 @@ export const c = new class deste extends command
 					embeds: [card_embed(no)]})
 				: Promise.resolve();
 
-			return null;
+			return operation.complete;
 		}
 		return operation.on(state);
 	}

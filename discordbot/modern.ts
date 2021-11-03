@@ -1,20 +1,32 @@
 import { Routes } from 'discord-api-types/v9';
-import { ButtonInteraction, Client, CommandInteraction, Interaction, SelectMenuInteraction } from "discord.js";
+import { ApplicationCommandPermissionData, ButtonInteraction, Client, CommandInteraction, ContextMenuInteraction, Interaction, SelectMenuInteraction } from "discord.js";
 import { command } from "./command";
 import { dcmodule } from "./module";
 import { REST } from "@discordjs/rest";
+import { SlashCommandBuilder } from '@discordjs/builders';
 
 const tools = require("../../discordbot/tools");
 
 
-export type known_interactions = CommandInteraction | ButtonInteraction | SelectMenuInteraction
+export type first_interactions = CommandInteraction | ContextMenuInteraction
+export type second_interactions = ButtonInteraction | SelectMenuInteraction
+export type known_interactions = CommandInteraction | ButtonInteraction | SelectMenuInteraction | ContextMenuInteraction
+export interface command_module {
+    data : SlashCommandBuilder,
+    execute : (interaction : known_interactions, state : command_user_state) => Promise<command_user_state | null>,
+    permissions : ApplicationCommandPermissionData[] | undefined,
+};
 export interface command_user_state {
     command_id : string,
     state : number,
+    reset: boolean,
 }
+
 type user_id = string;
 type command_id = string;
 type command_name = string;
+
+
 
 export class modern extends dcmodule
 {
@@ -113,6 +125,11 @@ export class modern extends dcmodule
         }
         this.commands = switch_to_ids;
     }
+
+        
+    static is_first_interaction(obj: Interaction): obj is first_interactions { return (obj as first_interactions).commandId !== undefined; }
+    static is_second_interaction(obj: Interaction): obj is second_interactions { return (obj as second_interactions).customId !== undefined; }
+
     /*** EVENT OVERRIDES ***/
     protected async on_interaction_create(interaction : Interaction) {
 
@@ -127,9 +144,9 @@ export class modern extends dcmodule
         const user_info = command.get_user_info(interaction.user);
 
         let state: command_user_state;
-        let command_module: command;
+        let command_module: command | undefined;
 
-        if (interaction instanceof CommandInteraction) {
+        if (modern.is_first_interaction(interaction)) {
 
             const id: command_id = interaction.commandId;
             const module: command | undefined = this.commands[id];
@@ -138,20 +155,32 @@ export class modern extends dcmodule
                 return;
             }
             command_module = module;
-    
+
             // if user already started a command, dont start another one
             state = this.command_states[user_id] 
-            if (state)
-                return await interaction.reply({content: "Lütfen önceden çalıştırdığınız komutu tamamlayınız.", ephemeral: true });
-            
+            if (state) {
+                if (state.reset == true) {
+                    delete this.command_states[user_id];
+                    return await interaction.reply({content: "`Komut süreci sıfırlandı. Komutu artık baştan tekrar başlatabilirsiniz.`", ephemeral: true });
+                }
+                else {
+                    state.reset = true;
+                    return await interaction.reply({content: "Lütfen önceden çalıştırdığınız komutu tamamlayınız."
+                        +"\nEğer komutu yeniden başlatmak istiyorsanız bir sefer daha aynı komutu çalıştırınız."
+                        +"\n**Dikkat! Tüm süreciniz sıfırlanacaktır**", ephemeral: true });
+                }
+                
+            }
+
             // if user_id exists already, it will be overridden with state = 0
             // so that it pushes user to the first stage of the command
             state = this.command_states[user_id] = {
                 command_id: id,
                 state: 0,
+                reset: false,
             }
         }
-        else if (interaction.isButton() || interaction.isSelectMenu()) {
+        else if (modern.is_second_interaction(interaction)) {
             
             // assuming button is always triggered from a command
             state = this.command_states[user_id];
@@ -176,7 +205,7 @@ export class modern extends dcmodule
             this.log.error("An interaction neither button, select menu nor command is received", user_info)
             return;
         }
-        
+
         try {
             const operation = await command_module.execute(interaction, state);
             if (operation.is_complete()) 
