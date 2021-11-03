@@ -1,7 +1,7 @@
 import { Message, MessageReaction, PartialUser, Presence, User } from "discord.js";
-import { dcmodule } from "../../module";
+import { modern } from "../../modern";
 
-export const m = new class ping extends dcmodule {
+export const m = new class ping extends modern {
     
     constructor() { super(ping.name, false); }
     

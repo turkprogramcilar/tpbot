@@ -2,7 +2,8 @@ import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, Messa
 
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { ApplicationCommandPermissionTypes, MessageButtonStyles } from "discord.js/typings/enums";
-import { command_user_state, dcmodule, known_interactions } from "../../../module";
+import { command_user_state, known_interactions } from "../../../modern";
+import { dcmodule } from "../../../module";
 import { assert } from "console";
 import { log } from "../../../log";
 import { command } from "../../../command";

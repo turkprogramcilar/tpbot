@@ -1,4 +1,4 @@
-import { card_no } from "./cardgame.data";
+import { card_no } from "./data";
 
 export enum rarity {
     "Yaygın" = 1,

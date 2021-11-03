@@ -2,11 +2,23 @@ import { SlashCommandBuilder } from '@discordjs/builders';
 import { ApplicationCommandData, ApplicationCommandPermissionData, User } from 'discord.js';
 import { ApplicationCommandPermissionTypes } from 'discord.js/typings/enums';
 import { log, user_info } from './log';
-import { command_module, known_interactions, command_user_state, dcmodule } from './module';
+import { known_interactions, command_user_state } from './modern';
+import { dcmodule } from './module';
 
+export class operation<T>
+{
+    static complete = new operation(null);
+    static on<T>(value: T): operation<T>
+    {
+        return new operation<T>(value);
+    }
 
-export abstract class command implements command_module {
-
+    public constructor(private value: T) { }
+    public is_complete() { return this.value === null; }
+    public get_value() { return this.value; }
+}
+export abstract class command
+{
     protected log: log;
 
     public readonly data: SlashCommandBuilder;
@@ -60,5 +72,5 @@ export abstract class command implements command_module {
         };
     }
 
-    public abstract execute(interaction : known_interactions, state: command_user_state): Promise<command_user_state | null>
+    public abstract execute(interaction : known_interactions, state: command_user_state): Promise<operation<command_user_state | null>>
 }

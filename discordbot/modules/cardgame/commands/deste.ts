@@ -1,12 +1,13 @@
 import { ButtonInteraction, CommandInteraction, Interaction, MessageActionRow, MessageButton, MessageEmbed, MessageSelectMenu, SelectMenuInteraction } from "discord.js";
 
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { cards, card_no } from "../cardgame.data";
-import { card_text, card_texts, rarity } from "../cardgame.text";
+import { cards, card_no } from "../data";
+import { card_text, card_texts, rarity } from "../texts";
 import { command_user_state, dcmodule, known_interactions } from "../../../module";
-import { cardgame } from "../cardgame";
+import { cardgame } from "../game";
 import { user_info } from "../../../log";
 import { command } from "../../../command";
+import { helper } from "../../../helper";
 
 /*
 
@@ -60,13 +61,13 @@ export const c = new class deste extends command
 		super(deste.name, "Kart oynama panelini açar");
 	}
 
-	public async execute(interaction: known_interactions, state: command_user_state): Promise<command_user_state | null>
+	public async execute(interaction: known_interactions, state: command_user_state): Promise<operation<command_user_state | null>>
 	{
 		const menu = new MessageActionRow().addComponents(new MessageSelectMenu()
 			.setCustomId("menu")
 			.setPlaceholder("Kart seç")
 			.addOptions(
-				dcmodule.enum_keys(card_no).map((i: card_no) => {
+				helper.get_enum_keys(card_no).map((i: card_no) => {
 					return { label: card_texts[i].title, value: i.toString(), };
 				})
 			),
@@ -86,7 +87,7 @@ export const c = new class deste extends command
 			const no = Number(interaction.values[0]);
 			if (false === no in card_no) {
 				this.enum_error(no, "no", "card_no", interaction);
-				return null;
+				return operation.complete;
 			}
 			response.embeds = [card_embed(no)];
 			state.state = no;
@@ -109,7 +110,7 @@ export const c = new class deste extends command
 
 			return null;
 		}
-		return state;
+		return operation.on(state);
 	}
 	
 }

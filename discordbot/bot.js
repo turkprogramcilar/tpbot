@@ -37,6 +37,7 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
     };
 
     let modules = [];
+    let all_command_ids = [];
     const promises = [];
     for (const m of mods) {
 
@@ -84,13 +85,37 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
     }
     client.login(token);
 
-    client.on('ready', () => {
+    client.on('ready', async () => {
+
         console.log(`Logged in as ${client.user.tag}! (for modules=[${mods}])`);
-        for (const m of modules) 
+
+        all_commands = [];
+        modern_modules = [];
+        for (const m of modules) {
+
             m.on_event('ready', {});
 
+            if (m.get_commands !== undefined) {
+                
+                all_commands.push(m.get_commands());
+                modern_modules.push(m);
+            }
+        }
+
+        // load empty modern module for static function calls
+        const modern = require("../build/discordbot/modern.js");
+        const name_id_pairs = await modern.modern.register_commands(all_commands, client);
+
+        // broadcast all loaded command id's from discord server
+        for (const m of modern_modules)
+            m.set_command_ids(name_id_pairs);
+
+        all_command_ids = name_id_pairs.map(x => x[1]);
         
-            require("./marquee_status.js").init(client, msg_status);
+        console.log('Successfully reloaded all module (/) commands.');
+        
+        // load status switcher module
+        require("./marquee_status.js").init(client, msg_status);
     });
 
     for (const evt of ['presenceUpdate']) {
@@ -101,6 +126,12 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
         }); 
     }
     client.on('interactionCreate', async interaction => {
+        
+        if (interaction.isCommand() && false == all_command_ids.includes(interaction.commandId)) {
+            console.warn(`command id[${interaction.id}] is not found in commands when first executing command [user=${interaction.user.username},id=${interaction.user.id}]`);
+            return;
+        }
+        
         for (const m of modules) 
             m.on_event('interactionCreate', {interaction: interaction});
     });

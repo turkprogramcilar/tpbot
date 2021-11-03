@@ -17,9 +17,7 @@
   "license": "ISC",
   "dependencies": {
     "@discordjs/builders": "^0.7.0",
-    "@discordjs/rest": "^0.1.0-canary.0",
     "bufferutil": "^4.0.5",
-    "discord-api-types": "^0.24.0",
     "discord.js": "^13.2.0",
     "express": "^4.17.1",
     "jimp": "^0.16.1",
@@ -30,10 +28,12 @@
     "xss": "^1.0.10"
   },
   "devDependencies": {
+    "@discordjs/rest": "^0.1.0-canary.0",
     "@types/chai": "^4.2.22",
     "@types/mocha": "^8.2.3",
     "@types/node": "^15.14.9",
     "chai": "^4.3.4",
+    "discord-api-types": "^0.24.0",
     "mocha": "^9.1.3",
     "ts-node": "^10.3.0",
     "typescript": "^4.4.4"
