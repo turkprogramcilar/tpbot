@@ -31,6 +31,7 @@ export interface command_module {
 export interface command_user_state {
     command_id : string,
     state : number,
+    reset: boolean,
 }
 type user_id = string;
 
@@ -264,14 +265,26 @@ export class dcmodule {
     
             // if user already started a command, dont start another one
             state = this.command_states[user_id] 
-            if (state)
-                return await interaction.reply({content: "Lütfen önceden çalıştırdığınız komutu tamamlayınız.", ephemeral: true });
+            if (state) {
+                if (state.reset == true) {
+                    delete this.command_states[user_id];
+                    return await interaction.reply({content: "`Komut süreci sıfırlandı. Komutu artık baştan tekrar başlatabilirsiniz.`", ephemeral: true });
+                }
+                else {
+                    state.reset = true;
+                    return await interaction.reply({content: "Lütfen önceden çalıştırdığınız komutu tamamlayınız."
+                        +"\nEğer komutu yeniden başlatmak istiyorsanız bir sefer daha aynı komutu çalıştırınız."
+                        +"\n**Dikkat! Tüm süreciniz sıfırlanacaktır**", ephemeral: true });
+                }
+                
+            }
             
             // if user_id exists already, it will be overridden with state = 0
             // so that it pushes user to the first stage of the command
             state = this.command_states[user_id] = {
                 command_id: comm_id,
                 state: 0,
+                reset: false,
             }
         }
         else if (dcmodule.is_second_interaction(interaction)) {
