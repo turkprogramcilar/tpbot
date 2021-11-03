@@ -18,6 +18,8 @@ export class operation<T>
 export abstract class command
 {
     protected log: log;
+    public data: any;
+    public permissions: any;
 
     public constructor(public command_name: string)
     {

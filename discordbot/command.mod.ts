@@ -3,7 +3,6 @@ import { ApplicationCommandType } from "discord-api-types";
 import { ApplicationCommandPermissionData, ContextMenuInteraction, Message, MessageEmbed } from "discord.js";
 import { ApplicationCommandPermissionTypes } from "discord.js/typings/enums";
 import { command, operation } from "./command";
-import { slash_command } from "./command.slash";
 import { known_interactions, command_user_state } from "./modern";
 import { dcmodule } from "./module";
 
@@ -47,7 +46,7 @@ export abstract class mod_command extends command
 			 || !target_channel?.isText()
 			 || !(target_message = await target_channel.messages.fetch(interaction.targetId))) {
 
-				await slash_command.respond_interaction_failure_to_user(interaction);
+				await command.respond_interaction_failure_to_user(interaction);
 				return operation.complete;
 			}
 			const gozalti = dcmodule.channel_id.gozalti;

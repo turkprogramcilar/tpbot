@@ -1,13 +1,11 @@
-import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
+import { ButtonInteraction, MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
 
-import { SlashCommandBuilder } from '@discordjs/builders';
 import { ApplicationCommandPermissionTypes, MessageButtonStyles } from "discord.js/typings/enums";
-import { command_user_state, known_interactions } from "../../../modern";
+import { known_interactions } from "../../../modern";
 import { dcmodule } from "../../../module";
 import { assert } from "console";
-import { log } from "../../../log";
-import { slash_command } from "../../../command.slash";
 import { status, click_interaction, dfa_command } from "../../../command.dfa";
+import { command } from "../../../command";
 
 // https://en.wikipedia.org/wiki/Deterministic_finite_automaton
 enum Q {
@@ -246,7 +244,7 @@ export const c = new class hosbuldum extends dfa_command<Q>
                 ;
             const channel = await interaction.guild?.channels.fetch(cid);
             if (channel?.isText()) {
-                const user = slash_command.get_user_info(interaction.user)
+                const user = command.get_user_info(interaction.user)
                 const msg = _i !== null
                     ? "```css\n"+`[${user.name}] seçenek seçti [${choice_labels[old_q][_i]}] id=${user.id} `+"```"
                     : "```css\n"+`[${user.name}] #hosbuldum komutunu başlattı.  id=${user.id}`+"```"
@@ -260,7 +258,7 @@ export const c = new class hosbuldum extends dfa_command<Q>
             // give user role
             const guild_user = await interaction.guild?.members.fetch(interaction.user);
             if (!guild_user) {
-                this.log.error("Can't fetch guild user at the end of hosbuldum command", slash_command.get_user_info(interaction.user));
+                this.log.error("Can't fetch guild user at the end of hosbuldum command", command.get_user_info(interaction.user));
                 return status.finished;
             }
             await guild_user.roles.add(dcmodule.role_id_tp_uyesi);

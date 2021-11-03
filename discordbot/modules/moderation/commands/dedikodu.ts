@@ -1,10 +1,9 @@
 import { ContextMenuInteraction, Message, MessageEmbed } from "discord.js";
 import { ApplicationCommandPermissionTypes } from "discord.js/typings/enums";
-import { slash_command } from "../../../command.slash";
 import { mod_command } from "../../../command.mod";
 import { command_user_state, known_interactions } from "../../../modern";
 import { dcmodule } from "../../../module";
-import { operation } from "../../../command";
+import { command, operation } from "../../../command";
 
 export const c = new class dedikodu extends mod_command
 {
@@ -30,7 +29,7 @@ export const c = new class dedikodu extends mod_command
 			 || !target_channel?.isText()
 			 || !(target_message = await target_channel.messages.fetch(interaction.targetId))) {
 
-				await slash_command.respond_interaction_failure_to_user(interaction);
+				await command.respond_interaction_failure_to_user(interaction);
 				return operation.complete;
 			}
 			const mod_command = `${this.command_name}`;
