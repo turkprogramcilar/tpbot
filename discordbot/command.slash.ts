@@ -1,4 +1,4 @@
-import { SlashCommandBuilder } from '@discordjs/builders';
+import { ContextMenuCommandBuilder, SlashCommandBuilder } from '@discordjs/builders';
 import { ApplicationCommandData, ApplicationCommandPermissionData, User } from 'discord.js';
 import { ApplicationCommandPermissionTypes } from 'discord.js/typings/enums';
 import { log, user_info } from './log';
@@ -17,11 +17,11 @@ export class operation<T>
     public is_complete() { return this.value === null; }
     public get_value() { return this.value; }
 }
-export abstract class command
+export abstract class slash_command
 {
     protected log: log;
 
-    public readonly data: SlashCommandBuilder;
+    public readonly data: SlashCommandBuilder | ContextMenuCommandBuilder;
 
     public constructor(public command_name: string, description: string, public readonly permissions: ApplicationCommandPermissionData[] | undefined = undefined, everyone: boolean = false) {
         
@@ -52,8 +52,8 @@ export abstract class command
     }
     protected async log_and_reply_user(msg : string, interaction : known_interactions) 
     {
-        this.log.error(msg, command.get_user_info(interaction.user));
-        await command.respond_interaction_failure_to_user(interaction);
+        this.log.error(msg, slash_command.get_user_info(interaction.user));
+        await slash_command.respond_interaction_failure_to_user(interaction);
     }
     static async respond_interaction_failure_to_user(interaction : known_interactions)
     {

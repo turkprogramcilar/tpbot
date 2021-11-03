@@ -5,7 +5,7 @@ import { cards, card_no } from "../data";
 import { card_text, card_texts, rarity } from "../texts";
 import { cardgame } from "../game";
 import { user_info } from "../../../log";
-import { command, operation } from "../../../command";
+import { slash_command, operation } from "../../../command.slash";
 import { helper } from "../../../helper";
 import { command_user_state, known_interactions } from "../../../modern";
 
@@ -55,7 +55,7 @@ const card_embed = (no: card_no) => {
         .setColor(rarity_colors[card.rarity]);
 }
 
-export const c = new class deste extends command
+export const c = new class deste extends slash_command
 {
 	public constructor() {
 		super(deste.name, "Kart oynama panelini açar");

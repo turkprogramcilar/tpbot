@@ -1,9 +1,9 @@
 import { CommandInteraction } from "discord.js";
-import { command, operation } from "../../../command";
+import { slash_command, operation } from "../../../command.slash";
 import { known_interactions, command_user_state } from "../../../modern";
 
 
-export const c = new class pang extends command
+export const c = new class pang extends slash_command
 {
 	public constructor()
 	{

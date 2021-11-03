@@ -2,14 +2,12 @@ import { ContextMenuCommandBuilder } from "@discordjs/builders";
 import { ApplicationCommandType } from "discord-api-types";
 import { ApplicationCommandPermissionData, ContextMenuInteraction, Message, MessageEmbed } from "discord.js";
 import { ApplicationCommandPermissionTypes } from "discord.js/typings/enums";
-import { command } from "./command";
+import { slash_command } from "./command.slash";
 import { known_interactions, command_user_state } from "./modern";
 import { dcmodule } from "./module";
 
 
-export abstract class mod_command {
-
-    public readonly data: ContextMenuCommandBuilder;
+export abstract class mod_command extends slash_command {
 	
 	public constructor(protected command_name: string, public permissions: ApplicationCommandPermissionData[])
 	{
@@ -47,7 +45,7 @@ export abstract class mod_command {
 			 || !target_channel?.isText()
 			 || !(target_message = await target_channel.messages.fetch(interaction.targetId))) {
 
-				await command.respond_interaction_failure_to_user(interaction);
+				await slash_command.respond_interaction_failure_to_user(interaction);
 				return null;
 			}
 			const gozalti = dcmodule.channel_id.gozalti;

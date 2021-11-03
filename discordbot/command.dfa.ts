@@ -1,5 +1,5 @@
 import { ApplicationCommandPermissionData, ButtonInteraction, CommandInteraction, ContextMenuInteraction, SelectMenuInteraction } from "discord.js";
-import { command, operation } from "./command";
+import { slash_command, operation } from "./command.slash";
 import { command_user_state, known_interactions } from "./modern";
 
 export type click_interaction = ButtonInteraction | SelectMenuInteraction | ContextMenuInteraction;
@@ -9,7 +9,7 @@ export enum status {
     finished,
 }
 
-export abstract class dfa_command<Q extends number> extends command
+export abstract class dfa_command<Q extends number> extends slash_command
 {
     public constructor(
         private Q_keys: number[],

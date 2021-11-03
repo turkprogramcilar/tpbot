@@ -1,6 +1,6 @@
 import { Routes } from 'discord-api-types/v9';
 import { ApplicationCommandPermissionData, ButtonInteraction, Client, CommandInteraction, ContextMenuInteraction, Interaction, SelectMenuInteraction } from "discord.js";
-import { command } from "./command";
+import { slash_command } from "./command.slash";
 import { dcmodule } from "./module";
 import { REST } from "@discordjs/rest";
 import { SlashCommandBuilder } from '@discordjs/builders';
@@ -31,10 +31,10 @@ type command_name = string;
 export class modern extends dcmodule
 {
     
-    protected commands: {[key: string]: command} = {};
+    protected commands: {[key: string]: slash_command} = {};
     private command_states : { [key: user_id] : command_user_state } = {};
 
-    static async register_commands(commands: {[key: string]: command}[], client: Client): Promise<[command_name, command_id][]> {
+    static async register_commands(commands: {[key: string]: slash_command}[], client: Client): Promise<[command_name, command_id][]> {
 
         const id = client.user?.id;
         const token = client.token;
@@ -86,7 +86,7 @@ export class modern extends dcmodule
         return res_arr.map(x => [x.name, x.id]);
     }
 
-    public get_commands(): {[key: string]: command} | undefined {
+    public get_commands(): {[key: string]: slash_command} | undefined {
         // load commands
         if (this.state.command_support !== true)
             return undefined;
@@ -97,7 +97,7 @@ export class modern extends dcmodule
             const command_files = commands_folder_files.filter(file => file.endsWith('.js'));
 
             for (const file of command_files) {
-                const command : command = require("../../"+root+file.substring(0, file.length-3)).c;
+                const command : slash_command = require("../../"+root+file.substring(0, file.length-3)).c;
                 // Set a new item in the Collection
                 // With the key as the command name and the value as the exported module
                 this.commands[command.data.name] = command;
@@ -112,10 +112,10 @@ export class modern extends dcmodule
     }
     public set_command_ids(name_id_pairs: [command_name, command_id][]): void {
 
-        const switch_to_ids: {[key: command_id]: command} = {};
+        const switch_to_ids: {[key: command_id]: slash_command} = {};
         for (const [name, id] of name_id_pairs) {
 
-            const command_module: command | undefined = this.commands[name];
+            const command_module: slash_command | undefined = this.commands[name];
             if (command_module !== undefined) {
 
                 switch_to_ids[id] = command_module;
@@ -139,15 +139,15 @@ export class modern extends dcmodule
 
         // process commands
         const user_id = interaction.user.id;
-        const user_info = command.get_user_info(interaction.user);
+        const user_info = slash_command.get_user_info(interaction.user);
 
         let state: command_user_state;
-        let command_module: command | undefined;
+        let command_module: slash_command | undefined;
 
         if (modern.is_first_interaction(interaction)) {
 
             const id: command_id = interaction.commandId;
-            const module: command | undefined = this.commands[id];
+            const module: slash_command | undefined = this.commands[id];
             if (undefined === module) {
                 // its not in our command scope
                 return;
@@ -212,7 +212,7 @@ export class modern extends dcmodule
         } catch (error) {
             this.log.error(error, user_info);
             delete this.command_states[user_id];
-            await command.respond_interaction_failure_to_user(interaction);
+            await slash_command.respond_interaction_failure_to_user(interaction);
         }
     }
 }
