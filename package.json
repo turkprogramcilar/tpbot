@@ -8,6 +8,7 @@
   },
   "scripts": {
     "start": "node main.js",
+    "debug": "node main.js --inspect=9090",
     "build": "tsc",
     "postinstall": "npm run build",
     "test": "mocha -r ts-node/register **/*.tests.ts"
