@@ -1,2 +1,2 @@
-worker: npm start
-worker-debug: npm debug
+worker: npm run start
+worker-debug: npm run debug
