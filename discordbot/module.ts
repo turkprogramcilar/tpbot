@@ -117,6 +117,7 @@ export class dcmodule {
     }
     // on_event for receiving events from bot.js
     public async on_event(evt: string, args: any) {
+        this.log.verbose("ON_EVENT::"+`${evt}\n${args}\n`);
 
         switch(evt) {
             case 'ready'                : await this.on_ready();                              break;

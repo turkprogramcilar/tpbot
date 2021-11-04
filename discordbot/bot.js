@@ -5,6 +5,7 @@ const fs      = require("fs").promises;
 const php     = require("./php.js");
 const tools   = require("./tools.js");
 const parser  = require("./cmdparser.js");
+const log     = require("./log.js");
 
 const Discord = require('discord.js');
 const htmlp   = require('node-html-parser');
@@ -35,6 +36,7 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
             }
         },
     };
+    const log = new log("BOTJS_VERBOSE");
 
     let modules = [];
     let all_command_ids = [];
@@ -126,12 +128,14 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
         }); 
     }
     client.on('interactionCreate', async interaction => {
-        
+        log.verbose(`INTERACTION_CREATE\n${interaction}\n`)
+
         if (interaction.isCommand() && false == all_command_ids.includes(interaction.commandId)) {
             console.warn(`command id[${interaction.id}] is not found in commands when first executing command [user=${interaction.user.username},id=${interaction.user.id}]`);
             return;
         }
         
+        log.verbose(`FOR LOOP MODULES\n${modules}\n`);
         for (const m of modules) 
             m.on_event('interactionCreate', {interaction: interaction});
     });
