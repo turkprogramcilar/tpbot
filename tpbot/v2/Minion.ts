@@ -16,20 +16,6 @@ export interface Events {
 }
 export class Minion<T>
 {
-    static toSummoner<E extends keyof Events>(parentPort: MessagePort | null, event: E, ...args: Events[E])
-    {
-        parentPort?.postMessage([event, ...args]);
-    }
-    static fromSummoner<E extends keyof Events>(parentPort: MessagePort | null, event: E, listener: (...args: Events[E]) => Awaitable<void>)
-    {
-        parentPort?.on("message", (pair) => {
-            const [pairEvent, ...pairArgs] = pair;
-            if (pairEvent === event) {
-                listener(...pairArgs);
-            }
-        });
-    }
-
     private worker: Worker;
     public constructor(public name: string, path: string, errorCallback: (error: Error) => void, public data: T)
     {
