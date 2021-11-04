@@ -128,7 +128,7 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
         }); 
     }
     client.on('interactionCreate', async interaction => {
-        log.verbose(`INTERACTION_CREATE\n${interaction}\n`)
+        log.verbose(`INTERACTION_CREATE`, interaction)
 
         if (interaction.isCommand() && false == all_command_ids.includes(interaction.commandId)) {
             console.warn(`command id[${interaction.id}] is not found in commands when first executing command [user=${interaction.user.username},id=${interaction.user.id}]`);
