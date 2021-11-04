@@ -76,8 +76,17 @@ export class Kernel extends Summoner<BotData>
     private whenBotManagerCrashes(bot: Minion<BotData>, error: Error | unknown)
     {
         bot.data.crash = Kernel.Increase(bot.data.crash);
-        this.print.error(`Exception level: BotManager[name=${bot.name},crashes=${bot.data.crash.perMinute}/m]`);
+        this.print.error(`Exception level: BotManager[name=${bot.name}, `
+            + `crashes=${bot.data.crash.perMinute}/m]`);
         this.print.exception(error);
+
+        // if the bot manager is crashing very fast when summon after summon,
+        // stop it launching more
+        if (bot.data.crash.count > 5 && bot.data.crash.perMinute > 6) {
+            this.print.warn(`${bot.name} is stopped due crashing too fast. `
+                + `[crashes=${bot.data.crash.perMinute}]`);
+            return;
+        }
         this.summonBotManager(bot.data.token, bot.name, bot.data.crash);
     }
 
