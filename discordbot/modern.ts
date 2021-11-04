@@ -103,15 +103,18 @@ export class modern extends dcmodule
                 this.commands[command.data.name] = command;
                 this.log.info("Require/Loading command file: "+file);
             }
+            this.log.verbose("GET_COMMANDS BODY END FOR MODULE: "+this.module_name);
         }
         catch (error) {
             this.log.error(error);
             throw Error("Can't get_commands in modern.ts body");
         }
+        this.log.verbose("RETURNING SAFELY FROM GET_COMMANDS FOR MODULE: "+this.module_name);
         return this.commands;
     }
     public set_command_ids(name_id_pairs: [command_name, command_id][]): void {
 
+        this.log.verbose("SET_COMMAND_IDS BEFORE FOR "+this.module_name,this.commands);
         const switch_to_ids: {[key: command_id]: command} = {};
         for (const [name, id] of name_id_pairs) {
 
@@ -122,6 +125,7 @@ export class modern extends dcmodule
             }
         }
         this.commands = switch_to_ids;
+        this.log.verbose("SET_COMMAND_IDS AFTER FOR "+this.module_name,this.commands);
     }
 
         
@@ -131,6 +135,7 @@ export class modern extends dcmodule
     /*** EVENT OVERRIDES ***/
     protected async on_interaction_create(interaction : Interaction) {
 
+        this.log.verbose("ON_INTERACTION CALLED FOR MODERN "+this.module_name);
         // just to be safe if accidentally called from older modules
         if (this.state.command_support !== true) {
             this.log.warn("called from module that's command_support !== true");

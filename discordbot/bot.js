@@ -97,18 +97,27 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
 
             if (m.get_commands !== undefined) {
                 
+                log.verbose("GET_COMMANDS FOR "+m.module_name);
                 all_commands.push(m.get_commands());
                 modern_modules.push(m);
             }
         }
+        log.verbose("modern_modules",modern_modules);
+        log.verbose("all_commands",all_commands);
 
         // load empty modern module for static function calls
+        log.verbose("LOAD EMPTY MODERN");
         const modern = require("../build/discordbot/modern.js");
+        log.verbose("LOADED=",modern);
         const name_id_pairs = await modern.modern.register_commands(all_commands, client);
+        log.verbose("NAME_ID_PAIRS=",name_id_pairs);
 
         // broadcast all loaded command id's from discord server
-        for (const m of modern_modules)
+        for (const m of modern_modules) {
+
+            log.verbose("SET_COMMAND_IDS FOR MODULE="+m.module_name);
             m.set_command_ids(name_id_pairs);
+        }
 
         all_command_ids = name_id_pairs.map(x => x[1]);
         all_command_names = name_id_pairs.map(x => x[0])
