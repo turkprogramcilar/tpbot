@@ -9,7 +9,7 @@
     "start": "ts-node ./build/tpbot/v2/Bootloader.js",
     "build": "tsc",
     "postinstall": "npm run build",
-    "test": "mocha -r ts-node/register **/*.tests.ts"
+    "test": "mocha -r ts-node/register ./tpbot.tests/*.ts"
   },
   "keywords": [
     "Türk",
