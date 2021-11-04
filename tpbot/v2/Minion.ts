@@ -7,6 +7,10 @@ export interface Events {
     message: [string],
     /** Used by minion to inform summoner that its fully initialized and listening events */
     risen: [void],
+    /**
+     * Used by Summoner to acknowledge the risen event by minion
+     */
+    risenAcknowledge: [void],
     updateMinionName: [string],
     updateSummonerName: [string],
 }

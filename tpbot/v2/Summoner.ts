@@ -2,7 +2,7 @@ import path from "path";
 import { Print } from "./Print";
 import { Minion } from "./Minion";
 
-export abstract class Summoner<T>
+export class Summoner<T>
 {
     public constructor(protected print: Print) { }
 
@@ -13,6 +13,7 @@ export abstract class Summoner<T>
         const minion = new Minion<T>(minionName, fullpath, errorCallback, data);
 
         minion.when("risen", () => {
+            minion.emit("risenAcknowledge");
             minion.emit("updateSummonerName", summonerName);
         });
         minion.when("updateMinionName", newName => {
