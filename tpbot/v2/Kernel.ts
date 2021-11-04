@@ -63,7 +63,7 @@ export class Kernel extends Summoner<BotData>
         // this.awaitStdin();
     }
 
-    private summonBotManager(botToken: string, botName: string, crashInfo?: CrashInfo)
+    public summonBotManager(botToken: string, botName: string, crashInfo?: CrashInfo)
     {
         let bot: Minion<BotData>;
         bot = this.summon(this.botManagerPath, botName, Kernel.name, (error) => this.whenBotManagerCrashes(bot, error), { token: botToken, crash: crashInfo });
