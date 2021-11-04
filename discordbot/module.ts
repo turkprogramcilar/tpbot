@@ -31,6 +31,7 @@ export class dcmodule {
     static readonly role_id_koruyucu: string = "782712917900525628";
     static readonly role_id_kidemli : string = constants.rid.kidemli;
     static readonly role_id_tp_uyesi: string = constants.rid.tp_uyesi;
+    static readonly role_id_wake_up_neo: string = "905782978200891452";
     static readonly role_id_gozalti : string = constants.rid.gozalti;
     //
     static readonly channel_id = {
