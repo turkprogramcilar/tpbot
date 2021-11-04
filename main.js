@@ -1,4 +1,5 @@
 const { json } = require("express");
+BigInt.prototype.toJSON = function() { return this.toString() }
 
 const webserver =
     process.env.DCBOT_WEBSERVER != undefined && process.env.DCBOT_WEBSERVER != 'false'
