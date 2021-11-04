@@ -4,6 +4,7 @@ import { dcmodule } from "./module";
 import { REST } from "@discordjs/rest";
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { command } from './command';
+import { log } from './log';
 
 const tools = require("../../discordbot/tools");
 
@@ -35,6 +36,8 @@ export class modern extends dcmodule
     private command_states : { [key: user_id] : command_user_state } = {};
 
     static async register_commands(commands: {[key: string]: command}[], client: Client): Promise<[command_name, command_id][]> {
+        const print = new log("MODERN_STATIC_REGISTER_COMMANDS");
+        print.verbose("COMMANDS", commands);
 
         const id = client.user?.id;
         const token = client.token;
@@ -46,10 +49,14 @@ export class modern extends dcmodule
         const rest = new REST({ version: '9' }).setToken(token);
 
         const flatten = commands.reduce((a, c) => a={...a,...c} , {});
+        print.verbose("FLATTEN", flatten);
+        const jsonbody = Object.values(flatten).map(x => x.data.toJSON());
+        print.verbose("FLATTEN", jsonbody);
         const response = await rest.put(
             Routes.applicationGuildCommands(id, tpid),
-            { body: Object.values(flatten).map(x => x.data.toJSON()) },
+            { body: jsonbody },
         );
+        print.verbose("RESPONSE", response);
 
         const res_arr = response as any[];
         if (!response || !res_arr) {
@@ -68,6 +75,7 @@ export class modern extends dcmodule
                 console.error(`json response with command name ${name} is not found on our side.`);
                 return;
             }
+            print.verbose("command_module.permissions", command_module.permissions);
             // check if command has defined an permissions for its commands
             if (command_module.permissions) {
 
@@ -80,6 +88,7 @@ export class modern extends dcmodule
                     permissions: command_module.permissions
                 });
             }
+            print.verbose("permission exit");
         });
         await Promise.all(tasks);
 
