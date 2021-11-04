@@ -140,7 +140,7 @@ export class dcmodule {
     }
     protected async on_interaction_create(interaction : Interaction) {
 
-        this.log.verbose("MODULE.TS ON_INTERACTION_CREATE", evt, args);
+        this.log.verbose("MODULE.TS ON_INTERACTION_CREATE", interaction);
     }
     protected async on_message(msg : Message)
     {
