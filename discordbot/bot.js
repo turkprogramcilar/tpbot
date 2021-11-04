@@ -89,8 +89,8 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
 
     client.on('ready', async () => {
 
-        all_commands = [];
-        modern_modules = [];
+        const all_commands = [];
+        const modern_modules = [];
         for (const m of modules) {
 
             m.on_event('ready', {});
@@ -102,7 +102,6 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
                 modern_modules.push(m);
             }
         }
-        log.verbose("modern_modules",modern_modules);
         log.verbose("all_commands",all_commands);
 
         // load empty modern module for static function calls
