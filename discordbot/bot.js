@@ -5,7 +5,7 @@ const fs      = require("fs").promises;
 const php     = require("./php.js");
 const tools   = require("./tools.js");
 const parser  = require("./cmdparser.js");
-const log     = require("./log.js");
+const logger     = require("../build/discordbot/log.js");
 
 const Discord = require('discord.js');
 const htmlp   = require('node-html-parser');
@@ -36,7 +36,7 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
             }
         },
     };
-    const log = new log("BOTJS_VERBOSE");
+    const log = new logger.log("BOTJS_VERBOSE");
 
     let modules = [];
     let all_command_ids = [];
