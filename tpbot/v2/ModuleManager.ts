@@ -6,9 +6,9 @@ import { Crasher } from "./modules/Crasher";
 import { BotData } from "./Kernel";
 
 // tslint:disable-next-line: no-unused-expression
-new class BotManager
+new class ModuleManager
 {
-    print: Print = new Print(BotManager.name);
+    print: Print = new Print(ModuleManager.name);
     constructor()
     {
         const data: BotData = workerData;
