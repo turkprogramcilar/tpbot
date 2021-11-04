@@ -178,7 +178,6 @@ export const c = new class hosbuldum extends dfa_command<Q>
 
         const permissions = [
             { id: dcmodule.role_id_tp_uyesi, type: ApplicationCommandPermissionTypes.ROLE, permission: false, },
-            { id: dcmodule.role_id_wake_up_neo, type: ApplicationCommandPermissionTypes.ROLE, permission: false, },
             { id: dcmodule.role_id_gozalti,  type: ApplicationCommandPermissionTypes.ROLE, permission: false, },
             { id: dcmodule.role_id_kidemli,  type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
             { id: dcmodule.role_id_kurucu,   type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
@@ -262,7 +261,7 @@ export const c = new class hosbuldum extends dfa_command<Q>
                 this.log.error("Can't fetch guild user at the end of hosbuldum command", command.get_user_info(interaction.user));
                 return status.finished;
             }
-            await guild_user.roles.add(dcmodule.role_id_wake_up_neo);
+            await guild_user.roles.add(dcmodule.role_id_tp_uyesi);
             return status.finished;
         }
         return status.in_progress;
