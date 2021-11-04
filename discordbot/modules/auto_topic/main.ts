@@ -11,7 +11,7 @@ export const m = new class auto_topic extends dcmodule {
             
             if (msg.channel.rateLimitPerUser == 120) {
 
-                msg.startThread({name: "👉Yorumlar"});
+                msg.startThread({name: "👉Yorumlar", autoArchiveDuration: 1440});
             }
         }
     }
