@@ -4,6 +4,10 @@ import { Print } from "./Print";
 const print = new Print("Bootloader");
 process.on('uncaughtException', print.exception);
 
+if (undefined === process.env.TPBOT) {
+    throw new Error("TPBOT environment value is undefined.");
+}
+
 const legacyEnabled = false;
 // check if we need to load legacy codebase
 if (legacyEnabled) {
