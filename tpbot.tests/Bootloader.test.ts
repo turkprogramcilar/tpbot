@@ -1,4 +1,5 @@
 import { fail } from "assert";
+import { expect } from "chai";
 
 describe("Bootloader", () => {
 
@@ -14,8 +15,9 @@ describe("Bootloader", () => {
             require("../tpbot/v2/Bootloader");
             fail("no error is thrown");
         }
-        catch (error) {
-
+        catch (error)
+        {
+            expect(error);
         }
             
     })
