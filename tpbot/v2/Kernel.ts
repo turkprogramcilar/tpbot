@@ -48,10 +48,10 @@ export class Kernel extends Summoner<BotData>
     public constructor()
     {
         super(new Print(Kernel.name));
-        this.print.info("Initializing...");
+        this.log.info("Initializing...");
 
         if (undefined === process.env.TPBOT) {
-            this.print.warn("TPBOT environment variable is undefined.");
+            this.log.warn("TPBOT environment variable is undefined.");
             throw new Error("Cannot start any bot without TOKEN");
         }
 
@@ -68,7 +68,7 @@ export class Kernel extends Summoner<BotData>
         let bot: Minion<BotData>;
         bot = this.summon(this.botManagerPath, botName, Kernel.name, (error) => this.whenBotManagerCrashes(bot, error), { token: botToken, crash: crashInfo });
         bot.when("message", message => {
-            this.print.from(bot.name).info(message);
+            this.log.from(bot.name).info(message);
             bot.emit("message", "Pong");
         });
     }
@@ -76,14 +76,14 @@ export class Kernel extends Summoner<BotData>
     private whenBotManagerCrashes(bot: Minion<BotData>, error: Error | unknown)
     {
         bot.data.crash = Kernel.Increase(bot.data.crash);
-        this.print.error(`Exception level: BotManager[name=${bot.name}, `
+        this.log.error(`Exception level: BotManager[name=${bot.name}, `
             + `crashes=${bot.data.crash.perMinute}/m]`);
-        this.print.exception(error);
+        this.log.exception(error);
 
         // if the bot manager is crashing very fast when summon after summon,
         // stop it launching more
         if (bot.data.crash.count > 5 && bot.data.crash.perMinute > 6) {
-            this.print.warn(`${bot.name} is stopped due crashing too fast. `
+            this.log.warn(`${bot.name} is stopped due crashing too fast. `
                 + `[crashes=${bot.data.crash.perMinute}]`);
             return;
         }
