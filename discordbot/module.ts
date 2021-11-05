@@ -238,6 +238,14 @@ export class dcmodule {
     protected is_word(msg : Message, word : string) : boolean {
         return parser.is(msg, word);
     }
+    protected is_regex(msg : Message, regex: RegExp) : RegExpMatchArray | null {
+        let result : RegExpMatchArray | null = null;
+        const save = msg.content;
+        parser.r_arg(msg, regex, (x : any) => result = x);
+        if (result)
+            return save.match(regex);
+        return result;
+    }
     protected async switch_word(msg : Message, cases : [string, () => void | Promise<void>][]) : Promise<boolean> {
         for (const [word, func] of cases) {
             if (this.is_word(msg, word)) {
