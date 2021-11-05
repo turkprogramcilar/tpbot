@@ -4,20 +4,20 @@ import { Minion } from "./Minion";
 
 export class Summoner<T>
 {
-    public constructor(protected print: Print) { }
+    public constructor(protected log: Print) { }
 
     public summon(file: string, minionName: string, summonerName: string, errorCallback: (error: Error | unknown) => void, data: T)
     {
         const fullpath = path.resolve(__dirname, file);
-        this.print.info("Loading file at "+fullpath);
+        this.log.info("Loading file at "+fullpath);
         const minion = new Minion<T>(minionName, fullpath, errorCallback, data);
 
-        minion.when("risen", () => {
-            minion.emit("risenAcknowledge");
+        minion.when("awaken", () => {
+            minion.emit("awakenAcknowledge");
             minion.emit("updateSummonerName", summonerName);
         });
         minion.when("updateMinionName", newName => {
-            this.print.info(`Renamed "${minionName}" to "${newName}"`);
+            this.log.info(`Renamed "${minionName}" to "${newName}"`);
             minion.name = minionName = newName;
         });
 

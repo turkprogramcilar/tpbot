@@ -12,11 +12,11 @@ new class ModuleManager extends MinionFile
     print: Print = new Print(ModuleManager.name);
     constructor()
     {
-        super();
+        super(ModuleManager.name);
         const data: BotData = workerData;
-        this.fromSummoner(parentPort, "message", this.print.info.bind(this.print));
-        this.fromSummoner(parentPort, "updateSummonerName", summonerName => { this.print.from(summonerName); });
-        this.toSummoner(parentPort, "risen");
+        this.fromSummoner("message", this.print.info.bind(this.print));
+        this.fromSummoner("updateSummonerName", summonerName => { this.print.from(summonerName); });
+        this.toSummoner("awaken");
         // following is an auto-login, normally this must be configured
         // or started manually @TODO
         this.login(data.token).catch(this.print.exception);
@@ -31,7 +31,7 @@ new class ModuleManager extends MinionFile
         client.on("ready", () => {
 
             if (client.user !== undefined && client.user !== null) {
-                this.toSummoner(parentPort, "updateMinionName", client.user.tag);
+                this.toSummoner("updateMinionName", client.user.tag);
             }
             else {
                 this.print.warn("Can't update descriptive name because client.user is either null or undefined");
