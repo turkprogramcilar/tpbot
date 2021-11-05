@@ -12,7 +12,7 @@ export class Summoner<T>
         this.log.info("Loading file at "+fullpath);
         const minion = new Minion<T>(minionName, fullpath, errorCallback, data);
 
-        minion.when("awaken", () => {
+        minion.once("awaken", () => {
             minion.emit("awakenAcknowledge");
             minion.emit("updateSummonerName", summonerName);
         });

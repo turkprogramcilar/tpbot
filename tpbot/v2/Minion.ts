@@ -18,7 +18,7 @@ export interface Events {
 export class Minion<T>
 {
     private log: Print;
-    private risen: boolean = false;
+    private ack: boolean = false;
     private worker: Worker;
     public constructor(public name: string, path: string, errorCallback: (error: Error) => void, public data: T)
     {
@@ -26,17 +26,17 @@ export class Minion<T>
         this.worker = new Worker(path, { workerData: data });
         this.worker.on("error", errorCallback);
         this.once("awaken", () => {
-            this.risen = true;
+            this.ack = true;
         });
     }
 
     public async awaken()
     {
-        if (this.risen)
+        if (this.ack)
             return;
 
         let counter = 0;
-        while (false === this.risen) {
+        while (false === this.ack) {
 
             this.log.info(`await minion awakening N=${++counter}`);
             await Helper.sleep(100);

@@ -6,7 +6,7 @@ import { Print } from "./Print";
 
 export abstract class MinionFile
 {
-    private risenAck = false;
+    private ack = false;
     protected readonly log;
     public constructor(minionName: string)
     {
@@ -14,17 +14,17 @@ export abstract class MinionFile
     }
     public async synchronize(onAcknowledge?: () => void): Promise<void>
     {
-        if (this.risenAck)
+        if (this.ack)
             return;
 
         this.fromSummonerOnce("awakenAcknowledge", () => {
-            this.risenAck = true;
+            this.ack = true;
             if (onAcknowledge !== undefined) 
                 onAcknowledge();
         });
 
         let counter = 0;
-        while (false === this.risenAck) {
+        while (false === this.ack) {
 
             this.log.info(`ping awaken to summoner N=${++counter}`);
             this.toSummoner("awaken");
