@@ -10,7 +10,7 @@ export const m = new class moderation extends modern {
     public async on_message(msg : Message) {
 
         let result: RegExpMatchArray | null;
-        if (msg.channel instanceof TextChannel
+        if (msg.channel.isText()
          && this.is_prefixed(msg)
          && this.is_word(msg, "kural")
          && (result = this.is_regex(msg, /(\d+)(?:\.|\s+)(\d+)/)) != null) {
