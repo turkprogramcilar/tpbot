@@ -122,7 +122,7 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
         all_command_names = name_id_pairs.map(x => x[0])
         
         const cmds = modern_modules.map(x => x.module_name);
-        console.log(`Logged in as ${client.user.tag}! (for modules=[${mods}], commands=[${all_command_names}]`);
+        console.log(`Logged in as ${client.user.tag}! (for modules=[${mods}], commands=[${all_command_names}])`);
         
         // load status switcher module
         require("./marquee_status.js").init(client, msg_status);
