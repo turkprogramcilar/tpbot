@@ -124,6 +124,7 @@ export class dcmodule {
         case 'presenceUpdate'   : await this.on_presence_update(args[0], args[1]);   break;
         case 'interactionCreate': await this.on_interaction_create(args.interaction);break;
         case 'guildMemberAdd'   : await this.on_guild_member_add(args.member);       break;
+        case 'guildMemberRemove': await this.on_guild_member_remove(args.member);    break;
 
         case 'messageReactionAdd':
         case 'messageReactionRemove':
@@ -137,6 +138,7 @@ export class dcmodule {
         }
     }
     protected async on_guild_member_add(member: GuildMember) { }
+    protected async on_guild_member_remove(member: GuildMember) { }
     protected async on_ready() { }
     protected async on_interaction_create(interaction : Interaction) {
 
