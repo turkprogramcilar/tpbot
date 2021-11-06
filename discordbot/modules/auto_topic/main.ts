@@ -43,7 +43,7 @@ export const m = new class auto_topic extends dcmodule {
                 url.hostname = "github1s.com";
                 await thread.send("_Açık kaynak kodlu paylaşımınız için teşekkürler!"
                     + ` Arkadaşımınızın paylaşımını ayrıyetten tarayıcınız`
-                    + ` içerisinde vscode uygulaması açıp hemen gözatmak için tıklayınız: _`
+                    + ` içerisinde vscode uygulaması açıp hemen gözatmak için tıklayınız:_ `
                     + url.toString())
                 break;
             }
