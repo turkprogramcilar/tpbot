@@ -18,16 +18,8 @@ export const m = new class welcome extends commander {
             + " Onay sistemini başlatmak için kanala **/hosbuldum** yazınız."
             + " Sistem sizi otomatik kabul edecektir.",
             embeds: [
-                {
-                  thumbnail: {
-                    url: 'attachment://hosbuldum_komutu.gif'
-                  }
-                }
-              ],
-              files: [{
-                attachment: 'https://cdn.discordapp.com/attachments/900650376762626078/905845292061048832/hosbuldum_komutu.gif',
-                name: 'hosbuldum_komutu.gif'
-              }]
+                new MessageEmbed().setImage("https://cdn.discordapp.com/attachments/900650376762626078/905845292061048832/hosbuldum_komutu.gif")
+            ]
         });
         await message.delete();
     }
