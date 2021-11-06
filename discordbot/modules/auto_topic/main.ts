@@ -9,10 +9,10 @@ export const m = new class auto_topic extends dcmodule {
 
         if (msg.channel instanceof TextChannel) {
             
-            if (msg.channel.rateLimitPerUser == 120) {
+            if (msg.channel.rateLimitPerUser === 120) {
 
-                msg.startThread({name: "Yorumlar 👉", autoArchiveDuration: 1440});
+                await msg.startThread({name: "Yorumlar 👉", autoArchiveDuration: 1440});
             }
         }
     }
-};
+}();
