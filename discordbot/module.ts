@@ -34,6 +34,7 @@ export class dcmodule {
     static readonly role_id_gozalti : string = constants.rid.gozalti;
     //
     static readonly channel_id = {
+        onay: "900650376762626078",
         bir_bak_buraya: constants.cid.bir_bak_buraya,
         roller: constants.cid.roller,
         // soru sor

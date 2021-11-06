@@ -8,6 +8,18 @@ export const m = new class welcome extends commander {
     constructor() { super(welcome.name, false); }
 
     /* events */
+    protected async on_message(message: Message)
+    {
+        if (message.channelId !== dcmodule.channel_id.onay)
+            return;
+
+        await (await message.author.createDM()).send({
+            content: "Türk Programcılar Discord sunucusuna hoşgeldiniz."
+            + " Onay sistemini başlatmak için kanala **/hosbuldum** yazınız."
+            + " Sistem sizi otomatik kabul edecektir.",
+            files: ["https://cdn.discordapp.com/attachments/900650376762626078/905845292061048832/hosbuldum_komutu.gif"]
+        });
+    }
     protected async on_guild_member_add(member: GuildMember) 
     {
         const channel_id = process.env.DCBOT_DEBUG
