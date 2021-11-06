@@ -1,7 +1,7 @@
 import { ContextMenuCommandBuilder, SlashCommandBuilder } from "@discordjs/builders";
 import { User } from "discord.js";
 import { log, user_info } from "./log";
-import { known_interactions, command_user_state } from "./modern";
+import { known_interactions, command_user_state } from "./commander";
 
 export class operation<T>
 {

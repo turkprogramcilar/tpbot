@@ -1,14 +1,43 @@
 import { ContextMenuCommandBuilder } from "@discordjs/builders";
 import { ApplicationCommandType } from "discord-api-types";
-import { ApplicationCommandPermissionData, ContextMenuInteraction, Message, MessageEmbed } from "discord.js";
+import { ApplicationCommandPermissionData, ButtonInteraction, ContextMenuInteraction, Message, MessageEmbed, TextBasedChannels, User } from "discord.js";
 import { ApplicationCommandPermissionTypes } from "discord.js/typings/enums";
 import { command, operation } from "./command";
-import { known_interactions, command_user_state } from "./modern";
+import { known_interactions, command_user_state } from "./commander";
 import { dcmodule } from "./module";
 
 
 export abstract class mod_command extends command 
 {
+	static async execute_at_channel(
+		command_name: string, 
+		op: User, 
+		target_user: User, 
+		mod_channel: TextBasedChannels,
+		target_message: Message,
+		full_command: string,
+		interaction: ContextMenuInteraction | ButtonInteraction
+		)
+	{
+		const yetkili_komutlari = dcmodule.channel_id.yetkili_komutlari;
+		const mod_command = `\`${command_name}`;
+		const p1 = mod_channel.send({
+			content: full_command, 
+			embeds: [
+				// pass new MessageEmbed() into lambda function. if message has attachments, setImage, else return embed as is
+				(x=>target_message.attachments.size === 0 ? x : x.setImage(target_message.attachments.first()!.url))
+				(new MessageEmbed()
+					.setThumbnail(target_user.avatarURL() ?? target_user.displayAvatarURL())
+					.setAuthor(op.username, op.avatarURL() ?? op.displayAvatarURL())
+					.setTitle(`${target_user.username} üzerinde \`${mod_command}\` komutu çalıştırdı. Mesaja gitmek için tıklayınız`)
+					.setDescription(target_message.content)
+					.setURL(target_message.url)
+				)	
+			]
+		});
+		const p2 = interaction.reply({ content: `${target_user.username} kullanıcısı üzerinde <#${yetkili_komutlari}> kanalında \`${mod_command}\` komutu çalıştırıldı.`, ephemeral: true});
+		await p1, p2;
+	}
     public data: ContextMenuCommandBuilder;
 	
 	public constructor(command_name: string, public permissions: ApplicationCommandPermissionData[])
@@ -49,26 +78,15 @@ export abstract class mod_command extends command
 				await command.respond_interaction_failure_to_user(interaction);
 				return operation.complete;
 			}
-			const gozalti = dcmodule.channel_id.gozalti;
-			const mod_command = `\`${this.command_name}`;
-			const op = interaction.user;
-			const target_user = target_message.author;
-			const p1 = yetkili_komutlari_channel.send({
-				content: `${mod_command} ${target_user.id}`, 
-				embeds: [
-					// pass new MessageEmbed() into lambda function. if message has attachments, setImage, else return embed as is
-					(x=>target_message.attachments.size == 0 ? x : x.setImage(target_message.attachments.first()!.url))
-					(new MessageEmbed()
-						.setThumbnail(target_user.avatarURL() ?? target_user.displayAvatarURL())
-						.setAuthor(op.username, op.avatarURL() ?? op.displayAvatarURL())
-						.setTitle(`${target_user.username} üzerinde \`${mod_command}\` komutu çalıştırdı. Mesaja gitmek için tıklayınız`)
-						.setDescription(target_message.content)
-						.setURL(target_message.url)
-					)	
-				]
-			});
-			const p2 = interaction.reply({ content: `${target_user.username} kullanıcısı üzerinde <#${yetkili_komutlari}> kanalında \`${mod_command}\` komutu çalıştırıldı. Kullanıcı artık <#${gozalti}> kanalında.`, ephemeral: true});
-			await p1, p2;
+			await mod_command.execute_at_channel(
+				this.command_name, 
+				interaction.user, 
+				target_message.author, 
+				yetkili_komutlari_channel,
+				target_message,
+				`${mod_command} ${target_message.author.id}`,
+				interaction
+				);
 		}
 		
 		return operation.complete;

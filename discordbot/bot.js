@@ -106,9 +106,9 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
 
         // load empty modern module for static function calls
         log.verbose("LOAD EMPTY MODERN");
-        const modern = require("../build/discordbot/modern.js");
+        const modern = require("../build/discordbot/commander.js");
         log.verbose("LOADED=",modern.modern);
-        const name_id_pairs = await modern.modern.register_commands(all_commands, client);
+        const name_id_pairs = await modern.commander.register_commands(all_commands, client);
         log.verbose("NAME_ID_PAIRS=",name_id_pairs);
 
         // broadcast all loaded command id's from discord server

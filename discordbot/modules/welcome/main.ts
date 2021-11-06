@@ -1,7 +1,7 @@
-import { Guild, GuildMember, Message, MessageEmbed } from "discord.js";
-import { modern } from "../../modern";
+import { GuildMember, MessageEmbed } from "discord.js";
+import { commander } from "../../commander";
 import { dcmodule } from "../../module";
-export const m = new class welcome extends modern {
+export const m = new class welcome extends commander {
     
     constructor() { super(welcome.name, false); }
 

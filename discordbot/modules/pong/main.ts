@@ -1,7 +1,7 @@
 import { Message, MessageReaction, PartialUser, Presence, User } from "discord.js";
-import { modern } from "../../modern";
+import { commander } from "../../commander";
 
-export const m = new class pong extends modern {
+export const m = new class pong extends commander {
     
     constructor() { super(pong.name); }
     
