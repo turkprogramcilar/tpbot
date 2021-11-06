@@ -7,7 +7,7 @@ import { cardgame } from "../game";
 import { user_info } from "../../../log";
 import { slash_command } from "../../../command.slash";
 import { helper } from "../../../helper";
-import { command_user_state, known_interactions } from "../../../modern";
+import { command_user_state, known_interactions } from "../../../commander";
 import { operation } from "../../../command";
 
 /*

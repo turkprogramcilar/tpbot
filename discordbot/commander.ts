@@ -24,7 +24,7 @@ type command_name = string;
 
 
 
-export class modern extends dcmodule
+export class commander extends dcmodule
 {
     
     protected commands: {[key: string]: command} = {};
@@ -153,7 +153,7 @@ export class modern extends dcmodule
         let state: command_user_state;
         let _command: command | undefined;
 
-        if (modern.is_first_interaction(interaction)) {
+        if (commander.is_first_interaction(interaction)) {
 
             const id: command_id = interaction.commandId;
             const module: command | undefined = this.commands[id];
@@ -187,7 +187,7 @@ export class modern extends dcmodule
                 reset: false,
             }
         }
-        else if (modern.is_second_interaction(interaction)) {
+        else if (commander.is_second_interaction(interaction)) {
             
             // assuming button is always triggered from a command
             state = this.command_states[user_id];

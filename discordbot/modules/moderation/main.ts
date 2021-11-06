@@ -1,7 +1,7 @@
 import { Message, TextChannel } from "discord.js";
-import { modern } from "../../modern";
+import { commander } from "../../commander";
 import { dcmodule } from "../../module";
-export const m = new class moderation extends modern {
+export const m = new class moderation extends commander {
 
     private saved_topics: string[] | null = null;
     private saved_rules: string[][] | null = null;

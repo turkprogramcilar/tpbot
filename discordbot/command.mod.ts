@@ -3,7 +3,7 @@ import { ApplicationCommandType } from "discord-api-types";
 import { ApplicationCommandPermissionData, ContextMenuInteraction, Message, MessageEmbed } from "discord.js";
 import { ApplicationCommandPermissionTypes } from "discord.js/typings/enums";
 import { command, operation } from "./command";
-import { known_interactions, command_user_state } from "./modern";
+import { known_interactions, command_user_state } from "./commander";
 import { dcmodule } from "./module";
 
 

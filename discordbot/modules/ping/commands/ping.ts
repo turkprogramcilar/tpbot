@@ -1,7 +1,7 @@
 import { CommandInteraction } from "discord.js";
 import { operation } from "../../../command";
 import { slash_command } from "../../../command.slash";
-import { command_user_state, known_interactions } from "../../../modern";
+import { command_user_state, known_interactions } from "../../../commander";
 
 
 export const c = new class ping extends slash_command
