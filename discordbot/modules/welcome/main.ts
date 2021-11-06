@@ -21,7 +21,7 @@ export const m = new class welcome extends modern {
             this.log.warn("Given channel is not text channel.");
             return;
         }
-        channel.send({embeds: [new MessageEmbed()
+        await channel.send({embeds: [new MessageEmbed()
             /* @WARN following ! will cause error if guild icon is undefined */
             .setAuthor(member.user.username, member.avatarURL() ?? member.displayAvatarURL())
             .setThumbnail("https://media1.giphy.com/media/KSrNm2ThozpYnh3abh/giphy.gif")
@@ -49,7 +49,7 @@ export const m = new class welcome extends modern {
             this.log.warn("Given channel is not text channel.");
             return;
         }
-        channel.send(`**${member.user.username}** sunucudan çıktı.`
+        await channel.send(`**${member.user.username}** sunucudan çıktı.`
             + ` \`[${member.user.tag} id=${member.user.id}]\``);
     }
-}
+}()
