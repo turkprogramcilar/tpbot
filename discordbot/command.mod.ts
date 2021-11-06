@@ -20,7 +20,7 @@ export abstract class mod_command extends command
 		)
 	{
 		const yetkili_komutlari = dcmodule.channel_id.yetkili_komutlari;
-		const mod_command = `\`${command_name}`;
+		const prefixed_command = `\`${command_name}`;
 		const p1 = mod_channel.send({
 			content: full_command, 
 			embeds: [
@@ -29,13 +29,13 @@ export abstract class mod_command extends command
 				(new MessageEmbed()
 					.setThumbnail(target_user.avatarURL() ?? target_user.displayAvatarURL())
 					.setAuthor(op.username, op.avatarURL() ?? op.displayAvatarURL())
-					.setTitle(`${target_user.username} üzerinde \`${mod_command}\` komutu çalıştırdı. Mesaja gitmek için tıklayınız`)
+					.setTitle(`${target_user.username} üzerinde \`${prefixed_command}\` komutu çalıştırdı. Mesaja gitmek için tıklayınız`)
 					.setDescription(target_message.content)
 					.setURL(target_message.url)
 				)	
 			]
 		});
-		const p2 = interaction.reply({ content: `${target_user.username} kullanıcısı üzerinde <#${yetkili_komutlari}> kanalında \`${mod_command}\` komutu çalıştırıldı.`, ephemeral: true});
+		const p2 = interaction.reply({ content: `${target_user.username} kullanıcısı üzerinde <#${yetkili_komutlari}> kanalında \`${prefixed_command}\` komutu çalıştırıldı.`, ephemeral: true});
 		await p1, p2;
 	}
     public data: ContextMenuCommandBuilder;
@@ -69,22 +69,27 @@ export abstract class mod_command extends command
 			const yetkili_komutlari_channel = await interaction.guild?.channels.fetch(yetkili_komutlari)
 
 			const target_channel = await interaction.guild?.channels.fetch(interaction.channelId);
-			let target_message: Message;
 
 			if (!yetkili_komutlari_channel?.isText() 
-			 || !target_channel?.isText()
-			 || !(target_message = await target_channel.messages.fetch(interaction.targetId))) {
+			 || !target_channel?.isText()) {
 
 				await command.respond_interaction_failure_to_user(interaction);
 				return operation.complete;
 			}
+			const target_message = await target_channel.messages.fetch(interaction.targetId);
+			if (!target_message) {
+
+				await command.respond_interaction_failure_to_user(interaction);
+				return operation.complete;
+			}
+
 			await mod_command.execute_at_channel(
 				this.command_name, 
 				interaction.user, 
 				target_message.author, 
 				yetkili_komutlari_channel,
 				target_message,
-				`${mod_command} ${target_message.author.id}`,
+				`${this.command_name} ${target_message.author.id}`,
 				interaction
 				);
 		}
