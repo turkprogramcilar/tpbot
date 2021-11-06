@@ -1,7 +1,7 @@
 import { ButtonInteraction, MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
 
 import { ApplicationCommandPermissionTypes, MessageButtonStyles } from "discord.js/typings/enums";
-import { known_interactions } from "../../../modern";
+import { known_interactions } from "../../../commander";
 import { dcmodule } from "../../../module";
 import { assert } from "console";
 import { status, click_interaction, dfa_command } from "../../../command.dfa";

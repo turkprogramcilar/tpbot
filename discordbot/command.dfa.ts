@@ -1,7 +1,7 @@
 import { ApplicationCommandPermissionData, ButtonInteraction, CommandInteraction, ContextMenuInteraction, SelectMenuInteraction } from "discord.js";
 import { operation } from "./command";
 import { slash_command } from "./command.slash";
-import { command_user_state, known_interactions } from "./modern";
+import { command_user_state, known_interactions } from "./commander";
 
 export type click_interaction = ButtonInteraction | SelectMenuInteraction | ContextMenuInteraction;
 
