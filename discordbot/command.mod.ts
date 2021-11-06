@@ -89,7 +89,7 @@ export abstract class mod_command extends command
 				target_message.author, 
 				yetkili_komutlari_channel,
 				target_message,
-				`${this.command_name} ${target_message.author.id}`,
+				`\`${this.command_name} ${target_message.author.id}`,
 				interaction
 				);
 		}
