@@ -21,16 +21,12 @@ export const m = new class welcome extends modern {
             this.log.warn("Given channel is not text channel.");
             return;
         }
+        await new Promise(x => setTimeout(x, 5000));
         await channel.send({embeds: [new MessageEmbed()
-            /* @WARN following ! will cause error if guild icon is undefined */
             .setAuthor(member.user.username, member.avatarURL() ?? member.displayAvatarURL())
             .setThumbnail("https://media1.giphy.com/media/KSrNm2ThozpYnh3abh/giphy.gif")
             .setDescription(`YIHAHO <@${member.id}>, **Türk Programcılar** discord sunucusuna hoşgeldin!`)
             .setImage("https://media4.giphy.com/media/mTTuI8qkiXMtVjjqmq/giphy.gif")
-            /*.setAuthor(op.username, op.avatarURL() ?? op.displayAvatarURL())
-            .setTitle(`${target_user.username} üzerinde \`${mod_command}\` komutu çalıştırdı. Mesaja gitmek için tıklayınız`)
-            .setDescription(target_message.content)
-            .setURL(target_message.url)*/
         ]});
     }
     protected async on_guild_member_remove(member: GuildMember)
