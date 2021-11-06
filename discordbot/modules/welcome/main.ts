@@ -17,8 +17,19 @@ export const m = new class welcome extends commander {
             content: "Türk Programcılar Discord sunucusuna hoşgeldiniz."
             + " Onay sistemini başlatmak için kanala **/hosbuldum** yazınız."
             + " Sistem sizi otomatik kabul edecektir.",
-            files: ["https://cdn.discordapp.com/attachments/900650376762626078/905845292061048832/hosbuldum_komutu.gif"]
+            embeds: [
+                {
+                  thumbnail: {
+                    url: 'attachment://hosbuldum_komutu.gif'
+                  }
+                }
+              ],
+              files: [{
+                attachment: 'https://cdn.discordapp.com/attachments/900650376762626078/905845292061048832/hosbuldum_komutu.gif',
+                name: 'hosbuldum_komutu.gif'
+              }]
         });
+        await message.delete();
     }
     protected async on_guild_member_add(member: GuildMember) 
     {
