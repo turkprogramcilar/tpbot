@@ -15,17 +15,17 @@ export abstract class mod_command extends command
 		target_user: User, 
 		mod_channel: TextBasedChannels,
 		target_message: Message,
-		mod_content: string,
+		full_command: string,
 		interaction: ContextMenuInteraction | ButtonInteraction
 		)
 	{
 		const yetkili_komutlari = dcmodule.channel_id.yetkili_komutlari;
 		const mod_command = `\`${command_name}`;
 		const p1 = mod_channel.send({
-			content: mod_content, 
+			content: full_command, 
 			embeds: [
 				// pass new MessageEmbed() into lambda function. if message has attachments, setImage, else return embed as is
-				(x=>target_message.attachments.size == 0 ? x : x.setImage(target_message.attachments.first()!.url))
+				(x=>target_message.attachments.size === 0 ? x : x.setImage(target_message.attachments.first()!.url))
 				(new MessageEmbed()
 					.setThumbnail(target_user.avatarURL() ?? target_user.displayAvatarURL())
 					.setAuthor(op.username, op.avatarURL() ?? op.displayAvatarURL())
