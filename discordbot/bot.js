@@ -147,6 +147,10 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
         for (const m of modules) 
             m.on_event('interactionCreate', {interaction: interaction});
     });
+    client.on('guildMemberAdd', async (member) => {
+        for (const m of modules) 
+            m.on_event('guildMemberAdd', {member: member});
+    });
     client.on('messageReactionRemove', async (reaction,user) => {
         for (const m of modules) 
             m.on_event('messageReactionRemove', {reaction: reaction, user: user});
