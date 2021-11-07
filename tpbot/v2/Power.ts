@@ -1,5 +1,6 @@
 import { Bootloader } from "./Bootloader";
 
 const bootloader = new Bootloader();
-process.on('uncaughtException', bootloader.print.exception.bind(bootloader));
+// tslint:disable-next-line: no-console
+process.on('uncaughtException', e => console.error(`[POWER]:`, e));
 bootloader.run();

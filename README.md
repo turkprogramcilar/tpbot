@@ -7,19 +7,31 @@
 
 ## Yeni mimari
 @TODO
+
+## Ortam değişkenleri tanımlamaları (Environment variables)
+### TPBOT_ROOT_DIR
+Sistem TypeScript ile derlendiğinden varsayılan olarak tsconfig ayarlamasında
+biz build/ klasörü içerisine çıkartma yapıyoruz. Fakat burada modüllerin 
+birbirlerini yükleyebilmeleri için gerekli klasör yollarının çözümlenmesi
+gerekiyor. Burada eğer varsayılan değişirse TypeScript çıkartmasının yolu ve
+kök dizine olan uzaklığı değişeceğinden sizin kök dizine olan mesafeyi
+belirtebilmeniz için oluşturulmuştur. Varsayılan değer build/ klasörüne çıkartım
+yapıldığında `../` olmalıdır.
+
 ### TPBOT_TOKEN
 TPBOT_TOKEN ile başlayan her ortam değişkeni (environment variable) sistem 
 tarafından TOKEN olarak kabul edilir. Örneğin:
     `TPBOT_TOKEN`    `TPBOT_TOKEN123`    `TPBOT_TOKEN_BOT`
 Birden fazla TOKEN belirtmeniz dahilinde tüm bot hesapları `tpbot.yaml` dosyası 
-altında modül yükleme görevi tanımlanmışsa `moduleMapping` kısmında her biri
-yüklenecektir.
-### TPBOT_SHELL
-TPBOT_SHELL ortam değişkeni (environment variable) shell için kullanılacak olan
-bot hesabı TOKEN değerini içermelidir. Bu bot hesabını sunucuya sokmamanız ve
-gizli tutabilirsiniz. Veya tercihe göre herhangi bir modül görevi olan bota da
+altında modül yükleme görevi tanımlanmışsa `moduleMapping` kısmında veya 
+`shellBots` altında tanımlanmışsa her biri ilgili görev için yüklenecektir.
+
+## tpbot.yaml ayar dosyası
+### shellBots
+Shell için kullanılacak olan bot hesabını sunucuya sokmanız gerekmez.
+Gizli tutabilirsiniz. Veya tercihe göre herhangi bir modül görevi olan bota da
 tanımlayabilirsiniz sunucu içerisinde bulunan. Bu bot DM kanalından shell
-komutları kabul edecektir. `tpbot.yaml` dosyasında `shellAccess` kısmında DM
+komutları kabul edecektir. `tpbot.yaml` dosyasında `shellBots` kısmında DM
 kanalından kimlerin shell komutu çalıştıracağını tanımlayabilirsiniz.
 
 ## Geliştirme ve katkıda bulunma
