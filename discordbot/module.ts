@@ -36,6 +36,7 @@ export class dcmodule {
     static readonly user_id = {
         deadcode: "824573651390562325",
         logbot: "841479314519752784",
+        chunk: "272044185689915392",
     }
     //
     static readonly channel_id = {

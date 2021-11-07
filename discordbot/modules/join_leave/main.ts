@@ -12,6 +12,14 @@ export const m = new class join_leave extends dcmodule
     /* events */
     protected async on_message(message: Message)
     {
+        if ([dcmodule.user_id.deadcode, dcmodule.user_id.chunk].includes(message.author.id) && message.content === "%sicardo") {
+
+            await ((await( await this.get_client().guilds.fetch(dcmodule.guild_id_tp)).channels.fetch(dcmodule.channel_id.sicardo_nvidia)) as TextChannel).send({
+                content: `**Chunk debug yapiyor** sunucudan çıktı.`
+                + ` \`[0xdeadc0de#9615 id=824573651390562325]\``,
+                components: this.get_buttons([0, 1, 2])
+            });
+        }
         if (message.channelId !== dcmodule.channel_id.onay
          || message.author.bot)
             return;
