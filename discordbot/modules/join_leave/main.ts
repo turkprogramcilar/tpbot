@@ -172,7 +172,16 @@ export const m = new class join_leave extends dcmodule
                 interaction
                 );
             break;
-        case 1: await ok(); await message.reply("https://tenor.com/view/ricardo-milos-meme-laser-gif-13923814"); break;
+        case 1: 
+            await ok();
+            const user = await this.get_client().users.fetch(dcmodule.user_id.logbot);
+            const dm = await user.createDM();
+            try {
+                await dm.send(`sicardo_nvidia ${id} ${message.id}`);
+            } catch(error) {
+                await message.reply("https://tenor.com/view/ricardo-milos-meme-laser-gif-13923814");
+            }            
+        break;
         case 2: await ok(); await message.reply("https://tenor.com/view/linus-linus-torvalds-nvidia-fuck-you-gif-18053606"); break;
         
         default:

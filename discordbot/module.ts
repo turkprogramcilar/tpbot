@@ -33,6 +33,11 @@ export class dcmodule {
     static readonly role_id_tp_uyesi: string = constants.rid.tp_uyesi;
     static readonly role_id_gozalti : string = constants.rid.gozalti;
     //
+    static readonly user_id = {
+        deadcode: "824573651390562325",
+        logbot: "841479314519752784",
+    }
+    //
     static readonly channel_id = {
         onay: "900650376762626078",
         bir_bak_buraya: constants.cid.bir_bak_buraya,
