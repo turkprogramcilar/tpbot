@@ -18,7 +18,8 @@ export const m = new class welcome extends commander {
         const msg = {
             content: "Türk Programcılar Discord sunucusuna hoşgeldiniz."
             + " Onay sistemini başlatmak için kanala **/hosbuldum** yazınız."
-            + " Sistem sizi otomatik kabul edecektir.",
+            + " Sistem sizi otomatik kabul edecektir."
+            + " _(Mesaj kendini 60 saniye içerisinde imha edecektir)_",
             embeds: [
                 new MessageEmbed().setImage("https://cdn.discordapp.com/attachments/900650376762626078/905845292061048832/hosbuldum_komutu.gif")
             ]};
@@ -26,19 +27,19 @@ export const m = new class welcome extends commander {
         try {
             await (await message.author.createDM()).send(msg);
 
-        } catch (_) {
+        } catch {
 
-            if (this.spam_flag)
-                return;
-            this.spam_flag = true;
+            if (!this.spam_flag) {
+                this.spam_flag = true;
             
-            const reply = await message.reply(msg);
-            setTimeout(async () => {
-
-                await reply.delete()
-                this.spam_flag = false;
-
-            }, 60000);
+                const reply = await message.reply(msg);
+                setTimeout(async () => {
+    
+                    await reply.delete()
+                    this.spam_flag = false;
+    
+                }, 60000);
+            }
         }
 
         await message.delete();
