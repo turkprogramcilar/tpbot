@@ -98,7 +98,7 @@ export const m = new class join_leave extends dcmodule
         if (!button_interaction
          ||  button_interaction.guild === null
          || !button_interaction.channel?.isText()
-         || !button_interaction.customId.includes(this.module_name))
+         || !button_interaction.customId?.includes(this.module_name))
             return;
 
         const message = button_interaction.message;
