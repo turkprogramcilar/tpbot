@@ -39,6 +39,11 @@ export class dcmodule {
         chunk: "272044185689915392",
     }
     //
+    static readonly emoji_id = {
+        ricardo: "906998514238771231",
+        nvidia: "906998783370465352",
+    }
+    //
     static readonly channel_id = {
         onay: "900650376762626078",
         bir_bak_buraya: constants.cid.bir_bak_buraya,
@@ -120,9 +125,7 @@ export class dcmodule {
         await this.after_init();
     }
     // called after bot.js init (can be overridden by child modules)
-    public async after_init() {
-
-    }
+    public async after_init() { }
     // on_event for receiving events from bot.js
     public async on_event(evt: string, args: any) {
 
@@ -148,13 +151,13 @@ export class dcmodule {
     protected async on_guild_member_add(member: GuildMember) { }
     protected async on_guild_member_remove(member: GuildMember) { }
     protected async on_ready() { }
-    protected async on_interaction_create(interaction : Interaction) {
-
+    protected async on_interaction_create(interaction : Interaction)
+    {
         this.log.verbose("MODULE.TS ON_INTERACTION_CREATE", interaction);
     }
     protected async on_message(msg : Message)
     {
-        this.administrative_channel_adjust(msg);
+        await this.administrative_channel_adjust(msg);
     }
     protected async on_reaction_add(reaction : MessageReaction, user : User | PartialUser) {}
     protected async on_reaction_remove(reaction : MessageReaction, user : User | PartialUser) {}
@@ -189,6 +192,17 @@ export class dcmodule {
                 setTimeout(() => this.fetch_channel(channel_id, retry), 1000);
         }
     
+    }
+
+    // p2p
+    public async p2p_sicardo(id: string, msg_id: string, chan_id: string)
+    {
+        const p2p = await (await this.get_client().guilds.fetch(dcmodule.guild_id_tp)).channels.fetch(dcmodule.channel_id.tpbot_p2p);
+        try {
+            await (p2p as TextChannel).send(`sicardo_nvidia ${id} ${msg_id} ${chan_id}`);
+        } catch(error) {
+            this.log.error("Can't send sicardo to p2p");
+        }         
     }
 
     // database and module state methods
