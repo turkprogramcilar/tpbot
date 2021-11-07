@@ -1,9 +1,20 @@
-# be very careful of whom you giving this rights!
+# Be very careful of whom you giving this rights!
 shellAccess:
     Tag under id is used to double ensure that you don't mistaken any id of the
     user you intended to give shell access. It's like making you sure double
     type your password when you change it. You can temporarly or permanently
     use 'access' boolean field to enable or disable user's access.
-    0xdeadc0de#9615:
+    0xdead c0de#9615:
         id: "824573651390562325"
         access: true
+
+Provide bot's account TOKENs in TPBOT_TOKEN1, TPBOT_TOKEN2... TPBOT_TOKEN_ANY
+environment values. We understand that you mean you provided a token when you
+begin any environment name with TPBOT_TOKEN. The all following environment names
+are understood as TOKENs
+    TPBOT_TOKEN    TPBOT_TOKEN_WHATEVER    TPBOT_TOKENASDASD   TPBOT_TOKEN123
+
+The following environment names are *not* understood as TOKENs
+    TPBOT__TOKEN   TPBOT_1_TOKEN
+#moduleMapping:
+#    Beta Göetze 2#0621:

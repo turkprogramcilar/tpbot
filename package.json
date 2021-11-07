@@ -33,7 +33,8 @@
     "tslint": "^6.1.3",
     "utf-8-validate": "^5.0.7",
     "ws": "^7.5.5",
-    "xss": "^1.0.10"
+    "xss": "^1.0.10",
+    "yaml": "^1.10.2"
   },
   "devDependencies": {
     "@types/chai": "^4.2.22",
