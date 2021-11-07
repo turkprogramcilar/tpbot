@@ -94,7 +94,9 @@ export const m = new class join_leave extends dcmodule
     }
     protected async on_interaction_create(interaction: Interaction)
     {
-        const button_interaction = interaction as ButtonInteraction;
+        if (!interaction.isButton())
+            return;
+        const button_interaction: ButtonInteraction = interaction;
         if (!button_interaction
          ||  button_interaction.guild === null
          || !button_interaction.channel?.isText()
