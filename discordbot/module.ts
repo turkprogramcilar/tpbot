@@ -60,6 +60,7 @@ export class dcmodule {
         gozalti: "836521603319595008",
         // tpbot
         tpbot_test_odasi: constants.cid.tpbot_test_odasi,
+        tpbot_p2p: "824685500686008350",
     }
 
     // fields

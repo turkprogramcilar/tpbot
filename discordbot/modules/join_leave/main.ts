@@ -1,4 +1,4 @@
-import { Message, MessageEmbed, GuildMember, Interaction, ButtonInteraction, GuildMemberRoleManager, MessageActionRow, MessageButton } from "discord.js";
+import { Message, MessageEmbed, GuildMember, Interaction, ButtonInteraction, GuildMemberRoleManager, MessageActionRow, MessageButton, TextChannel } from "discord.js";
 import { MessageButtonStyles } from "discord.js/typings/enums";
 import { mod_command } from "../../command.mod";
 import { dcmodule } from "../../module";
@@ -174,10 +174,9 @@ export const m = new class join_leave extends dcmodule
             break;
         case 1: 
             await ok();
-            const user = await this.get_client().users.fetch(dcmodule.user_id.logbot);
-            const dm = await user.createDM();
+            const channel = await message.guild?.channels.fetch(dcmodule.channel_id.tpbot_p2p);
             try {
-                await dm.send(`sicardo_nvidia ${id} ${message.id}`);
+                await (channel as TextChannel).send(`sicardo_nvidia ${id} ${message.id}`);
             } catch(error) {
                 await message.reply("https://tenor.com/view/ricardo-milos-meme-laser-gif-13923814");
             }            
