@@ -5,22 +5,42 @@ import { commander } from "../../commander";
 import { dcmodule } from "../../module";
 export const m = new class welcome extends commander {
     
+    private spam_flag = false;
     constructor() { super(welcome.name, false); }
 
     /* events */
     protected async on_message(message: Message)
     {
-        if (message.channelId !== dcmodule.channel_id.onay)
+        if (message.channelId !== dcmodule.channel_id.onay
+         || message.author.bot)
             return;
 
-        await (await message.author.createDM()).send({
+        const msg = {
             content: "Türk Programcılar Discord sunucusuna hoşgeldiniz."
             + " Onay sistemini başlatmak için kanala **/hosbuldum** yazınız."
             + " Sistem sizi otomatik kabul edecektir.",
             embeds: [
                 new MessageEmbed().setImage("https://cdn.discordapp.com/attachments/900650376762626078/905845292061048832/hosbuldum_komutu.gif")
-            ]
-        });
+            ]};
+
+        try {
+            await (await message.author.createDM()).send(msg);
+
+        } catch (_) {
+
+            if (this.spam_flag)
+                return;
+            this.spam_flag = true;
+            
+            const reply = await message.reply(msg);
+            setTimeout(async () => {
+
+                await reply.delete()
+                this.spam_flag = false;
+
+            }, 60000);
+        }
+
         await message.delete();
     }
     protected async on_guild_member_add(member: GuildMember) 
