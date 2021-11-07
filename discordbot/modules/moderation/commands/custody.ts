@@ -11,4 +11,4 @@ export const c = new class custody extends mod_command
             { id: dcmodule.role_id_kurucu,   type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
         ])
     }
-}
+}();

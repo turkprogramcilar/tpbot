@@ -54,4 +54,4 @@ export const c = new class dedikodu extends mod_command
 		
 		return operation.complete;
 	}
-}
+}();
