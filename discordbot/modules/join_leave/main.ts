@@ -113,7 +113,7 @@ export const m = new class join_leave extends dcmodule
         const is_mod = (button_interaction.member?.roles as GuildMemberRoleManager)
             ?.cache.hasAny(dcmodule.role_id_koruyucu, dcmodule.role_id_kurucu);
         
-        if (button === 2 && !is_mod)
+        if (button === 0 && !is_mod)
             return;
 
         const id = (message.content.match(/^.+\[.*id=(\d+)\]`$/) ?? [])[1];
@@ -146,16 +146,13 @@ export const m = new class join_leave extends dcmodule
     {
         const ok = () => interaction.reply({content: "Görev tamam.", ephemeral: true});
         switch (button) {
-        case 0: await ok(); await message.reply("https://tenor.com/view/ricardo-milos-meme-laser-gif-13923814"); break;
-        case 1: await ok(); await message.reply("https://tenor.com/view/linus-linus-torvalds-nvidia-fuck-you-gif-18053606"); break;
-        case 2:
-
+        case 0:
             const mod_channel = await interaction.guild?.channels.fetch(dcmodule.channel_id.yetkili_komutlari)
             if (!mod_channel
-             || !mod_channel.isText()) {
+                || !mod_channel.isText()) {
                 this.log.error("Can't fetch mod channel");
                 return;
-             }
+                }
             
             if (!(interaction.message instanceof Message)) {
                 this.log.error("Interaction is not instance of Message");
@@ -173,6 +170,9 @@ export const m = new class join_leave extends dcmodule
                 interaction
                 );
             break;
+        case 1: await ok(); await message.reply("https://tenor.com/view/ricardo-milos-meme-laser-gif-13923814"); break;
+        case 2: await ok(); await message.reply("https://tenor.com/view/linus-linus-torvalds-nvidia-fuck-you-gif-18053606"); break;
+        
         default:
             this.log.warn("Unexpected interaction id: "+button);
             return;
@@ -182,18 +182,20 @@ export const m = new class join_leave extends dcmodule
     {
         return [
             new MessageActionRow().addComponents(
-                ...[new MessageButton()
+                ...[
+                new MessageButton()
                     .setCustomId(this.module_name+"0")
-                    .setStyle(MessageButtonStyles.SECONDARY)
-                    .setLabel("Sicardo"),
+                    .setStyle(MessageButtonStyles.DANGER)
+                    .setLabel("Gözaltı"),
                 new MessageButton()
                     .setCustomId(this.module_name+"1")
                     .setStyle(MessageButtonStyles.SECONDARY)
-                    .setLabel("Nvidia"),
+                    .setLabel("Sicardo"),
                 new MessageButton()
                     .setCustomId(this.module_name+"2")
-                    .setStyle(MessageButtonStyles.DANGER)
-                    .setLabel("Gözaltı")].filter((x, i) => which.includes(i))
+                    .setStyle(MessageButtonStyles.SECONDARY)
+                    .setLabel("Nvidia"),
+                ].filter((x, i) => which.includes(i))
             )
         ]
     }
