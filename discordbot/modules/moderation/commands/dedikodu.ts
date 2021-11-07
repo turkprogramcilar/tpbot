@@ -1,5 +1,4 @@
 import { ContextMenuInteraction, Message, MessageEmbed } from "discord.js";
-import { ApplicationCommandPermissionTypes } from "discord.js/typings/enums";
 import { mod_command } from "../../../command.mod";
 import { command_user_state, known_interactions } from "../../../commander";
 import { dcmodule } from "../../../module";
