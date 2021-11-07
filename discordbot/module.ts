@@ -167,6 +167,29 @@ export class dcmodule {
     public fetch_guild_member(guild : Guild, user_id : string) { 
         return guild.members.cache.get(user_id);
     }
+    public async fetch_channel(channel_id: string, retry: number = 5)
+    {
+        try {
+            const channel = await this.get_client().channels.fetch(channel_id);
+            if (!channel) {
+                throw new Error("channel is null");
+            }
+            if (!channel.isText()) {
+                throw new Error("channel is not text");
+            }
+            const text_channel = channel as TextChannel;
+            await text_channel.messages.fetch();
+
+        } catch (error) {
+
+            retry -= 1;
+            this.log.warn(`An error occurred in ${this.fetch_channel.name}... Will retry if retry[${retry}] != 0`);
+            this.log.error(error);
+            if (retry !== 0)
+                setTimeout(() => this.fetch_channel(channel_id, retry), 1000);
+        }
+    
+    }
 
     // database and module state methods
     protected is_initialized() : boolean {
