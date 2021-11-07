@@ -38,17 +38,21 @@ export abstract class mod_command extends command
 		const p2 = interaction.reply({ content: `${target_user.username} kullanıcısı üzerinde <#${yetkili_komutlari}> kanalında \`${prefixed_command}\` komutu çalıştırıldı.`, ephemeral: true});
 		await Promise.all([p1, p2]);
 	}
+
+	private communication_prefix: string;
     public data: ContextMenuCommandBuilder;
 	
 	public constructor(
 		command_name: string,
+		public custom_prefix?: string,
 		public permissions: ApplicationCommandPermissionData[] = [
 			{ id: dcmodule.role_id_koruyucu, type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
 			{ id: dcmodule.role_id_kurucu,   type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
-		]
+		],
 		)
 	{
 		super(command_name);
+		this.communication_prefix = custom_prefix ?? this.prefix;
 		
         this.data = new ContextMenuCommandBuilder()
 			.setName(this.command_name)
@@ -95,7 +99,7 @@ export abstract class mod_command extends command
 				target_message.author, 
 				yetkili_komutlari_channel,
 				target_message,
-				`\`${this.command_name} ${target_message.author.id}`,
+				`${this.communication_prefix}${this.command_name} ${target_message.author.id}`,
 				interaction
 				);
 		}

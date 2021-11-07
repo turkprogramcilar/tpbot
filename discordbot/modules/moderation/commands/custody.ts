@@ -4,6 +4,6 @@ export const c = new class custody extends mod_command
 {
     public constructor()
     {
-        super(custody.name);
+        super(custody.name, "`" );
     }
 }();

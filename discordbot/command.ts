@@ -15,11 +15,13 @@ export class operation<T>
     public is_complete() { return this.value === null; }
     public get_value() { return this.value; }
 }
+// tslint:disable-next-line: max-classes-per-file
 export abstract class command
 {
     protected log: log;
     public data: any;
     public permissions: any;
+    public prefix: string = process.env.DCBOT_PREFIX ?? "%";
 
     public constructor(public command_name: string)
     {
