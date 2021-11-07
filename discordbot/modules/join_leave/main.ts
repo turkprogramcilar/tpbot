@@ -94,35 +94,40 @@ export const m = new class join_leave extends dcmodule
     }
     protected async on_interaction_create(interaction: Interaction)
     {
-        if (interaction.guild == null
-         || !interaction.channel?.isText()
-         || !(interaction instanceof ButtonInteraction)
-         || !interaction.customId.includes(this.module_name))
+        const button_interaction = interaction as ButtonInteraction;
+        if (!button_interaction
+         ||  button_interaction.guild === null
+         || !button_interaction.channel?.isText()
+         || !button_interaction.customId.includes(this.module_name))
+            return;
+
+        const message = button_interaction.message;
+        if (!message)
             return;
 
         const get_button_id = (customId: string): number => Number((customId.match(/^.+(\d)+$/) ?? [])[1]);
-        const button = get_button_id(interaction.customId);
+        const button = get_button_id(button_interaction.customId);
         if (isNaN(button))
             return;
 
-        const is_mod = (interaction.member?.roles as GuildMemberRoleManager)
+        const is_mod = (button_interaction.member?.roles as GuildMemberRoleManager)
             ?.cache.hasAny(dcmodule.role_id_koruyucu, dcmodule.role_id_kurucu);
         
         if (button === 2 && !is_mod)
             return;
 
-        const id = (interaction.message.content.match(/^.+\[.*id=(\d+)\]`$/) ?? [])[1];
+        const id = (message.content.match(/^.+\[.*id=(\d+)\]`$/) ?? [])[1];
         if (!id)
             return;
 
 
-        if (!(interaction.message instanceof Message))
+        if (!(message instanceof Message))
             return;
 
-        const p2 = interaction.message.edit(
+        const p2 = message.edit(
             ((options: any) => {
                 const res = this.get_buttons(
-                    interaction.message.components[0].components
+                    message.components[0].components
                         .map(x => get_button_id(x.customId ?? ""))
                         .filter(x => !isNaN(x) && x !== button)
                 );
@@ -131,9 +136,9 @@ export const m = new class join_leave extends dcmodule
                 else
                     options.components = [];
                 return options;
-            })({ content: interaction.message.content })
+            })({ content: message.content })
         );
-        const p3 = this.handle_button_click(button, interaction.message, id, interaction);
+        const p3 = this.handle_button_click(button, message, id, button_interaction);
         await Promise.all([p2, p3]);
     }
     /* methods */
