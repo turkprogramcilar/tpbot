@@ -9,10 +9,7 @@ export const c = new class dedikodu extends mod_command
 {
     public constructor()
     {
-        super(dedikodu.name, [
-            { id: dcmodule.role_id_kidemli, type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
-            { id: dcmodule.role_id_kurucu,   type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
-        ])
+        super(dedikodu.name);
     }
 
 	public async execute(interaction: known_interactions, state: command_user_state) {

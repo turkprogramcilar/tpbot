@@ -40,7 +40,13 @@ export abstract class mod_command extends command
 	}
     public data: ContextMenuCommandBuilder;
 	
-	public constructor(command_name: string, public permissions: ApplicationCommandPermissionData[])
+	public constructor(
+		command_name: string,
+		public permissions: ApplicationCommandPermissionData[] = [
+			{ id: dcmodule.role_id_koruyucu, type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
+			{ id: dcmodule.role_id_kurucu,   type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
+		]
+		)
 	{
 		super(command_name);
 		
