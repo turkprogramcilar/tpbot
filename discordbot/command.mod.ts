@@ -36,7 +36,7 @@ export abstract class mod_command extends command
 			]
 		});
 		const p2 = interaction.reply({ content: `${target_user.username} kullanıcısı üzerinde <#${yetkili_komutlari}> kanalında \`${prefixed_command}\` komutu çalıştırıldı.`, ephemeral: true});
-		await p1, p2;
+		await Promise.all([p1, p2]);
 	}
     public data: ContextMenuCommandBuilder;
 	
