@@ -164,8 +164,6 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
             m.on_event('messageReactionAdd', {reaction: reaction, user: user});
     });
     client.on('messageCreate', async msg => {
-        if (msg.author == client.user)
-            return;
 
         const content = msg.content;
         const evt = msg.channel.type == 'dm' ? 'dm' : 'message';

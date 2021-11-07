@@ -22,7 +22,6 @@ export abstract class mod_command extends command
 		const yetkili_komutlari = dcmodule.channel_id.yetkili_komutlari;
 		const prefixed_command = `\`${command_name}`;
 		const p1 = mod_channel.send({
-			content: full_command, 
 			embeds: [
 				// pass new MessageEmbed() into lambda function. if message has attachments, setImage, else return embed as is
 				(x=>target_message.attachments.size === 0 ? x : x.setImage(target_message.attachments.first()!.url))
@@ -35,8 +34,9 @@ export abstract class mod_command extends command
 				)	
 			]
 		});
+		const p11 = mod_channel.send(full_command);
 		const p2 = interaction.reply({ content: `${target_user.username} kullanıcısı üzerinde <#${yetkili_komutlari}> kanalında \`${prefixed_command}\` komutu çalıştırıldı.`, ephemeral: true});
-		await Promise.all([p1, p2]);
+		await Promise.all([p1, p11, p2]);
 	}
 
 	private communication_prefix: string;
