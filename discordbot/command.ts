@@ -51,7 +51,7 @@ export abstract class command
             await interaction.reply({ content: 'Komut işlenirken hata oluştu. Lütfen bir süre sonra tekrar deneyin. Hatanın devam etmesi durumunda lütfen yetkililer ile iletişime geçin. Teşekkürler!', ephemeral: true });
         }
         catch (error) {
-            console.warn("respond failure to user failed with error: "+error)
+            console.error("respond failure to user failed with error: "+error)
         }
     }
     static get_user_info(user : User) : user_info
