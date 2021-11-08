@@ -2,6 +2,7 @@ import { Message, MessageEmbed, GuildMember, Interaction, ButtonInteraction, Gui
 import { MessageButtonStyles } from "discord.js/typings/enums";
 import { mod_command } from "../../command.mod";
 import { dcmodule } from "../../module";
+import { tp } from "../../tp";
 
 export const m = new class join_leave extends dcmodule
 {
@@ -12,7 +13,7 @@ export const m = new class join_leave extends dcmodule
     /* events */
     protected async on_message(message: Message)
     {
-        if (message.channelId !== dcmodule.channel_id.onay
+        if (message.channelId !== tp.channel_id.onay
          || message.author.bot)
             return;
 
@@ -22,7 +23,7 @@ export const m = new class join_leave extends dcmodule
             + " Sistem sizi otomatik kabul edecektir."
             + " _(Mesaj kendini 60 saniye içerisinde imha edecektir)_",
             embeds: [
-                new MessageEmbed().setImage("https://cdn.discordapp.com/attachments/900650376762626078/905845292061048832/hosbuldum_komutu.gif")
+                new MessageEmbed().setImage(tp.gifs.hosbuldum_komutu)
             ]};
 
         try {
@@ -48,8 +49,8 @@ export const m = new class join_leave extends dcmodule
     protected async on_guild_member_add(member: GuildMember) 
     {
         const channel_id = process.env.DCBOT_DEBUG
-            ? dcmodule.channel_id.tpbot_test_odasi
-            : dcmodule.channel_id.sohbet
+            ? tp.channel_id.tpbot_test_odasi
+            : tp.channel_id.sohbet
             ;
         
         const channel = await member.guild.channels.fetch(channel_id);
@@ -64,16 +65,16 @@ export const m = new class join_leave extends dcmodule
         await new Promise(x => setTimeout(x, 5000));
         await channel.send({embeds: [new MessageEmbed()
             .setAuthor(member.user.username, member.avatarURL() ?? member.displayAvatarURL())
-            .setThumbnail("https://media1.giphy.com/media/KSrNm2ThozpYnh3abh/giphy.gif")
+            .setThumbnail(tp.gifs.keke)
             .setDescription(`YIHAHO <@${member.id}>, **Türk Programcılar** discord sunucusuna hoşgeldin!`)
-            .setImage("https://media4.giphy.com/media/mTTuI8qkiXMtVjjqmq/giphy.gif")
+            .setImage(tp.gifs.hosgeldin)
         ]});
     }
     protected async on_guild_member_remove(member: GuildMember)
     {
         const channel_id = process.env.DCBOT_DEBUG
-            ? dcmodule.channel_id.tpbot_test_odasi
-            : dcmodule.channel_id.sicardo_nvidia
+            ? tp.channel_id.tpbot_test_odasi
+            : tp.channel_id.sicardo_nvidia
             ;
         
         const channel = await member.guild.channels.fetch(channel_id);
@@ -113,7 +114,7 @@ export const m = new class join_leave extends dcmodule
             return;
 
         const is_mod = (button_interaction.member?.roles as GuildMemberRoleManager)
-            ?.cache.hasAny(dcmodule.role_id_koruyucu, dcmodule.role_id_kurucu);
+            ?.cache.hasAny(tp.role_id_koruyucu, tp.role_id_kurucu);
         
         if (button === 0 && !is_mod)
             return;
@@ -149,7 +150,7 @@ export const m = new class join_leave extends dcmodule
         const ok = () => interaction.reply({content: "Görev tamam.", ephemeral: true});
         switch (button) {
         case 0:
-            const mod_channel = await interaction.guild?.channels.fetch(dcmodule.channel_id.yetkili_komutlari)
+            const mod_channel = await interaction.guild?.channels.fetch(tp.channel_id.yetkili_komutlari)
             if (!mod_channel
                 || !mod_channel.isText()) {
                 this.log.error("Can't fetch mod channel");
@@ -176,7 +177,7 @@ export const m = new class join_leave extends dcmodule
             await ok();
             await this.p2p_sicardo(id, message.id, message.channelId);
             break;
-        case 2: await ok(); await message.reply("https://tenor.com/view/linus-linus-torvalds-nvidia-fuck-you-gif-18053606"); break;
+        case 2: await ok(); await message.reply(tp.gifs.nvidia); break;
         
         default:
             this.log.warn("Unexpected interaction id: "+button);

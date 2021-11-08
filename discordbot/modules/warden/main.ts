@@ -1,5 +1,6 @@
 import { MessageEmbed, MessageReaction, PartialUser, User } from "discord.js";
 import { dcmodule } from "../../module";
+import { tp } from "../../tp";
 
 enum powers {
     "🍅", "RICARDO", "NVIDIA"
@@ -11,15 +12,15 @@ export const m = new class warden extends dcmodule {
 
     public async after_init()
     {
-        await this.fetch_channel(dcmodule.channel_id.gozalti);
+        await this.fetch_channel(tp.channel_id.gozalti);
     }
     public async on_reaction_add(reaction : MessageReaction, user : User | PartialUser)
     {
-        if (reaction.message.channelId !== dcmodule.channel_id.gozalti)
+        if (reaction.message.channelId !== tp.channel_id.gozalti)
             return;
             
         const msg_author = reaction.message.member;
-        if (!msg_author?.roles.cache.has(dcmodule.role_id_gozalti))
+        if (!msg_author?.roles.cache.has(tp.role_id_gozalti))
             return;
 
         if (reaction.message.createdAt.getTime() + 1*24*60*60*1000 < new Date().getTime())

@@ -2,6 +2,7 @@
 import { assert } from "console";
 import { Message, Client, User, PartialUser, MessageReaction, Presence, Guild, TextChannel, Interaction, GuildMember } from "discord.js";
 import { log } from './log';
+import { tp } from "./tp";
 
 // local imports
 const db        = require("../../discordbot/mongodb");
@@ -25,49 +26,6 @@ const MS_BULK : string = "bulkmessages";
 const FORBIDDEN_KEYS : string[] = [MS_DCUSERS, MS_BULK];
 
 export class dcmodule {
-    // some constants
-    static readonly guild_id_tp     : string = constants.sid.tpdc;
-    static readonly role_id_kurucu  : string = constants.rid.kurucu;
-    static readonly role_id_koruyucu: string = "782712917900525628";
-    static readonly role_id_kidemli : string = constants.rid.kidemli;
-    static readonly role_id_tp_uyesi: string = constants.rid.tp_uyesi;
-    static readonly role_id_gozalti : string = constants.rid.gozalti;
-    //
-    static readonly user_id = {
-        deadcode: "824573651390562325",
-        logbot: "841479314519752784",
-        chunk: "272044185689915392",
-    }
-    //
-    static readonly emoji_id = {
-        ricardo: "906998514238771231",
-        nvidia: "906998783370465352",
-    }
-    //
-    static readonly channel_id = {
-        onay: "900650376762626078",
-        bir_bak_buraya: constants.cid.bir_bak_buraya,
-        roller: constants.cid.roller,
-        // soru sor
-        yazilim_sor: constants.cid.yazilim_sor,
-        kafamda_deli_sorular: constants.cid.kafamda_deli_sorular,
-        kodlama_disi_sor: constants.cid.kodlama_disi_sor,
-        // main
-        sohbet: constants.cid.sohbet,
-        istek_oneri_sikayet: constants.cid.istek_oneri_sikayet,
-        // tp oyunlari
-        sicardo_nvidia: "782713536924221469",
-        // paylasimlar
-        proje_paylas: constants.cid.proje_paylas,
-        // yonetim
-        yetkili_komutlari: "851031980250103888",
-        yonetim_dedikodu: constants.cid.yonetim_dedikodu,
-        // gozalti
-        gozalti: "836521603319595008",
-        // tpbot
-        tpbot_test_odasi: constants.cid.tpbot_test_odasi,
-        tpbot_p2p: "824685500686008350",
-    }
 
     // fields
     protected db_fetch_start : Date | undefined = new Date();
@@ -197,7 +155,7 @@ export class dcmodule {
     // p2p
     public async p2p_sicardo(id: string, msg_id: string, chan_id: string)
     {
-        const p2p = await (await this.get_client().guilds.fetch(dcmodule.guild_id_tp)).channels.fetch(dcmodule.channel_id.tpbot_p2p);
+        const p2p = await (await this.get_client().guilds.fetch(tp.guild_id_tp)).channels.fetch(tp.channel_id.tpbot_p2p);
         try {
             await (p2p as TextChannel).send(`sicardo_nvidia ${id} ${msg_id} ${chan_id}`);
         } catch(error) {
