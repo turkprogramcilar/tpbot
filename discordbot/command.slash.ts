@@ -3,6 +3,7 @@ import { ApplicationCommandPermissionData, User } from 'discord.js';
 import { ApplicationCommandPermissionTypes } from 'discord.js/typings/enums';
 import { command } from './command';
 import { dcmodule } from './module';
+import { tp } from './tp';
 
 export abstract class slash_command extends command
 {
@@ -20,8 +21,8 @@ export abstract class slash_command extends command
         if (DEBUG !== undefined) {
             this.data = this.data.setDefaultPermission(false);
             this.permissions = [
-                { id: dcmodule.role_id_kidemli,  type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
-                { id: dcmodule.role_id_kurucu,   type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
+                { id: tp.role_id_kidemli,  type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
+                { id: tp.role_id_kurucu,   type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
             ];
         }
         else if (permissions)

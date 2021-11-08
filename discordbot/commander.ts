@@ -5,6 +5,7 @@ import { REST } from "@discordjs/rest";
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { command } from './command';
 import { log } from './log';
+import { tp } from './tp';
 
 const tools = require("../../discordbot/tools");
 
@@ -40,7 +41,7 @@ export class commander extends dcmodule
             throw new Error("can't register commands. id or token is null");
         }
 
-        const tpid = dcmodule.guild_id_tp
+        const tpid = tp.guild_id_tp
         const rest = new REST({ version: '9' }).setToken(token);
 
         const flatten = commands.reduce((a, c) => a={...a,...c} , {});

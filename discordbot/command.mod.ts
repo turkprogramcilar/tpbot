@@ -5,6 +5,7 @@ import { ApplicationCommandPermissionTypes } from "discord.js/typings/enums";
 import { command, operation } from "./command";
 import { known_interactions, command_user_state } from "./commander";
 import { dcmodule } from "./module";
+import { tp } from "./tp";
 
 
 export abstract class mod_command extends command 
@@ -19,7 +20,7 @@ export abstract class mod_command extends command
 		interaction: ContextMenuInteraction | ButtonInteraction
 		)
 	{
-		const yetkili_komutlari = dcmodule.channel_id.yetkili_komutlari;
+		const yetkili_komutlari = tp.channel_id.yetkili_komutlari;
 		const prefixed_command = `\`${command_name}`;
 		const p1 = mod_channel.send({
 			embeds: [
@@ -46,8 +47,8 @@ export abstract class mod_command extends command
 		command_name: string,
 		public custom_prefix?: string,
 		public permissions: ApplicationCommandPermissionData[] = [
-			{ id: dcmodule.role_id_koruyucu, type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
-			{ id: dcmodule.role_id_kurucu,   type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
+			{ id: tp.role_id_koruyucu, type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
+			{ id: tp.role_id_kurucu,   type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
 		],
 		)
 	{
@@ -62,8 +63,8 @@ export abstract class mod_command extends command
         if (DEBUG !== undefined) {
             this.data = this.data.setDefaultPermission(false);
             this.permissions = [
-                { id: dcmodule.role_id_kidemli,  type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
-                { id: dcmodule.role_id_kurucu,   type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
+                { id: tp.role_id_kidemli,  type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
+                { id: tp.role_id_kurucu,   type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
             ];
         }
         else if (this.permissions)
@@ -75,7 +76,7 @@ export abstract class mod_command extends command
 
 		if (interaction instanceof ContextMenuInteraction) {
 
-			const yetkili_komutlari = dcmodule.channel_id.yetkili_komutlari;
+			const yetkili_komutlari = tp.channel_id.yetkili_komutlari;
 			const yetkili_komutlari_channel = await interaction.guild?.channels.fetch(yetkili_komutlari)
 
 			const target_channel = await interaction.guild?.channels.fetch(interaction.channelId);
