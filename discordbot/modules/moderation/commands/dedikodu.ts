@@ -3,6 +3,7 @@ import { mod_command } from "../../../command.mod";
 import { command_user_state, known_interactions } from "../../../commander";
 import { dcmodule } from "../../../module";
 import { command, operation } from "../../../command";
+import { tp } from "../../../tp";
 
 export const c = new class dedikodu extends mod_command
 {
@@ -15,7 +16,7 @@ export const c = new class dedikodu extends mod_command
 
 		if (interaction instanceof ContextMenuInteraction) {
 
-			const info_channel_id = dcmodule.channel_id.yonetim_dedikodu;
+			const info_channel_id = tp.channel_id.yonetim_dedikodu;
 			const info_channel = await interaction.guild?.channels.fetch(info_channel_id)
 
 			const target_channel = await interaction.guild?.channels.fetch(interaction.channelId);

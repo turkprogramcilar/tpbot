@@ -1,6 +1,7 @@
 
 import { GuildMember, Message, MessageReaction, PartialUser, Presence, Role, TextChannel, User } from "discord.js";
 import { dcmodule } from "../module";
+import { tp } from "../tp";
 
 
 
@@ -12,7 +13,7 @@ const this_dcmodule = class bilenrol extends dcmodule {
     
     public async after_init(){
         
-        await this.fetch_channel(dcmodule.channel_id.gozalti);
+        await this.fetch_channel(tp.channel_id.gozalti);
     }
     public async on_reaction_remove(reaction : MessageReaction, user : User | PartialUser) {
         await this.reaction_internal(reaction, user, false);

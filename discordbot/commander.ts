@@ -77,7 +77,7 @@ export class commander extends dcmodule
 
                 if (!client.application?.owner) await client.application?.fetch();
 
-                const app_command = await client.guilds.cache.get(dcmodule.guild_id_tp)?.commands.fetch(_command_id);
+                const app_command = await client.guilds.cache.get(tp.guild_id_tp)?.commands.fetch(_command_id);
                 if (!app_command) throw Error ("Can't fetch application command");
                 
                 await app_command.permissions.set({

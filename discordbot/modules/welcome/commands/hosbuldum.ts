@@ -2,10 +2,10 @@ import { ButtonInteraction, MessageActionRow, MessageButton, MessageEmbed } from
 
 import { ApplicationCommandPermissionTypes, MessageButtonStyles } from "discord.js/typings/enums";
 import { known_interactions } from "../../../commander";
-import { dcmodule } from "../../../module";
 import { assert } from "console";
 import { status, click_interaction, dfa_command } from "../../../command.dfa";
 import { command } from "../../../command";
+import { tp } from "../../../tp";
 
 // https://en.wikipedia.org/wiki/Deterministic_finite_automaton
 enum Q {
@@ -72,17 +72,17 @@ const channel_mentions : { [key in Q]: string } = {
     
     [Q.yardim]: "",
     [Q.sohbet]: "",
-    [Q.proje] : `<#${dcmodule.channel_id.proje_paylas}>`,
-    [Q.reklam]: `<#${dcmodule.channel_id.istek_oneri_sikayet}>`,
+    [Q.proje] : `<#${tp.channel_id.proje_paylas}>`,
+    [Q.reklam]: `<#${tp.channel_id.istek_oneri_sikayet}>`,
 
-    [Q.yazilim]   : `<#${dcmodule.channel_id.yazilim_sor}>`,
-    [Q.bilgisayar]: `<#${dcmodule.channel_id.kodlama_disi_sor}>`,
-    [Q.diger]     : `<#${dcmodule.channel_id.kafamda_deli_sorular}>`,
+    [Q.yazilim]   : `<#${tp.channel_id.yazilim_sor}>`,
+    [Q.bilgisayar]: `<#${tp.channel_id.kodlama_disi_sor}>`,
+    [Q.diger]     : `<#${tp.channel_id.kafamda_deli_sorular}>`,
 
     [Q.acil]   : ``,
     [Q.sabirli]: ``,
 
-    [Q.roller]: `<#${dcmodule.channel_id.roller}> ve <#${dcmodule.channel_id.bir_bak_buraya}>`,
+    [Q.roller]: `<#${tp.channel_id.roller}> ve <#${tp.channel_id.bir_bak_buraya}>`,
     [Q.bitir]: ``,
 };
 
@@ -177,10 +177,10 @@ export const c = new class hosbuldum extends dfa_command<Q>
     {
 
         const permissions = [
-            { id: dcmodule.role_id_tp_uyesi, type: ApplicationCommandPermissionTypes.ROLE, permission: false, },
-            { id: dcmodule.role_id_gozalti,  type: ApplicationCommandPermissionTypes.ROLE, permission: false, },
-            { id: dcmodule.role_id_kidemli,  type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
-            { id: dcmodule.role_id_kurucu,   type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
+            { id: tp.role_id_tp_uyesi, type: ApplicationCommandPermissionTypes.ROLE, permission: false, },
+            { id: tp.role_id_gozalti,  type: ApplicationCommandPermissionTypes.ROLE, permission: false, },
+            { id: tp.role_id_kidemli,  type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
+            { id: tp.role_id_kurucu,   type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
         ];
         super(
             Object(Q),
@@ -239,8 +239,8 @@ export const c = new class hosbuldum extends dfa_command<Q>
         }
         (async (_i) => {
             const cid = process.env.DCBOT_DEBUG !== undefined
-                ? dcmodule.channel_id.tpbot_test_odasi
-                : dcmodule.channel_id.sicardo_nvidia
+                ? tp.channel_id.tpbot_test_odasi
+                : tp.channel_id.sicardo_nvidia
                 ;
             const channel = await interaction.guild?.channels.fetch(cid);
             if (channel?.isText()) {
@@ -261,7 +261,7 @@ export const c = new class hosbuldum extends dfa_command<Q>
                 this.log.error("Can't fetch guild user at the end of hosbuldum command", command.get_user_info(interaction.user));
                 return status.finished;
             }
-            await guild_user.roles.add(dcmodule.role_id_tp_uyesi);
+            await guild_user.roles.add(tp.role_id_tp_uyesi);
             return status.finished;
         }
         return status.in_progress;
