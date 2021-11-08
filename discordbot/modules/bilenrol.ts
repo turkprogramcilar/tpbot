@@ -13,7 +13,7 @@ const this_dcmodule = class bilenrol extends dcmodule {
     
     public async after_init(){
         
-        await this.fetch_channel(tp.channel_id.gozalti);
+        await this.fetch_channel(tp.channel_id.roller);
     }
     public async on_reaction_remove(reaction : MessageReaction, user : User | PartialUser) {
         await this.reaction_internal(reaction, user, false);
