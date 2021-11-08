@@ -157,7 +157,7 @@ export class dcmodule {
     {
         const p2p = await (await this.get_client().guilds.fetch(tp.guild_id_tp)).channels.fetch(tp.channel_id.tpbot_p2p);
         try {
-            await (p2p as TextChannel).send(`sicardo_nvidia ${id} ${msg_id} ${chan_id}`);
+            await (p2p as TextChannel).send(`sicardo_nvidia ${id} ${chan_id} ${msg_id}`);
         } catch(error) {
             this.log.error("Can't send sicardo to p2p");
         }         

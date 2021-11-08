@@ -27,7 +27,9 @@ export abstract class tp
         hosgeldin: "https://media4.giphy.com/media/mTTuI8qkiXMtVjjqmq/giphy.gif",
         // hosbuldum komutu nasil kullanilir gifli anlatim:
         hosbuldum_komutu: "https://cdn.discordapp.com/attachments/900650376762626078/905845292061048832/hosbuldum_komutu.gif",
-        nvidia: "https://tenor.com/view/linus-linus-torvalds-nvidia-fuck-you-gif-18053606",
+        nvidia: "https://c.tenor.com/3Sqfo6YaavAAAAAC/linus-linus-torvalds.gif",
+        tomato: "https://c.tenor.com/C0Gy42t5mJEAAAAC/throwing-tomatoes-tomatoes.gif",
+        sicardo: "https://c.tenor.com/gNGpI5FVz9sAAAAC/ricardo-milos-meme.gif"
     }
     //
     static readonly channel_id = {

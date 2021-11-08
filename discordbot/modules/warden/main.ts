@@ -41,11 +41,11 @@ export const m = new class warden extends dcmodule {
         if (!msg_state) {
             this.states[msg_id] = {};
         }
-        // ensure user state
+        // ensure user statenv
         const user_id = user.id;
-        const user_state = this.states[msg_id][user_id];
+        let user_state = this.states[msg_id][user_id];
         if (!user_state) {
-            this.states[msg_id][user_id] = {
+            user_state = this.states[msg_id][user_id] = {
                 [powers["🍅"]]: true,
                 [powers.RICARDO]: true,
                 [powers.NVIDIA]: true,
@@ -61,17 +61,29 @@ export const m = new class warden extends dcmodule {
             return;
             
         const msg = `${user.username} aşağıdaki mesajı sana iletti`;
+        const gif = emoji === powers["🍅"]
+            ? tp.gifs.tomato
+            : tp.gifs.nvidia
+            ;
         switch(emoji) {
+        case powers["🍅"]:
         case powers.NVIDIA:
             await reaction.message.reply({embeds: [new MessageEmbed()
                 .setDescription(msg)
-                .setImage()
+                .setImage(gif)
             ]});
             break;
         case powers.RICARDO:
-            
-            break;
-        case powers["🍅"]:
+            const id = reaction.message.member?.id;
+            const chan_id = reaction.message.channelId;
+            if (!id) {
+                await reaction.message.reply({embeds: [new MessageEmbed()
+                    .setDescription(msg)
+                    .setImage(tp.gifs.sicardo)
+                ]});
+                return;
+            }
+            await this.p2p_sicardo(id, msg_id, chan_id)
             break;
         default:
             throw new Error("Unexpected type error or not defined case at switch for enum");
