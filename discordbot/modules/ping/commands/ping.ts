@@ -19,4 +19,4 @@ export const c = new class ping extends slash_command
 
 		return operation.complete;
 	}
-}
+}()

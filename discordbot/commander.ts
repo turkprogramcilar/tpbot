@@ -62,25 +62,25 @@ export class commander extends dcmodule
             throw Error("response doesn't match with command length we sent.");
         }
 
-        let tasks : Promise<void>[] = res_arr.map(async json => {
-            const command_id : string = json.id;
+        const tasks : Promise<void>[] = res_arr.map(async json => {
+            const _command_id : string = json.id;
             const name : string = json.name;
-            const command = flatten[name];
-            if (!command) {
+            const _command = flatten[name];
+            if (!_command) {
                 console.error(`json response with command name ${name} is not found on our side.`);
                 return;
             }
-            print.verbose("command.permissions", command.permissions);
+            print.verbose("command.permissions", _command.permissions);
             // check if command has defined an permissions for its commands
-            if (command.permissions) {
+            if (_command.permissions) {
 
                 if (!client.application?.owner) await client.application?.fetch();
 
-                const app_command = await client.guilds.cache.get(dcmodule.guild_id_tp)?.commands.fetch(command_id);
+                const app_command = await client.guilds.cache.get(dcmodule.guild_id_tp)?.commands.fetch(_command_id);
                 if (!app_command) throw Error ("Can't fetch application command");
                 
                 await app_command.permissions.set({
-                    permissions: command.permissions
+                    permissions: _command.permissions
                 });
             }
             print.verbose("permission exit");
@@ -101,10 +101,11 @@ export class commander extends dcmodule
             const command_files = commands_folder_files.filter(file => file.endsWith('.js'));
 
             for (const file of command_files) {
-                const command : command = require("../../"+root+file.substring(0, file.length-3)).c;
+                const _command: command = require("../../"+root+file.substring(0, file.length-3)).c;
+                _command.prefix = this.state.prefix ?? _command.prefix;
                 // Set a new item in the Collection
                 // With the key as the command name and the value as the exported module
-                this.commands[command.data.name] = command;
+                this.commands[_command.data.name] = _command;
                 this.log.info("Require/Loading command file: "+file);
             }
             this.log.verbose("GET_COMMANDS BODY END FOR MODULE: "+this.module_name);

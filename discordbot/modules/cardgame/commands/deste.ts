@@ -114,4 +114,4 @@ export const c = new class deste extends slash_command
 		return operation.on(state);
 	}
 	
-}
+}();

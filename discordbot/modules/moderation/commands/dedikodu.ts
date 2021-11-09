@@ -1,5 +1,4 @@
 import { ContextMenuInteraction, Message, MessageEmbed } from "discord.js";
-import { ApplicationCommandPermissionTypes } from "discord.js/typings/enums";
 import { mod_command } from "../../../command.mod";
 import { command_user_state, known_interactions } from "../../../commander";
 import { dcmodule } from "../../../module";
@@ -9,10 +8,7 @@ export const c = new class dedikodu extends mod_command
 {
     public constructor()
     {
-        super(dedikodu.name, [
-            { id: dcmodule.role_id_kidemli, type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
-            { id: dcmodule.role_id_kurucu,   type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
-        ])
+        super(dedikodu.name);
     }
 
 	public async execute(interaction: known_interactions, state: command_user_state) {
@@ -23,16 +19,17 @@ export const c = new class dedikodu extends mod_command
 			const info_channel = await interaction.guild?.channels.fetch(info_channel_id)
 
 			const target_channel = await interaction.guild?.channels.fetch(interaction.channelId);
-			let target_message: Message;
+			
 
 			if (!info_channel?.isText() 
 			 || !target_channel?.isText()
-			 || !(target_message = await target_channel.messages.fetch(interaction.targetId))) {
+			 || !(await target_channel.messages.fetch(interaction.targetId))) {
 
 				await command.respond_interaction_failure_to_user(interaction);
 				return operation.complete;
 			}
-			const mod_command = `${this.command_name}`;
+			const target_message = await target_channel.messages.fetch(interaction.targetId);
+			const _mod_command = `${this.command_name}`;
 			const op = interaction.user;
 			const target_user = target_message.author;
 			const p1 = info_channel.send({
@@ -42,16 +39,16 @@ export const c = new class dedikodu extends mod_command
 					(new MessageEmbed()
 						.setThumbnail(target_user.avatarURL() ?? target_user.displayAvatarURL())
 						.setAuthor(op.username, op.avatarURL() ?? op.displayAvatarURL())
-						.setTitle(`${target_user.username} üzerinde \`${mod_command}\` komutu çalıştırdı. Mesaja gitmek için tıklayınız`)
+						.setTitle(`${target_user.username} üzerinde \`${_mod_command}\` komutu çalıştırdı. Mesaja gitmek için tıklayınız`)
 						.setDescription(target_message.content)
 						.setURL(target_message.url)
 					)	
 				]
 			});
-			const p2 = interaction.reply({ content: `${target_user.username} kullanıcısı üzerinde \`${mod_command}\` komutu çalıştırıldı. Bilgilendirme <#${info_channel_id}> kanalında yapıldı.`, ephemeral: true});
-			await p1, p2;
+			const p2 = interaction.reply({ content: `${target_user.username} kullanıcısı üzerinde \`${_mod_command}\` komutu çalıştırıldı. Bilgilendirme <#${info_channel_id}> kanalında yapıldı.`, ephemeral: true});
+			await Promise.all([p1, p2]);
 		}
 		
 		return operation.complete;
 	}
-}
+}();
