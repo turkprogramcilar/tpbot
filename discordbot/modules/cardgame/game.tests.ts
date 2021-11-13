@@ -13,26 +13,23 @@ const rng: (states: boolean[]) => () => boolean = (states: boolean[]) => {
 }
 
 const card_test = (card: card_no, false_at: number, p1damage: number, p2damage: number) => () => {
-    let booleans = Array(10).fill(true);
+    const booleans = Array(10).fill(true);
     booleans[false_at] = false;
 
     const game = new cardgame([card], [], rng(booleans));
 
-    const p1was = game.players[1].health;
-    const p2was = game.players[2].health;
+    const p1was = game.players[0].health;
+    const p2was = game.players[1].health;
 
-    game.play_card(card);
+    game.play_card(0);
     game.end_round();
-    expect(game.players[1].health).equals(p1was - p1damage);
-    expect(game.players[2].health).equals(p2was - p2damage);
+    expect(game.players[0].health).equals(p1was - p1damage);
+    expect(game.players[1].health).equals(p2was - p2damage);
 };
 
 describe('kart oyunu', () => {
 
-    it("oyunu birinci oyuncudan baslar", () => {
-        const game = basicgame();
-        expect(game.turn).is.equal(1);
-    });
+    it("oyunu birinci oyuncudan baslar");
 
     it("birden fazla saldiri kartini ayni tur icerisinde kullanilmasina izin vermez", () => {
         const game = basicgame();
@@ -48,10 +45,7 @@ describe('kart oyunu', () => {
         expect(game.play_card(saldiri_karti).OK).to.be.false;
     });
 
-    it("birinci tur saldiri karti oynanir ikincisi oynanamaz ve ikinci tur saldiri karti oynanabilir tekrardan", () => {
-
-        fail("yapilacak");
-    });
+    it("birinci tur saldiri karti oynanir ikincisi oynanamaz ve ikinci tur saldiri karti oynanabilir tekrardan");
 
     it("bir oyuncunun cani 0a duserse oyunu diger oyuncu kazanir", () => {
 
@@ -66,11 +60,12 @@ describe('kart oyunu', () => {
         game.play_card(0);
         game.end_round();
         expect(game.play_card(0).state).equals(game_state.win_p1);
-        expect(game.players[1].health, "geri kalan cani, eger bozulursa belki hasarlar degistirilmistir").equals(40);
-        expect(game.players[2].health, "geri kalan cani, eger bozulursa belki hasarlar degistirilmistir").equals(0);
+        expect(game.players[0].health, "geri kalan cani, eger bozulursa belki hasarlar degistirilmistir").equals(20);
+        expect(game.players[1].health, "geri kalan cani, eger bozulursa belki hasarlar degistirilmistir").equals(0);
 
         game = new cardgame([tr, tr, tr], [tr, tr, tr], rng([true, true, true, true, true, true]));
 
+        // ilk roundu kart oynamadan atlat ve p2 kazansin
         //game.play_card(0);
         game.end_round();
         game.play_card(0);
@@ -82,8 +77,8 @@ describe('kart oyunu', () => {
         game.play_card(0);
         game.end_round();
         expect(game.play_card(0).state).equals(game_state.win_p2);
-        expect(game.players[2].health, "geri kalan cani, eger bozulursa belki hasarlar degistirilmistir").equals(40);
-        expect(game.players[1].health, "geri kalan cani, eger bozulursa belki hasarlar degistirilmistir").equals(0);
+        expect(game.players[1].health, "geri kalan cani, eger bozulursa belki hasarlar degistirilmistir").equals(20);
+        expect(game.players[0].health, "geri kalan cani, eger bozulursa belki hasarlar degistirilmistir").equals(0);
     });
 });
 
@@ -93,8 +88,8 @@ describe('tatar ramazan karti', () => {
     it("50% sansla karsi tarafa hasar verir", () => {
         const game = new cardgame([tr, tr, tr], [tr, tr, tr], rng([true, false]));
 
-        const p1was = game.players[1].health;
-        const p2was = game.players[2].health;
+        const p1was = game.players[0].health;
+        const p2was = game.players[1].health;
 
         const damage = cards[tr].flips![0].heads!.attack!.target;
         if (!damage) fail("kartin hasari yok. olmali");
@@ -102,16 +97,15 @@ describe('tatar ramazan karti', () => {
         // 50% sansla vur
         game.play_card(0);
         game.end_round();
-        expect(game.players[1].health).equals(p1was);
-        expect(game.players[2].health).equals(p2was - damage);
+        expect(game.players[0].health).equals(p1was);
+        expect(game.players[1].health).equals(p2was - damage);
 
         // 50% sansla vurama
         game.play_card(0);
         game.end_round();
-        expect(game.players[1].health).equals(p1was);
-        expect(game.players[2].health).equals(p2was - damage);
+        expect(game.players[0].health).equals(p1was);
+        expect(game.players[1].health).equals(p2was - damage);
 
-        expect(game.turn).is.equal(1);
     });
 
 });

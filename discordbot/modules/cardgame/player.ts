@@ -3,7 +3,6 @@ import { alive_until, buff, buff_category, card_no, target, trigger } from "./da
 export const attack_cooldown: buff = {
     type: buff_category.status,
     aim: target.self,
-    when: trigger.round_begin,
     life: alive_until.round_ends,
     actions: []
 }
@@ -36,5 +35,7 @@ export class player
             amount = this.max_health * amount;
         }
         this.health += amount;
+        if (this.health < 0)
+            this.health = 0;
     }
 }

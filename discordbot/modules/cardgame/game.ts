@@ -1,5 +1,5 @@
 import { helper } from "../../helper";
-import { action, card_no, cards, limit, card, target, damage } from "./data";
+import { action, card_no, cards, limit, card, target, damage, trigger, alive_until } from "./data";
 import { attack_cooldown, player } from "./player";
 import { card_texts } from "./texts";
 
@@ -36,22 +36,20 @@ export class cardgame {
     players: { [key: number]: player };
     // total rounds so far
     round: number = 1;
-    //who's turn?
-    turn: number = 1;
-    round_result: round_result = { ...default_round_result };
-    // current round limits
+    // who's turn?
+    private current_player_index: number;
 
     // ctor (lol put some green text here as a place holder so it fits nicely as a single line)
     constructor(
         p1cards?: number[],
         p2cards?: number[],
-        private flipper: (() => boolean) = () => (Math.random() < .5),
-        private logger: (msg: string) => void = (s) => { }) 
+        private flipper: (() => boolean) = () => (Math.random() < .5))
     {
-        this.players = {
-            1: new player(p1cards as card_no[]),
-            2: new player(p2cards as card_no[]),
-        }
+        this.players = [
+            new player(p1cards as card_no[]),
+            new player(p1cards as card_no[]),
+        ]
+        this.current_player_index = 0;
     }
 
     // plays the given card for the player, since player can play theoritically all cards
@@ -59,8 +57,8 @@ export class cardgame {
     public play_card(index: number): { OK: boolean, state: game_state, flips?: boolean[], reason?: string } {
 
         // set players
-        const current_player = this.players[this.turn];
-        const target_player = this.players[this.target_of(this.turn)];
+        const current_player = this.current_player();
+        const target_player = this.target_player();
         // get the card object
         const no: card_no | undefined = current_player.cards[index];
         if (no === undefined) {
@@ -88,6 +86,12 @@ export class cardgame {
         
         // remove the card from the deck @TODO
         return { OK: true, state: this.state(), flips: [] };
+    }
+    // ends the round for current player
+    public end_round()
+    {
+        this.clean_buffs(this.current_player(), alive_until.round_ends);
+        this.current_player_index = this.current_player_index === 0 ? 1 : 0;
     }
     private result(r: boolean, s: string = "")
     {
@@ -128,34 +132,26 @@ export class cardgame {
         get_function(current_player)(damage?.self   ?? 0, damage?.percentage ?? false);
         get_function(target_player) (damage?.target ?? 0, damage?.percentage ?? false);
     }
+    private process_buffs(current: player, type: trigger)
+    {
 
+    }
+    private clean_buffs(current: player, type: alive_until)
+    {
+        current.buffs = current.buffs.filter(x => x.life !== x.life);   
+    }
     private state(): game_state {
-        if (this.players[1].health == 0 && this.players[2].health == 0) return game_state.draw;
-        if (this.players[1].health == 0) return game_state.win_p2;
-        if (this.players[2].health == 0) return game_state.win_p1;
+        if (this.players[0].health === 0 && this.players[1].health === 0) return game_state.draw;
+        if (this.players[0].health === 0) return game_state.win_p2;
+        if (this.players[1].health === 0) return game_state.win_p1;
         return game_state.unfinished;
     }
-
-    // ends the round for current player
-    public end_round(): round_result {
-        
-        this.turn = this.target_of(this.turn);
-        return this.round_result;
+    private current_player()
+    {
+        return this.players[this.current_player_index];
     }
-
-    private target_hit(damage: number) {
-        const target = this.players[this.target_of(this.turn)];
-
-        this.hit_to(target, damage);
-    }
-    private self_hit(damage: number) {
-        this.hit_to(this.players[this.turn], damage);
-    }
-    private hit_to(target: player, damage: number) {
-        target.health -= damage;
-        if (target.health < 0) target.health = 0;
-    }
-    private target_of(player: number): number {
-        return player == 1 ? 2 : 1;
+    private target_player()
+    {
+        return this.players[this.current_player_index === 0 ? 1 : 0];
     }
 }

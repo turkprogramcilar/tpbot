@@ -16,8 +16,8 @@ export enum from {
     enemy_select,
 }
 export enum alive_until {
-    flip_heads,
-    flip_tails,
+    flip_heads_at_round_end,
+    flip_fails_at_round_end,
     round_ends,
 }
 export enum trigger {
@@ -182,7 +182,7 @@ export const cards: { [key in card_no]: card } = {
                 type: buff_category.harming,
                 aim: target.enemy,
                 when: trigger.round_end,
-                life: alive_until.flip_heads,
+                life: alive_until.flip_heads_at_round_end,
                 actions: [
                     { attack: { self: 20 } }
                 ]
