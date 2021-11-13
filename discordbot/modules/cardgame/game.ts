@@ -56,11 +56,8 @@ export class cardgame {
 
     // plays the given card for the player, since player can play theoritically all cards
     // in hands this method could be called more than once
-    public play_card(player: number, index: number): { OK: boolean, state: game_state, flips?: boolean[], reason?: string } {
+    public play_card(index: number): { OK: boolean, state: game_state, flips?: boolean[], reason?: string } {
 
-        if (this.turn != player) {
-            return this.result(false, "Illegal operation on play_card. Turn is not equal to player number");
-        }
         // set players
         const current_player = this.players[this.turn];
         const target_player = this.players[this.target_of(this.turn)];
@@ -121,9 +118,9 @@ export class cardgame {
     private process_action(action: action, current_player: player, target_player: player) {
         
         // attack
-        this.process_damage(action.attack, current_player, target_player, (p) => p.hit)
+        this.process_damage(action.attack, current_player, target_player, (p) => p.hit.bind(p))
         // heal
-        this.process_damage(action.heal, current_player, target_player, (p) => p.heal)
+        this.process_damage(action.heal, current_player, target_player, (p) => p.heal.bind(p))
 
     }
     private process_damage(damage: damage | undefined, current_player: player, target_player: player, get_function: (p: player) => ((amount: number, percentage: boolean) => void))
