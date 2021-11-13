@@ -12,11 +12,6 @@ const tools = require("../../discordbot/tools");
 export type first_interactions = CommandInteraction | ContextMenuInteraction
 export type second_interactions = ButtonInteraction | SelectMenuInteraction
 export type known_interactions = CommandInteraction | ButtonInteraction | SelectMenuInteraction | ContextMenuInteraction
-export interface command_module {
-    data : SlashCommandBuilder,
-    execute : (interaction : known_interactions, state : command_user_state) => Promise<command_user_state | null>,
-    permissions : ApplicationCommandPermissionData[] | undefined,
-};
 export interface command_user_state {
     command_id : string,
     state : number,
@@ -29,7 +24,7 @@ type command_name = string;
 
 
 
-export class modern extends dcmodule
+export class commander extends dcmodule
 {
     
     protected commands: {[key: string]: command} = {};
@@ -67,25 +62,25 @@ export class modern extends dcmodule
             throw Error("response doesn't match with command length we sent.");
         }
 
-        let tasks : Promise<void>[] = res_arr.map(async json => {
-            const command_id : string = json.id;
+        const tasks : Promise<void>[] = res_arr.map(async json => {
+            const _command_id : string = json.id;
             const name : string = json.name;
-            const command_module = flatten[name];
-            if (!command_module) {
+            const _command = flatten[name];
+            if (!_command) {
                 console.error(`json response with command name ${name} is not found on our side.`);
                 return;
             }
-            print.verbose("command_module.permissions", command_module.permissions);
+            print.verbose("command.permissions", _command.permissions);
             // check if command has defined an permissions for its commands
-            if (command_module.permissions) {
+            if (_command.permissions) {
 
                 if (!client.application?.owner) await client.application?.fetch();
 
-                const app_command = await client.guilds.cache.get(dcmodule.guild_id_tp)?.commands.fetch(command_id);
+                const app_command = await client.guilds.cache.get(dcmodule.guild_id_tp)?.commands.fetch(_command_id);
                 if (!app_command) throw Error ("Can't fetch application command");
                 
                 await app_command.permissions.set({
-                    permissions: command_module.permissions
+                    permissions: _command.permissions
                 });
             }
             print.verbose("permission exit");
@@ -106,10 +101,11 @@ export class modern extends dcmodule
             const command_files = commands_folder_files.filter(file => file.endsWith('.js'));
 
             for (const file of command_files) {
-                const command : command = require("../../"+root+file.substring(0, file.length-3)).c;
+                const _command: command = require("../../"+root+file.substring(0, file.length-3)).c;
+                _command.prefix = this.state.prefix ?? _command.prefix;
                 // Set a new item in the Collection
                 // With the key as the command name and the value as the exported module
-                this.commands[command.data.name] = command;
+                this.commands[_command.data.name] = _command;
                 this.log.info("Require/Loading command file: "+file);
             }
             this.log.verbose("GET_COMMANDS BODY END FOR MODULE: "+this.module_name);
@@ -127,10 +123,10 @@ export class modern extends dcmodule
         const switch_to_ids: {[key: command_id]: command} = {};
         for (const [name, id] of name_id_pairs) {
 
-            const command_module: command | undefined = this.commands[name];
-            if (command_module !== undefined) {
+            const command: command | undefined = this.commands[name];
+            if (command !== undefined) {
 
-                switch_to_ids[id] = command_module;
+                switch_to_ids[id] = command;
             }
         }
         this.commands = switch_to_ids;
@@ -156,9 +152,9 @@ export class modern extends dcmodule
         const user_info = command.get_user_info(interaction.user);
 
         let state: command_user_state;
-        let command_module: command | undefined;
+        let _command: command | undefined;
 
-        if (modern.is_first_interaction(interaction)) {
+        if (commander.is_first_interaction(interaction)) {
 
             const id: command_id = interaction.commandId;
             const module: command | undefined = this.commands[id];
@@ -166,7 +162,7 @@ export class modern extends dcmodule
                 // its not in our command scope
                 return;
             }
-            command_module = module;
+            _command = module;
 
             // if user already started a command, dont start another one
             state = this.command_states[user_id] 
@@ -192,7 +188,7 @@ export class modern extends dcmodule
                 reset: false,
             }
         }
-        else if (modern.is_second_interaction(interaction)) {
+        else if (commander.is_second_interaction(interaction)) {
             
             // assuming button is always triggered from a command
             state = this.command_states[user_id];
@@ -208,7 +204,7 @@ export class modern extends dcmodule
                 this.log.warn(`command id[${id}] is not found in commands when interacting with button or select menu`, user_info)
                 return;
             }
-            command_module = module;
+            _command = module;
             
             state = this.command_states[user_id];
         }
@@ -219,7 +215,7 @@ export class modern extends dcmodule
         }
 
         try {
-            const operation = await command_module.execute(interaction, state);
+            const operation = await _command.execute(interaction, state);
             if (operation.is_complete()) 
                 delete this.command_states[user_id];
 

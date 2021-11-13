@@ -2,9 +2,9 @@
 import { Message, MessageReaction, PartialUser, Presence, User } from "discord.js";
 import { commander } from "../../commander";
 
-export const m = new class ping extends commander {
+export const m = new class modern_bakkal extends commander {
     
-    constructor() { super(ping.name, false); }
+    constructor() { super(modern_bakkal.name, false); }
     
     public async after_init() { }
     public async on_message(msg : Message) {

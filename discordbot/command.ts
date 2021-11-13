@@ -1,7 +1,7 @@
 import { ContextMenuCommandBuilder, SlashCommandBuilder } from "@discordjs/builders";
 import { User } from "discord.js";
 import { log, user_info } from "./log";
-import { known_interactions, command_user_state } from "./modern";
+import { known_interactions, command_user_state } from "./commander";
 
 export class operation<T>
 {
@@ -15,11 +15,13 @@ export class operation<T>
     public is_complete() { return this.value === null; }
     public get_value() { return this.value; }
 }
+// tslint:disable-next-line: max-classes-per-file
 export abstract class command
 {
     protected log: log;
     public data: any;
     public permissions: any;
+    public prefix: string = process.env.DCBOT_PREFIX ?? "%";
 
     public constructor(public command_name: string)
     {

@@ -1,6 +1,6 @@
 // package imports
 import { assert } from "console";
-import { Message, Client, User, PartialUser, MessageReaction, Presence, Guild, TextChannel, Interaction } from "discord.js";
+import { Message, Client, User, PartialUser, MessageReaction, Presence, Guild, TextChannel, Interaction, GuildMember } from "discord.js";
 import { log } from './log';
 
 // local imports
@@ -33,7 +33,14 @@ export class dcmodule {
     static readonly role_id_tp_uyesi: string = constants.rid.tp_uyesi;
     static readonly role_id_gozalti : string = constants.rid.gozalti;
     //
+    static readonly user_id = {
+        deadcode: "824573651390562325",
+        logbot: "841479314519752784",
+        chunk: "272044185689915392",
+    }
+    //
     static readonly channel_id = {
+        onay: "900650376762626078",
         bir_bak_buraya: constants.cid.bir_bak_buraya,
         roller: constants.cid.roller,
         // soru sor
@@ -54,6 +61,7 @@ export class dcmodule {
         gozalti: "836521603319595008",
         // tpbot
         tpbot_test_odasi: constants.cid.tpbot_test_odasi,
+        tpbot_p2p: "824685500686008350",
     }
 
     // fields
@@ -119,25 +127,27 @@ export class dcmodule {
     public async on_event(evt: string, args: any) {
 
         switch(evt) {
-            case 'ready'                : await this.on_ready();                              break;
-            case 'message'              : await this.on_message(args.msg);                    break;
-            case 'presenceUpdate'       : await this.on_presence_update(args[0], args[1]);    break;
-            case 'interactionCreate'    : await this.on_interaction_create(args.interaction); break;
+        case 'ready'            : await this.on_ready();                             break;
+        case 'message'          : await this.on_message(args.msg);                   break;
+        case 'presenceUpdate'   : await this.on_presence_update(args[0], args[1]);   break;
+        case 'interactionCreate': await this.on_interaction_create(args.interaction);break;
+        case 'guildMemberAdd'   : await this.on_guild_member_add(args.member);       break;
+        case 'guildMemberRemove': await this.on_guild_member_remove(args.member);    break;
 
-            case 'messageReactionAdd':
-            case 'messageReactionRemove':
-                const reaction : MessageReaction = args.reaction;
-                const user : User | PartialUser = args.user;
-                if (evt == 'messageReactionAdd')                    
-                    await this.on_reaction_add(reaction, user);
-                else
-                    await this.on_reaction_remove(reaction, user);
-            break;
+        case 'messageReactionAdd':
+        case 'messageReactionRemove':
+            const reaction : MessageReaction = args.reaction;
+            const user : User | PartialUser = args.user;
+            if (evt == 'messageReactionAdd')                    
+                await this.on_reaction_add(reaction, user);
+            else
+                await this.on_reaction_remove(reaction, user);
+        break;
         }
     }
-    protected async on_ready() {
-        
-    }
+    protected async on_guild_member_add(member: GuildMember) { }
+    protected async on_guild_member_remove(member: GuildMember) { }
+    protected async on_ready() { }
     protected async on_interaction_create(interaction : Interaction) {
 
         this.log.verbose("MODULE.TS ON_INTERACTION_CREATE", interaction);

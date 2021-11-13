@@ -1,7 +1,7 @@
 import { ButtonInteraction, MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
 
 import { ApplicationCommandPermissionTypes, MessageButtonStyles } from "discord.js/typings/enums";
-import { known_interactions } from "../../../modern";
+import { known_interactions } from "../../../commander";
 import { dcmodule } from "../../../module";
 import { assert } from "console";
 import { status, click_interaction, dfa_command } from "../../../command.dfa";
@@ -158,7 +158,7 @@ const get_enum_keys = <T extends object>(enum_t : T) : (keyof T)[] => {
 for (const key of get_enum_keys(d)) {
     const expected = d[key].length;
     const actual   = choice_labels[key].length;
-    assert(expected == actual);
+    assert(expected === actual);
 }
 // empty scope
 {
@@ -166,9 +166,9 @@ for (const key of get_enum_keys(d)) {
     const actual   = get_enum_keys(embed_bodies).length;
     const actual2  = get_enum_keys(choice_labels).length;
     const actual3  = get_enum_keys(channel_mentions).length;
-    assert(expected == actual);
-    assert(expected == actual2);
-    assert(expected == actual3);
+    assert(expected === actual);
+    assert(expected === actual2);
+    assert(expected === actual3);
 }
 export const c = new class hosbuldum extends dfa_command<Q>
 {
@@ -209,9 +209,9 @@ export const c = new class hosbuldum extends dfa_command<Q>
         const question = embed_bodies[new_q];
         const choices  = choice_labels[new_q];
 
-        let buttons = new MessageActionRow()
+        const buttons = new MessageActionRow()
             .addComponents(
-                choices.map((x, i) => new MessageButton().setCustomId(i+"").setLabel(x).setStyle(MessageButtonStyles.PRIMARY))
+                choices.map((x, _i) => new MessageButton().setCustomId(_i+"").setLabel(x).setStyle(MessageButtonStyles.PRIMARY))
             );
 
         const embed = new MessageEmbed()
@@ -220,21 +220,21 @@ export const c = new class hosbuldum extends dfa_command<Q>
 
         const image_path = images[new_q];
         if (image_path !== undefined) {
-            if (new_q == Q.bitir)
+            if (new_q === Q.bitir)
                 embed.setThumbnail(image_path);
             else
                 embed.setImage(image_path);
         }
 
         // if its beginning, send panel as reply
-        if (new_q == Q.basla) {
+        if (new_q === Q.basla) {
             const response = { ephemeral: true, embeds: [embed], components: [buttons] };
             await interaction.reply(response);
         }
         // if its not beginning, send panel as update
         else {
             interaction = interaction as ButtonInteraction;
-            const response = { embeds: [embed], components: choices.length == 0 ? [] : [buttons]};
+            const response = { embeds: [embed], components: choices.length === 0 ? [] : [buttons]};
             await interaction.update(response);
         }
         (async (_i) => {
@@ -251,10 +251,10 @@ export const c = new class hosbuldum extends dfa_command<Q>
                     ;
                 await channel.send(msg);
             }
-        })(i);
+        })(i).catch(this.log.error.bind(this.log));
 
         // if its end, give user the role
-        if (new_q == Q.bitir) {
+        if (new_q === Q.bitir) {
             // give user role
             const guild_user = await interaction.guild?.members.fetch(interaction.user);
             if (!guild_user) {
@@ -266,4 +266,4 @@ export const c = new class hosbuldum extends dfa_command<Q>
         }
         return status.in_progress;
     }
-}
+}()

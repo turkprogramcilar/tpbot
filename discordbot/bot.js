@@ -106,9 +106,9 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
 
         // load empty modern module for static function calls
         log.verbose("LOAD EMPTY MODERN");
-        const modern = require("../build/discordbot/modern.js");
+        const modern = require("../build/discordbot/commander.js");
         log.verbose("LOADED=",modern.modern);
-        const name_id_pairs = await modern.modern.register_commands(all_commands, client);
+        const name_id_pairs = await modern.commander.register_commands(all_commands, client);
         log.verbose("NAME_ID_PAIRS=",name_id_pairs);
 
         // broadcast all loaded command id's from discord server
@@ -147,6 +147,14 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
         for (const m of modules) 
             m.on_event('interactionCreate', {interaction: interaction});
     });
+    client.on('guildMemberAdd', async (member) => {
+        for (const m of modules) 
+            m.on_event('guildMemberAdd', {member: member});
+    });
+    client.on('guildMemberRemove', async (member) => {
+        for (const m of modules) 
+            m.on_event('guildMemberRemove', {member: member});
+    });
     client.on('messageReactionRemove', async (reaction,user) => {
         for (const m of modules) 
             m.on_event('messageReactionRemove', {reaction: reaction, user: user});
@@ -156,8 +164,6 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
             m.on_event('messageReactionAdd', {reaction: reaction, user: user});
     });
     client.on('messageCreate', async msg => {
-        if (msg.author == client.user)
-            return;
 
         const content = msg.content;
         const evt = msg.channel.type == 'dm' ? 'dm' : 'message';
