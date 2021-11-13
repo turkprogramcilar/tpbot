@@ -69,7 +69,7 @@ export class cardgame {
         const played_card = cards[no];
 
         // check if this is a attack card and player has already used one before
-        if (played_card.play_limit == limit.attack_category) {
+        if (played_card.play_limit === limit.attack_category) {
 
             if (current_player.has_buff(attack_cooldown)) 
                 return this.result(false, "Bu tur içerisinde başka saldırı kartı oynayamazsınız");
@@ -138,6 +138,7 @@ export class cardgame {
 
     // ends the round for current player
     public end_round(): round_result {
+        
         this.turn = this.target_of(this.turn);
         return this.round_result;
     }

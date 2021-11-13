@@ -1,7 +1,7 @@
 import { alive_until, buff, buff_category, card_no, target, trigger } from "./data";
 
 export const attack_cooldown: buff = {
-    healing: buff_category.status,
+    type: buff_category.status,
     aim: target.self,
     when: trigger.round_begin,
     life: alive_until.round_ends,

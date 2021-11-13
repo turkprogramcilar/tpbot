@@ -33,7 +33,7 @@ export enum buff_category {
     status,
 }
 export interface buff {
-    healing: buff_category,
+    type: buff_category,
     aim: target,
     // determined when the actions of this buff procs
     when?: trigger,
@@ -113,7 +113,7 @@ export const cards: { [key in card_no]: card } = {
         play_limit: limit.unlimited,
         buffs: [
             {
-                healing: buff_category.harming,
+                type: buff_category.harming,
                 aim: target.enemy,
                 when: trigger.round_begin,
                 life: alive_until.round_ends,
@@ -179,7 +179,7 @@ export const cards: { [key in card_no]: card } = {
         play_limit: limit.unlimited,
         buffs: [
             {
-                healing: buff_category.harming,
+                type: buff_category.harming,
                 aim: target.enemy,
                 when: trigger.round_end,
                 life: alive_until.flip_heads,
