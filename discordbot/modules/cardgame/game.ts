@@ -29,16 +29,15 @@ const default_round_result: round_result = {
 }
 
 export class cardgame {
-    static readonly rarities =
-        helper.get_enum_keys(card_no)
-            .map(x => cards[x as card_no].rarity);
 
-    static readonly rarity_groups = this.rarities
-            .reduce((a, c) => { a[c]++; return a; }, [NaN,0,0,0,0,0])
-            .slice(1);
+    static readonly grouped_by_rarity = helper.get_enum_keys(card_no)
+            .reduce((a: number[][], c) => { 
+                a[cards[c as card_no].rarity-1].push(c); 
+                return a; 
+            }, [[],[],[],[],[]]);
     
-    static readonly roll_scale = this.rarity_groups
-            .map((x, i) => x/(i+1));
+    static readonly roll_scale = this.grouped_by_rarity
+            .map((x, i) => x.length/(i+1));
 
 
     static roll_card(rnd: (() => number) = Math.random): card_no
@@ -46,13 +45,11 @@ export class cardgame {
         const sum = this.roll_scale.reduce((a, c) => a+=c, 0);
         const roll = rnd() * sum;
         let s = this.roll_scale[0];
-        let i = 1;
-        for (; roll > s; i++) {
-            s += this.roll_scale[i];
+        let i = 0;
+        for (; roll >= s; i++) {
+            s += this.roll_scale[i+1];
         }
-        const group = helper.get_enum_keys(card_no)
-            .filter((x: card_no) => cards[x].rarity === i);
-
+        const group = this.grouped_by_rarity[i];
         return group[Math.floor(rnd() * group.length)];
     }
 

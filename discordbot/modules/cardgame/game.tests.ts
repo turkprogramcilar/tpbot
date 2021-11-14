@@ -86,14 +86,43 @@ describe("zar sistemi", () => {
 
     it("random 0 atilan kart en kolay ilk kattir", () => {
         const no: card_no = cardgame.roll_card(() => 0);
-        const first_common = 1+cardgame.rarities.indexOf(rarity.Yaygın);
+        const first_common = 1+cardgame.grouped_by_rarity[0][0];
         expect(no, "ilk yaygin olan karta esit olmali").equals(card_no.usta_rakun);
     });
 
     it("random 0.99999 atilan kart en son destansi karttir", () => {
+        const l = (a: any[]) => a[a.length-1];
         const no = cardgame.roll_card(() => 0.99999);
-        const last_legend = 1+cardgame.rarities.lastIndexOf(rarity.Destansı);
+        const last_legend = l(l(cardgame.grouped_by_rarity));
         expect(no, "son destansi olan karta esit olmali").equals(last_legend);
+    });
+
+    it("tum kartlar icin araliklar vardir", () => {
+        const concat = <T>(arr: T[][]) => arr.reduce((a,c)=>{a.push(...c);return a;},[]);
+        const sum = cardgame.roll_scale.reduce((a, c) => a+= c, 0);
+        let s = 0;
+        for (const [scale, scale_i] of cardgame.roll_scale.map((x, i) => [x, i])) {
+            const lower_bound = s;
+            s += scale;
+            const upper_bound = s;
+            const rarity_index = scale_i;
+            const current_cards = cardgame.grouped_by_rarity[rarity_index];
+
+            // burada zar atmak icin hileli zar kullaniyoruz once tur kumesi
+            // secimi daha sonra bu tur kumesi icinden kart secimi yapiliyor
+            const bounds = [lower_bound/sum, upper_bound/sum*0.99];
+            const rolls = concat(bounds.map(f => 
+                current_cards.map((x, i) => [f, i/current_cards.length, i])
+            ));
+            for (const [first, second, card_index] of rolls) {
+                const expected = cardgame.grouped_by_rarity[rarity_index][card_index];
+                expect(
+                    cardgame.roll_card([].shift.bind([first, second]) as any),
+                    "Tür aralığının alt ve üst şans sınırları verildiğinde " +
+                    "o türden kart geri döndürmeli"
+                ).equals(expected);
+            }
+        }
     });
 });
 
