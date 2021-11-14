@@ -1,8 +1,7 @@
 import { ButtonInteraction, CommandInteraction, Interaction, MessageActionRow, MessageButton, MessageEmbed, MessageSelectMenu, SelectMenuInteraction } from "discord.js";
 
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { cards, card_no } from "../data";
-import { card_text, card_texts, rarity } from "../texts";
+import { card, cards, card_no, rarity } from "../data";
 import { cardgame } from "../game";
 import { user_info } from "../../../log";
 import { slash_command } from "../../../command.slash";
@@ -47,13 +46,13 @@ const rarity_formats: {[key in rarity]: string} =  {
     5: "css"
 }
 const card_embed = (no: card_no) => {
-    const card : card_text = card_texts[no];
+    const _card = cards[no];
     return new MessageEmbed()
-        .setThumbnail(card.link)
-        .setTitle(`\`${card.title}\``)
-        .setDescription("```"+`${rarity_formats[card.rarity]}\n[${card.description}]`+"```")
-        .addField(`\`Kart cinsi: ${rarity[card.rarity]}\``, `No: ${no}\n\n\n`)
-        .setColor(rarity_colors[card.rarity]);
+        .setThumbnail(_card.link)
+        .setTitle(`\`${_card.title}\``)
+        .setDescription("```"+`${rarity_formats[_card.rarity]}\n[${_card.description}]`+"```")
+        .addField(`\`Kart cinsi: ${rarity[_card.rarity]}\``, `No: ${no}\n\n\n`)
+        .setColor(rarity_colors[_card.rarity]);
 }
 
 export const c = new class deste extends slash_command
@@ -69,7 +68,7 @@ export const c = new class deste extends slash_command
 			.setPlaceholder("Kart seç")
 			.addOptions(
 				helper.get_enum_keys(card_no).map((i: card_no) => {
-					return { label: card_texts[i].title, value: i.toString(), };
+					return { label: cards[i].title, value: i.toString(), };
 				})
 			),
 		);

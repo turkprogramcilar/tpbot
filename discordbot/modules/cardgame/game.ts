@@ -1,7 +1,6 @@
 import { helper } from "../../helper";
 import { action, card_no, cards, limit, card, target, damage, trigger, alive_until } from "./data";
 import { attack_cooldown, player } from "./player";
-import { card_texts, rarity } from "./texts";
 
 export enum game_state {
     unfinished = -1,
@@ -32,7 +31,7 @@ const default_round_result: round_result = {
 export class cardgame {
     static readonly rarities =
         helper.get_enum_keys(card_no)
-            .map(x => card_texts[x as card_no].rarity);
+            .map(x => cards[x as card_no].rarity);
 
     static readonly rarity_groups = this.rarities
             .reduce((a, c) => { a[c]++; return a; }, [NaN,0,0,0,0,0])
@@ -52,7 +51,7 @@ export class cardgame {
             s += this.roll_scale[i];
         }
         const group = helper.get_enum_keys(card_no)
-            .filter((x: card_no) => card_texts[x].rarity === i);
+            .filter((x: card_no) => cards[x].rarity === i);
 
         return group[Math.floor(rnd() * group.length)];
     }

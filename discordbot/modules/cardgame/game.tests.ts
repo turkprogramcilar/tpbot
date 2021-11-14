@@ -2,8 +2,7 @@ import { fail } from 'assert';
 import { expect } from 'chai';
 import { describe } from 'mocha'
 import { cardgame, game_state } from './game';
-import { card_no, cards } from './data';
-import { rarity } from './texts';
+import { card_no, cards, rarity } from './data';
 
 const tr = card_no.tatar_ramazan;
 
