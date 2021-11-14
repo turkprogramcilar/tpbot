@@ -1,5 +1,8 @@
 // type definitions
 
+import { coin } from "./data.builder.coin";
+import { flips } from "./data.builder.flips";
+
 export enum limit {
     attack_category,
     unlimited,
@@ -14,6 +17,7 @@ export enum from {
     self_select,
     enemy_random,
     enemy_select,
+    deck_3,
 }
 export enum alive_until {
     flip_heads_at_round_end,
@@ -84,8 +88,14 @@ export interface card {
     tail_break?: boolean,
     buffs?: buff[],
 }
+type part<Type> = {
+    [Property in keyof Type as Exclude<Property, "play_limit">]: Type[Property]
+};
+export type partial_card = part<card>;
 
-// card database
+// Card Database
+// -----------------------------------------------------------------------------
+
 
 export enum card_no {
     efsanevi_ataturk = 1,
@@ -136,8 +146,7 @@ export const cards: { [key in card_no]: card } = {
     },
     [card_no.korkusuz_korkak]: {
         play_limit: limit.attack_category,
-        flips: Array(5).fill({ heads: { attack: { target: 20 } } }),
-        tail_break: true,
+        ...flips.sequential(5, coin.attack(20))
     },
     [card_no.kara_murat_benim]: {
         play_limit: limit.attack_category,
@@ -160,7 +169,7 @@ export const cards: { [key in card_no]: card } = {
         play_limit: limit.unlimited,
         actions: [
             { discard_card: from.self_select, show_card: true },
-            { pick_card: from.self_select, show_card: true },
+            { pick_card: from.deck_3, show_card: true },
         ]
     },
     [card_no.zikir_halkasi]: {
@@ -213,10 +222,10 @@ export const cards: { [key in card_no]: card } = {
         ],
         tail_break: true,
     },
-    15: {
+    [card_no.changerboyle]: {
         play_limit: limit.unlimited,
-        flips: [
-            { heads: { transform_card: from.enemy_select } }
+        actions: [
+            { transform_card: from.enemy_select }
         ],
     },
     [card_no.tatar_ramazan]: {

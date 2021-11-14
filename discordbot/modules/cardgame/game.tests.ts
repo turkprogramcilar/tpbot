@@ -3,6 +3,7 @@ import { expect } from 'chai';
 import { describe } from 'mocha'
 import { cardgame, game_state } from './game';
 import { card_no, cards } from './data';
+import { rarity } from './texts';
 
 const tr = card_no.tatar_ramazan;
 
@@ -82,6 +83,21 @@ describe('kart oyunu', () => {
     });
 });
 
+describe("zar sistemi", () => {
+
+    it("random 0 atilan kart en kolay ilk kattir", () => {
+        const no: card_no = cardgame.roll_card(() => 0);
+        const first_common = 1+cardgame.rarities.indexOf(rarity.Yaygın);
+        expect(no, "ilk yaygin olan karta esit olmali").equals(card_no.usta_rakun);
+    });
+
+    it("random 0.99999 atilan kart en son destansi karttir", () => {
+        const no = cardgame.roll_card(() => 0.99999);
+        const last_legend = 1+cardgame.rarities.lastIndexOf(rarity.Destansı);
+        expect(no, "son destansi olan karta esit olmali").equals(last_legend);
+    });
+});
+
 // kart testleri
 describe('tatar ramazan karti', () => {
 
@@ -123,4 +139,9 @@ describe('tivorlu ismail karti', () => {
     it("1 yazida 30 hasar verir", card_test(card_no.tivorlu_ismail, 1, 0, 30));
     it("2 yazida 40 hasar verir", card_test(card_no.tivorlu_ismail, 2, 0, 40));
     it("3 yazida 50 hasar verir fakat oyuncu 20 hasar alir", card_test(card_no.tivorlu_ismail, 3, 20, 50));
+});
+
+describe("Usta rakun karti", () => {
+
+    it("secilen karti yokeder")
 });

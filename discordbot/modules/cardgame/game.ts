@@ -1,7 +1,7 @@
 import { helper } from "../../helper";
 import { action, card_no, cards, limit, card, target, damage, trigger, alive_until } from "./data";
 import { attack_cooldown, player } from "./player";
-import { card_texts } from "./texts";
+import { card_texts, rarity } from "./texts";
 
 export enum game_state {
     unfinished = -1,
@@ -30,9 +30,33 @@ const default_round_result: round_result = {
 }
 
 export class cardgame {
+    static readonly rarities =
+        helper.get_enum_keys(card_no)
+            .map(x => card_texts[x as card_no].rarity);
 
-    private readonly roll_scale = 
-        helper.get_enum_keys(card_no).map(x => card_texts[x as card_no].rarity as number)
+    static readonly rarity_groups = this.rarities
+            .reduce((a, c) => { a[c]++; return a; }, [NaN,0,0,0,0,0])
+            .slice(1);
+    
+    static readonly roll_scale = this.rarity_groups
+            .map((x, i) => x/(i+1));
+
+
+    static roll_card(rnd: (() => number) = Math.random): card_no
+    {
+        const sum = this.roll_scale.reduce((a, c) => a+=c, 0);
+        const roll = rnd() * sum;
+        let s = this.roll_scale[0];
+        let i = 1;
+        for (; roll > s; i++) {
+            s += this.roll_scale[i];
+        }
+        const group = helper.get_enum_keys(card_no)
+            .filter((x: card_no) => card_texts[x].rarity === i);
+
+        return group[Math.floor(rnd() * group.length)];
+    }
+
     players: { [key: number]: player };
     // total rounds so far
     round: number = 1;
@@ -51,6 +75,7 @@ export class cardgame {
         ]
         this.current_player_index = 0;
     }
+
 
     // plays the given card for the player, since player can play theoritically all cards
     // in hands this method could be called more than once
@@ -125,7 +150,7 @@ export class cardgame {
         this.process_damage(action.attack, current_player, target_player, (p) => p.hit.bind(p))
         // heal
         this.process_damage(action.heal, current_player, target_player, (p) => p.heal.bind(p))
-
+        // pick card
     }
     private process_damage(damage: damage | undefined, current_player: player, target_player: player, get_function: (p: player) => ((amount: number, percentage: boolean) => void))
     {

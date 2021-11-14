@@ -104,7 +104,7 @@ export const card_texts: { [key in card_no]: card_text } =
         rarity: rarity.Destansı,
         title: "ChangerBoyle",
         link: "https://cdn.discordapp.com/attachments/842470001155899430/847973979326382090/unknown.png",
-        description: "Karsi rakibin herhangi bi kartini taklit edebilir."
+        description: "Karsi rakibin herhangi bir kartini taklit edebilir."
     },
     [card_no.tatar_ramazan]: {
         rarity: rarity.Esrarengiz,
