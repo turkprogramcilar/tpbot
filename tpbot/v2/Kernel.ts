@@ -58,22 +58,22 @@ export class Kernel extends Summoner<BotData>
         // const tpbotJson = JSON.parse(process.env.TPBOT);
         const botToken: string | undefined = process.env.TPBOT; // for the moment, we get token directly
         const botName = "Beta";
-        this.summonBotManager(botToken, botName);
+        this.summonLoader(botToken, botName);
 
         // this.awaitStdin();
     }
 
-    public summonBotManager(botToken: string, botName: string, crashInfo?: CrashInfo)
+    public summonLoader(botToken: string, botName: string, crashInfo?: CrashInfo)
     {
         let bot: Minion<BotData>;
-        bot = this.summon(this.botManagerPath, botName, Kernel.name, (error) => this.whenBotManagerCrashes(bot, error), { token: botToken, crash: crashInfo });
+        bot = this.summon(this.botManagerPath, botName, Kernel.name, (error) => this.whenLoaderCrashes(bot, error), { token: botToken, crash: crashInfo });
         bot.when("message", message => {
             this.log.from(bot.name).info(message);
             bot.emit("message", "Pong");
         });
     }
 
-    private whenBotManagerCrashes(bot: Minion<BotData>, error: Error | unknown)
+    private whenLoaderCrashes(bot: Minion<BotData>, error: Error | unknown)
     {
         bot.data.crash = Kernel.Increase(bot.data.crash);
         this.log.error(`Exception level: BotManager[name=${bot.name}, `
@@ -87,7 +87,7 @@ export class Kernel extends Summoner<BotData>
                 + `[crashes=${bot.data.crash.perMinute}]`);
             return;
         }
-        this.summonBotManager(bot.data.token, bot.name, bot.data.crash);
+        this.summonLoader(bot.data.token, bot.name, bot.data.crash);
     }
 
     private awaitStdin()

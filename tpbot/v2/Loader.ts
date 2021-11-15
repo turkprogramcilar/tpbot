@@ -7,12 +7,12 @@ import { BotData } from "./Kernel";
 import { MinionFile } from "./MinionFile";
 
 // tslint:disable-next-line: no-unused-expression
-new class ModuleManager extends MinionFile
+new class Loader extends MinionFile
 {
-    print: Print = new Print(ModuleManager.name);
+    print: Print = new Print(Loader.name);
     constructor()
     {
-        super(ModuleManager.name);
+        super(Loader.name);
         const data: BotData = workerData;
         this.fromSummoner("message", this.print.info.bind(this.print));
         this.fromSummoner("updateSummonerName", summonerName => { this.print.from(summonerName); });
