@@ -29,7 +29,14 @@ const card_test = (card: card_no, false_at: number, p1damage: number, p2damage: 
 
 describe('kart oyunu', () => {
 
-    it("oyunu birinci oyuncudan baslar");
+    it("oyuncu round basi kart alir ve karti yoksa kart oynayamaz", () => {
+        const game = new cardgame([], []);
+        expect(game.play_card(0).OK).to.be.true;
+        expect(game.play_card(0).OK).to.be.false;
+        game.end_round();
+        expect(game.play_card(0).OK).to.be.true;
+        expect(game.play_card(0).OK).to.be.false;
+    })
 
     it("birden fazla saldiri kartini ayni tur icerisinde kullanilmasina izin vermez", () => {
         const game = basicgame();
@@ -45,7 +52,20 @@ describe('kart oyunu', () => {
         expect(game.play_card(saldiri_karti).OK).to.be.false;
     });
 
-    it("birinci tur saldiri karti oynanir ikincisi oynanamaz ve ikinci tur saldiri karti oynanabilir tekrardan");
+    it("birinci tur saldiri karti oynanir ikincisi oynanamaz ve ikinci tur saldiri karti oynanabilir tekrardan", () => {
+        const game = basicgame();
+        const saldiri_karti = 0; // tatar ramazan bir saldiri kartidir
+
+        // birinci oyuncu icin kontrol
+        expect(game.play_card(saldiri_karti).OK).to.be.true;
+        expect(game.play_card(saldiri_karti).OK).to.be.false;
+        game.end_round();
+
+        // ikinci oyuncu round atlatir
+        game.end_round();
+        expect(game.play_card(saldiri_karti).OK).to.be.true;
+        expect(game.play_card(saldiri_karti).OK).to.be.false;
+    });
 
     it("bir oyuncunun cani 0a duserse oyunu diger oyuncu kazanir", () => {
 

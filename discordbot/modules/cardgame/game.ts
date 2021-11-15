@@ -61,15 +61,17 @@ export class cardgame {
 
     // ctor (lol put some green text here as a place holder so it fits nicely as a single line)
     constructor(
-        p1cards?: number[],
-        p2cards?: number[],
+        p1cards: number[],
+        p2cards: number[],
         private flipper: (() => boolean) = () => (Math.random() < .5))
     {
         this.players = [
             new player(p1cards as card_no[]),
-            new player(p1cards as card_no[]),
+            new player(p2cards as card_no[]),
         ]
         this.current_player_index = 0;
+        // game starts, draw a card for player 1
+        this.draw_card(this.current_player());
     }
 
 
@@ -105,7 +107,8 @@ export class cardgame {
         // flip the coins if any
         this.flip_card_coins(played_card, current_player, target_player);
         
-        // remove the card from the deck @TODO
+        
+        current_player.cards.splice(index, 1);
         return { OK: true, state: this.state(), flips: [] };
     }
     // ends the round for current player
@@ -113,6 +116,8 @@ export class cardgame {
     {
         this.clean_buffs(this.current_player(), alive_until.round_ends);
         this.current_player_index = this.current_player_index === 0 ? 1 : 0;
+        // round is ended, new round begun, draw a card for the player
+        this.draw_card(this.current_player());
     }
     private result(r: boolean, s: string = "")
     {
@@ -156,6 +161,10 @@ export class cardgame {
     private process_buffs(current: player, type: trigger)
     {
 
+    }
+    private draw_card(who: player, count: number = 1)
+    {
+        who.cards.push(...Array<card_no>(count).fill(cardgame.roll_card()));
     }
     private clean_buffs(current: player, type: alive_until)
     {

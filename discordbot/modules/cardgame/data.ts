@@ -1,5 +1,8 @@
 // type definitions
 
+import { m } from "../auto_topic/main";
+import { actions } from "./data.builder.action";
+import { status } from "./data.builder.buff";
 import { coin } from "./data.builder.coin";
 import { flips } from "./data.builder.flips";
 
@@ -22,6 +25,7 @@ export enum alive_until {
     flip_heads_at_round_end,
     flip_fails_at_round_end,
     round_ends,
+    forever,
 }
 export enum trigger {
     round_begin,
@@ -35,9 +39,16 @@ export enum buff_category {
     harming,
     status,
 }
+export enum buff_id {
+    notification,
+    iboy,
+    bump,
+}
 export interface buff {
+    buff_id?: buff_id,
     type: buff_category,
     aim: target,
+    stacks?: number,
     // determined when the actions of this buff procs
     when?: trigger,
     life: alive_until,
@@ -46,6 +57,7 @@ export interface buff {
 export interface action {
     attack?: damage,
     heal?: damage,
+    card_count?: number,
     pick_card?: from,
     // transforms card into the chosen card. do not destroy other card. replace it with the same as chosen.
     transform_card?: from,
@@ -120,7 +132,9 @@ export enum card_no {
     // 20=
     kralin_soytari_gifi, kufurbaz_kral, tempolu_gunaydin, iboy, hainboyle,
     // 25=
-    ins_cnm_ya
+    ins_cnm_ya, everyone, etiket, cifte_bump, bump,
+    // 30=
+    ricardo_milos,
 }
 export const cards: { [key in card_no]: card } = {
     [card_no.efsanevi_ataturk]: {
@@ -129,9 +143,9 @@ export const cards: { [key in card_no]: card } = {
         link: "https://media1.tenor.com/images/2f94086d9d8d7616090e8dabb8e17ff7/tenor.gif?itemid=15462494",
         description: "Oyuncuyu tum zararli buyulerden kurtarir, gucunu tamamen yeniler ve dusmanin tum yararli buyulerini bozar.",
         actions: [
-            { cleanse: true },
-            { purge: true },
-            { heal: { self: 1.0, percentage: true } }
+            actions.cleanse(),
+            actions.purge(),
+            actions.heal(1.0, true),
         ]
     },
     [card_no.hasan_mezarci]: {
@@ -163,8 +177,8 @@ export const cards: { [key in card_no]: card } = {
         link: "https://media1.tenor.com/images/34121fc8c9f07be8fc19a13f300df98f/tenor.gif?itemid=11898048",
         description: "Koca isteyen kari polislerin elinde rehin durumdadir ve Oyuncu yazi tura atar. Yazi gelmesi halinde Koca isteyen kari polislerin elinden bir hazimle kurtularak oyuncuyu zararli buyulerden defeder. Bu durumda Oyuncu bir daha yazi tura atar. Eger tekrar yazi gelirse Koca isteyen kari dusmanina aldigi depar sonucu kafa atar ve ona X hasar verir",
         flips: [
-            { heads: { cleanse: true } },
-            { heads: { attack: { target: 20 } } },
+            { heads: actions.cleanse() },
+            { heads: actions.attack(20) },
         ],
         tail_break: true,
     },
@@ -267,7 +281,7 @@ export const cards: { [key in card_no]: card } = {
         rarity: rarity.Esrarengiz,
         title: "Tivorlu Ismail",
         link: "https://media.discordapp.net/attachments/829256056156586044/840294047314739210/tumblr_m38mn15UyX1qfltf6o1_r2_2501.gif",
-        description: "Tivorlu Ismail Hela Vela Velvela adli eserini canlandirmaya baslar. Hay Masallah dedikten sonra Zih der ve Aaaa diye yukselmeye baslar. Rakip 20 hasar alir. Tivorlu Ismail Aaaaa nakaratini tekrarladikca oyuncu yazi tura atar. Her yazi ardina tekrar yazi tura atar ve rakibine 10 hasar verir. Oyuncu yazi turayi 3 kere kombolama hakkinda sahiptir. Eger oyuncu 3 kere yazi tutturursa Ismail Hay masallah fakirim diyip parcasini bitirir ve Oyuncu kendine 20 hasar verir.",
+        description: "Tivorlu Ismail Hela Vela Velvela adli eserini canlandirmaya baslar. Hay Masallah dedikten sonra Zih der ve Aaaa diye yukselmeye baslar. Rakip 20 hasar alir. Tivorlu Ismail Aaaaa nakaratini tekrarladikca oyuncu yazi tura atar. Her yazi ardina tekrar yazi tura atar ve rakibine 10 hasar verir. Oyuncu yazi turayi 3 kere kombolama hakkinda sahiptir. Eger oyuncu 3 kere yazi tutturursa Ismail Hay masallah diyip parcasini bitirir ve Oyuncu kendine 20 hasar verir.",
         play_limit: limit.attack_category,
         actions: [
             { attack: { target: 20 } },
@@ -353,4 +367,45 @@ export const cards: { [key in card_no]: card } = {
         link: "https://media4.giphy.com/media/ob44JUxIej8jJEeEgp/giphy.gif?cid=790b7611a4c4375931ff92ee0e899e0c390702526109de29&rid=giphy.gif&ct=g",
         description: "Belirsizliğin ortasında kalınıldığında sunucuda inş cnm ya gifi atılır. Ne olacağı belli olmayan bu durumda sorun yaşayan oyuncu ya 30 sağlık puanı kaybeder yada rakibine 30 hasar verir.",
     },
+    [card_no.everyone]: {
+        rarity: rarity.Güzide,
+        title: "@everyone",
+        link: "https://cdn.discordapp.com/emojis/725714391642931260.gif",
+        description: "İki oyuncu sunucuda atılan everyone etiketinden dolayı bildirim alırlar. Kartı oynayan oyuncu yeni bir kart çeker.",
+    },
+    [card_no.etiket] : {
+        rarity: rarity.Yaygın,
+        title: "Etiket",
+        link: "https://c.tenor.com/V6vHhQ_A05YAAAAd/kamen-rider-kiva-otoya-kurenai.gif",
+        description: "Sunucuda aktif olan iki oyuncudan biri yazı tura sonucu etiketlenir. Oyuncu tura atarsa kendine, yazı atarsa rakibine etiket atar. Kartı oynayan oyuncu yeni bir kart çeker",
+    },
+    [card_no.cifte_bump]: {
+        rarity: rarity.İhtişamlı,
+        title: "Çifte Bump",
+        link: "https://cdn.discordapp.com/attachments/842470001155899430/909574126577004564/unknown.png",
+        description: "Sunucuda aktif olan iki oyuncu aynı anda bump yapar ve bump sayıları artar. Kartı oynayan oyuncu iki kart çeker",
+        actions: [ actions.draw_card(2), ],
+        buffs: [
+            status.self(buff_id.bump),
+            status.target(buff_id.bump),
+        ]
+    },
+    [card_no.bump]: {
+        rarity: rarity.İhtişamlı,
+        title: "Bump!",
+        link: "https://cdn.discordapp.com/attachments/842470001155899430/909584680511234068/unknown.png",
+        description: "Oyuncu sunucuda başarıyla bump yapar ve Ekselans Risitas tarafından ödüllerle kutsanır, 20 şifa puanı alır, bir kart çeker.",
+        actions: [ 
+            actions.heal(20), 
+            actions.draw_card(1),
+        ],
+        buffs: [ status.self(buff_id.bump) ],
+    },
+    [card_no.ricardo_milos]: {
+        rarity: rarity.Esrarengiz,
+        title: "Ricardo Milos",
+        link: "https://cdn.discordapp.com/emojis/867493678960214076.png",
+        description: "Oyuncu destesinden bir kartı çekerken Ricardo ile göz göze gelir ve Ricardo gülümser, iki kart çekmesini söyler. Oyuncu Ricardo kartını oynar ve ardından iki kart çeker. ",
+        actions: [ actions.draw_card(2), ]
+    }
 }
