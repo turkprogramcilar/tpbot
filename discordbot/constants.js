@@ -122,7 +122,7 @@ levelstb= "levels"
 cardstb = "cards"
 moduletb= "module_states" + (consts.env.debug ? "_debug" : "");
 // tbs that have static data (mostly game data) to be installed
-alltb   = [itemstb, levelstb, cardstb]
+alltb   = [itemstb, levelstb, /*cardstb card.json is deleted*/]
 //dbname = "test1"
 
 iconpath = './discordbot/icons';
