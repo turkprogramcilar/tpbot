@@ -1,6 +1,7 @@
 import { helper } from "../../helper";
-import { action, card_no, cards, limit, card, target, damage, trigger, alive_until } from "./data";
-import { attack_cooldown, player } from "./player";
+import { action, card_no, cards, limit, card, target, damage, trigger, alive_until, from, buff_id } from "./data";
+import { status } from "./data.builder.buff";
+import { player } from "./player";
 
 export enum game_state {
     unfinished = -1,
@@ -29,6 +30,7 @@ const default_round_result: round_result = {
 }
 
 export class cardgame {
+    static readonly max_health = 100;
 
     static readonly grouped_by_rarity = helper.get_enum_keys(card_no)
             .reduce((a: number[][], c) => { 
@@ -61,13 +63,14 @@ export class cardgame {
 
     // ctor (lol put some green text here as a place holder so it fits nicely as a single line)
     constructor(
-        p1cards: number[],
-        p2cards: number[],
-        private flipper: (() => boolean) = () => (Math.random() < .5))
+        p1cards: card_no[],
+        p2cards: card_no[],
+        private flipper: (() => boolean) = () => (Math.random() < .5),
+        private drawer: (() => card_no) = cardgame.roll_card.bind(cardgame))
     {
         this.players = [
-            new player(p1cards as card_no[]),
-            new player(p2cards as card_no[]),
+            new player(p1cards),
+            new player(p2cards),
         ]
         this.current_player_index = 0;
         // game starts, draw a card for player 1
@@ -92,16 +95,16 @@ export class cardgame {
         // check if this is a attack card and player has already used one before
         if (played_card.play_limit === limit.attack_category) {
 
-            if (current_player.has_buff(attack_cooldown)) 
+            if (current_player.has_buff(buff_id.attack_cooldown)) 
                 return this.result(false, "Bu tur içerisinde başka saldırı kartı oynayamazsınız");
 
-            current_player.buff(attack_cooldown);
+            current_player.buff(status.attack_cooldown());
         }
 
         // instant actions
-        for (const action of played_card.actions ?? []) {
+        for (const a of played_card.actions ?? []) {
 
-            this.process_action(action, current_player, target_player);
+            this.process_action(a, current_player, target_player);
         }
 
         // flip the coins if any
@@ -119,14 +122,22 @@ export class cardgame {
         // round is ended, new round begun, draw a card for the player
         this.draw_card(this.current_player());
     }
+    public current_player()
+    {
+        return this.players[this.current_player_index];
+    }
+    public target_player()
+    {
+        return this.players[this.current_player_index === 0 ? 1 : 0];
+    }
     private result(r: boolean, s: string = "")
     {
         return { OK: r, state: this.state(), reason: s };
     }
     // card-related processing methods @TODO might separate responsibility into card class
-    private flip_card_coins(card: card, current_player: player, target_player: player) {
+    private flip_card_coins(c: card, current_player: player, target_player: player) {
         const flips: boolean[] =  [];
-        for (const { heads: heads_action, tails: tails_action } of card.flips ?? []) {
+        for (const { heads: heads_action, tails: tails_action } of c.flips ?? []) {
 
             const flip = this.flipper();
             flips.push(flip);
@@ -139,24 +150,36 @@ export class cardgame {
                 if (tails_action !== undefined)
                     this.process_action(tails_action, current_player, target_player);
 
-                if (card.tail_break)
+                if (c.tail_break)
                     break;
             }
         }
         return flips;
     }
-    private process_action(action: action, current_player: player, target_player: player) {
+    private process_action(a: action, current_player: player, target_player: player) {
         
         // attack
-        this.process_damage(action.attack, current_player, target_player, (p) => p.hit.bind(p))
+        this.process_damage(a.attack, current_player, target_player, (p) => p.hit.bind(p))
         // heal
-        this.process_damage(action.heal, current_player, target_player, (p) => p.heal.bind(p))
-        // pick card
+        this.process_damage(a.heal, current_player, target_player, (p) => p.heal.bind(p))
+        // actions related with cards
+        if (a.card_count !== undefined) {
+            
+            // NOTE: currently we have only 1 card count property for one action
+            // if a card defines multiple card actions we might need to refactor
+            // 
+
+            // pick_card
+            if (a.pick_card === from.self_random) {
+
+                this.draw_card(this.current_player(), a.card_count);
+            }
+        }
     }
-    private process_damage(damage: damage | undefined, current_player: player, target_player: player, get_function: (p: player) => ((amount: number, percentage: boolean) => void))
+    private process_damage(d: damage | undefined, current_player: player, target_player: player, get_function: (p: player) => ((amount: number, percentage: boolean) => void))
     {
-        get_function(current_player)(damage?.self   ?? 0, damage?.percentage ?? false);
-        get_function(target_player) (damage?.target ?? 0, damage?.percentage ?? false);
+        get_function(current_player)(d?.self   ?? 0, d?.percentage ?? false);
+        get_function(target_player) (d?.target ?? 0, d?.percentage ?? false);
     }
     private process_buffs(current: player, type: trigger)
     {
@@ -175,13 +198,5 @@ export class cardgame {
         if (this.players[0].health === 0) return game_state.win_p2;
         if (this.players[1].health === 0) return game_state.win_p1;
         return game_state.unfinished;
-    }
-    private current_player()
-    {
-        return this.players[this.current_player_index];
-    }
-    private target_player()
-    {
-        return this.players[this.current_player_index === 0 ? 1 : 0];
     }
 }

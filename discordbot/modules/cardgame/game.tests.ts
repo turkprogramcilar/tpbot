@@ -1,20 +1,26 @@
+// tslint:disable no-unused-expression
 import { fail } from 'assert';
 import { expect } from 'chai';
 import { describe } from 'mocha'
 import { cardgame, game_state } from './game';
-import { card_no, cards, rarity } from './data';
+import { card_no, cards, rarity, buff_id } from './data';
 
 const tr = card_no.tatar_ramazan;
 
-const basicgame = () => new cardgame([tr, tr, tr], [tr, tr, tr]);
+const gamewith = (x: card_no) => new cardgame([x, x, x], [x, x, x]);
+/**
+ * three tatar ramazan card for each player at beginning
+ * @returns three attack carded deck for each player game
+ */
+const basicgame = gamewith.bind(this, tr);
 const rng: (states: boolean[]) => () => boolean = (states: boolean[]) => {
     let i = 0;
     return () => states[i++];
 }
 
-const card_test = (card: card_no, false_at: number, p1damage: number, p2damage: number) => () => {
-    const booleans = Array(10).fill(true);
-    booleans[false_at] = false;
+const card_test = (card: card_no, false_after: number, p1damage: number, p2damage: number) => () => {
+    const booleans = Array(false_after).fill(true);
+    booleans.push(...Array(10).fill(false));
 
     const game = new cardgame([card], [], rng(booleans));
 
@@ -26,11 +32,49 @@ const card_test = (card: card_no, false_at: number, p1damage: number, p2damage: 
     expect(game.players[0].health).equals(p1was - p1damage);
     expect(game.players[1].health).equals(p2was - p2damage);
 };
+const card_test_heal = (card: card_no, false_after: number, p1_heal: number, p2_heal: number) => () => {
+
+    const booleans = Array(false_after).fill(true);
+    booleans.push(...Array(10).fill(false));
+
+    const game = new cardgame([card, card, card], [], rng(booleans));
+
+    const p1was = game.players[0].health;
+    const p2was = game.players[1].health;
+
+    game.play_card(0);
+    expect(game.players[0].health, "full candayken degisim olmaz").equals(p1was);
+    expect(game.players[1].health, "full candayken degisim olmaz").equals(p2was);
+    game.end_round();
+    game.end_round();
+    
+    game.players[0].health -= p1_heal;
+    game.players[1].health -= p2_heal;
+    expect(game.players[0].health + p1_heal, "can dustugunden emin olalim").equals(p1was);
+    expect(game.players[1].health + p2_heal, "can dustugunden emin olalim").equals(p2was);
+    game.play_card(0);
+    expect(game.players[0].health, "kart oynandiktan sonra belirtilen miktar can dolar").equals(p1was);
+    expect(game.players[1].health, "kart oynandiktan sonra belirtilen miktar can dolar").equals(p2was);
+
+    game.players[0].health -= p1_heal/2;
+    game.players[1].health -= p2_heal/2;
+    expect(game.players[0].health + p1_heal/2, "1/2 test: can dustugunden emin olalim").equals(p1was);
+    expect(game.players[1].health + p2_heal/2, "1/2 test: can dustugunden emin olalim").equals(p2was);
+    game.play_card(0);
+    expect(game.players[0].health, "1/2 test: fullu gecmez, kart oynandiktan sonra belirtilen miktar can dolar").equals(p1was);
+    expect(game.players[1].health, "1/2 test: fullu gecmez, kart oynandiktan sonra belirtilen miktar can dolar").equals(p2was);
+
+};
+const card_test_heal_per = (card: card_no, false_after: number,
+    p1_heal_per: number, p2_heal_per: number) =>
+    card_test_heal(card, false_after, 
+        cardgame.max_health * p1_heal_per,
+        cardgame.max_health * p2_heal_per);
 
 describe('kart oyunu', () => {
 
     it("oyuncu round basi kart alir ve karti yoksa kart oynayamaz", () => {
-        const game = new cardgame([], []);
+        const game = new cardgame([], [], undefined, () => tr);
         expect(game.play_card(0).OK).to.be.true;
         expect(game.play_card(0).OK).to.be.false;
         game.end_round();
@@ -86,7 +130,7 @@ describe('kart oyunu', () => {
         game = new cardgame([tr, tr, tr], [tr, tr, tr], rng([true, true, true, true, true, true]));
 
         // ilk roundu kart oynamadan atlat ve p2 kazansin
-        //game.play_card(0);
+        // game.play_card(0);
         game.end_round();
         game.play_card(0);
         game.end_round();
@@ -146,8 +190,8 @@ describe("zar sistemi", () => {
     });
 });
 
-// kart testleri
-describe('tatar ramazan karti', () => {
+// tek zar atma testi
+describe('Tatar /amazan karti', () => {
 
     it("50% sansla karsi tarafa hasar verir", () => {
         const game = new cardgame([tr, tr, tr], [tr, tr, tr], rng([true, false]));
@@ -173,7 +217,8 @@ describe('tatar ramazan karti', () => {
     });
 
 });
-describe('korkusuz korkak karti', () => {
+// ard arda zar atma mekanigi testi
+describe('Korkusuz Korkak karti', () => {
 
     for (let i = 0; i <= 5; i++)
         it(`${i} kere yazi gelme sonucu ${i * 20} hasar verir`, card_test(card_no.korkusuz_korkak, i, 0, i * 20));
@@ -181,7 +226,7 @@ describe('korkusuz korkak karti', () => {
     it(`5 kere yazi gelme sonucu sistem durur ve 100 hasar verir sistem`, card_test(card_no.korkusuz_korkak, 7, 0, 5 * 20));
 });
 
-describe('tivorlu ismail karti', () => {
+describe('Tivorlu Ismail karti', () => {
 
     it("direkt olarak 20 hasar verir", card_test(card_no.tivorlu_ismail, 0, 0, 20));
     it("1 yazida 30 hasar verir", card_test(card_no.tivorlu_ismail, 1, 0, 30));
@@ -189,7 +234,55 @@ describe('tivorlu ismail karti', () => {
     it("3 yazida 50 hasar verir fakat oyuncu 20 hasar alir", card_test(card_no.tivorlu_ismail, 3, 20, 50));
 });
 
-describe("Usta rakun karti", () => {
+describe('Kara Murat benim karti', () => {
+
+    const tested_card = card_no.kara_murat_benim;
+
+    it("direkt olarak 10 hasar verir", card_test(tested_card, 0, 0, 10));
+    it("1 yazida 20 hasar verir", card_test(tested_card, 1, 0, 20));
+    it("2 yazida 30 hasar verir", card_test(tested_card, 2, 0, 30));
+})
+
+describe("Usta Rakun karti", () => {
 
     it("secilen karti yokeder")
 });
+// kart çekme mekaniği testi
+describe("Ricardo Milos karti", () => {
+
+    it("Oynandığında oyuncunun 2 tane daha kartı olur", () => {
+        const game = gamewith(card_no.ricardo_milos);
+        const before = game.current_player().cards.length;
+        game.play_card(0);
+        const after = game.current_player().cards.length;
+        //  card played + card gained
+        expect(before-1+2).equals(after);
+    })
+})
+// basit buff sistemi testi burada etki olmadikca buff
+// sonsuza kadar duruyor ayrica sifa testi
+describe("Bump! karti", () => {
+    
+    it("Oyuncuya şifa verir", card_test_heal(card_no.bump, 0, 20, 0));
+    it("Bump statusu verir ve status etki olmadikca durur", () => {
+        const game = gamewith(card_no.bump);
+        game.play_card(0);
+        expect(game.current_player().has_buff(buff_id.bump),
+            "kart oynanir oynanmaz bump statusu olmali");
+        game.end_round();
+        expect(game.target_player().has_buff(buff_id.bump),
+            "round bitince rakipe gecse de bump statusu olmali");
+        game.end_round();
+        expect(game.current_player().has_buff(buff_id.bump),
+            "rakibin roundu bitip kendine sira gelince de bump statusu olmali");
+
+    });
+    it("Bump statusu verir purge etkisi olunca silinir");    
+})
+// purge etkisi testi ve full heal
+const efsane = it;
+describe("Efsanevi Atatürk", () => {
+
+    efsane("Oyuncunun canını tamamen doldurur", 
+        card_test_heal_per(card_no.efsanevi_ataturk, 0, 1.0, 0));    
+})

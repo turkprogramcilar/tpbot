@@ -40,6 +40,8 @@ export enum buff_category {
     status,
 }
 export enum buff_id {
+    attack_cooldown,
+    // status
     notification,
     iboy,
     bump,
@@ -194,15 +196,14 @@ export const cards: { [key in card_no]: card } = {
         rarity: rarity.Esrarengiz,
         title: "Kara Murat benim",
         link: "https://media.tenor.com/images/fad02d9f6cf14dd6dd116f3739d55b4b/tenor.gif",
-        description: "Kara Murat 2 tane klon kardeşini oluşturup kara murat benim diye haykırır ve sesi aynı anda echo yapar. Kara murat kardeşleriyle sağ gösterip sol vurur.",
+        description: "Kara Murat 2 tane klon kardeşini oluşturup kara murat " +
+            "benim diye haykırır ve sesi aynı anda echo yapar. Kara murat " +
+            "kardeşleriyle sağ gösterip sol vurur. Rakip gerçek Kara Murat " +
+            "tarafından 10 hasar alır. Klon kardeşleri yazı atarsa düşmana 10 " +
+            "hasar verir.",
         play_limit: limit.attack_category,
-        actions: [
-            { attack: { target: 10 } },
-        ],
-        flips: [
-            { heads: { attack: { target: 10 } } },
-            { heads: { attack: { target: 10 } } },
-        ],
+        actions: [ actions.attack(10) ],
+        ...flips.parallel(2, coin.attack(10)),
     },
     [card_no.yossi_kohen]: {
         rarity: rarity.İhtişamlı,

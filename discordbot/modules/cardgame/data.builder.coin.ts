@@ -1,4 +1,5 @@
 import { coin_action } from "./data";
+import { actions } from "./data.builder.action";
 
 export abstract class coin
 {
@@ -9,6 +10,6 @@ export abstract class coin
      */
     static attack(damage: number): coin_action
     {
-        return {heads: {attack: { target: damage} }};
+        return {heads: actions.attack(damage)};
     }
 }

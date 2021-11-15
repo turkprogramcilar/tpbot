@@ -25,5 +25,6 @@ export abstract class status
     {
         return this.builder(id, target.self, count, alive_until.round_ends);
     }
-    
+    static attack_cooldown() { return this.combo(buff_id.attack_cooldown); }
+
 }
