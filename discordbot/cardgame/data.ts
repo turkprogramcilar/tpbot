@@ -1,10 +1,10 @@
 // type definitions
 
 import { m } from "../modules/auto_topic/main";
-import { actions } from "./data.builder.action";
-import { status } from "./data.builder.buff";
-import { coin } from "./data.builder.coin";
-import { flips } from "./data.builder.flips";
+import { actions } from "./data.action";
+import { status } from "./data.buff";
+import { coin } from "./data.coin";
+import { flips } from "./data.flips";
 
 export enum limit {
     attack_category,

@@ -1,6 +1,6 @@
 import { helper } from "../helper";
 import { action, card_no, cards, limit, card, target, damage, trigger, alive_until, from, buff_id } from "./data";
-import { status } from "./data.builder.buff";
+import { status } from "./data.buff";
 import { player } from "./player";
 
 export enum game_state {

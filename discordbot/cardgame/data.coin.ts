@@ -1,5 +1,5 @@
 import { coin_action } from "./data";
-import { actions } from "./data.builder.action";
+import { actions } from "./data.action";
 
 export abstract class coin
 {
