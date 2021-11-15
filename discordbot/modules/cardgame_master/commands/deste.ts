@@ -1,8 +1,8 @@
 import { ButtonInteraction, CommandInteraction, Interaction, MessageActionRow, MessageButton, MessageEmbed, MessageSelectMenu, SelectMenuInteraction } from "discord.js";
 
 import { SlashCommandBuilder } from '@discordjs/builders';
-import { card, cards, card_no, rarity } from "../../cardgame/data";
-import { cardgame } from "../../cardgame/game";
+import { card, cards, card_no, rarity } from "../../../cardgame/data";
+import { cardgame } from "../../../cardgame/game";
 import { user_info } from "../../../log";
 import { slash_command } from "../../../command.slash";
 import { helper } from "../../../helper";

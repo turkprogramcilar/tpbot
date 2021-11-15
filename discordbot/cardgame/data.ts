@@ -1,6 +1,6 @@
 // type definitions
 
-import { m } from "../auto_topic/main";
+import { m } from "../modules/auto_topic/main";
 import { actions } from "./data.builder.action";
 import { status } from "./data.builder.buff";
 import { coin } from "./data.builder.coin";

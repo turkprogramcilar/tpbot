@@ -1,4 +1,4 @@
-import { helper } from "../../helper";
+import { helper } from "../helper";
 import { action, card_no, cards, limit, card, target, damage, trigger, alive_until, from, buff_id } from "./data";
 import { status } from "./data.builder.buff";
 import { player } from "./player";
