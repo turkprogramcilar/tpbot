@@ -84,7 +84,7 @@ private whenLoaderCrashes(bot: Minion<BotData>, error: Error | unknown)
 
     // if the bot manager is crashing very fast when summon after summon,
     // stop it launching more
-    if (bot.data.crash.count > 5 && bot.data.crash.perMinute > 6) {
+    if (bot.data.crash.count >= 5 && bot.data.crash.perMinute > 6) {
         this.log.warn(`${bot.name} is stopped due crashing too fast. `
             + `[crashes=${bot.data.crash.perMinute}]`);
         return;
