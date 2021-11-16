@@ -1,3 +1,4 @@
+/*******************************************************************72*/
 import { Print } from "./Print";
 import { Summoner } from "./Summoner";
 import { Minion } from "./Minion";
@@ -19,88 +20,91 @@ export interface BotData
 }
 export class Kernel extends Summoner<BotData>
 {
-    static Increase(before: CrashInfo | undefined): CrashInfo
-    {
-        if (undefined === before) {
-            before = {
-                count: 0,
-                perMinute: 0,
-                lastTimestamp: null
-            }
+/*******************************************************************72*/
+static Increase(before: CrashInfo | undefined): CrashInfo
+{
+    if (undefined === before) {
+        before = {
+            count: 0,
+            perMinute: 0,
+            lastTimestamp: null
         }
-        if (null === before.lastTimestamp) {
-            before.lastTimestamp = new Date().getTime();
-            before.perMinute = Infinity;
-            before.count = 1;
-        }
-        else { 
-            before.perMinute /= before.count++;
-            const now = new Date().getTime();
-            before.perMinute = 1/(1/before.perMinute + (now - before.lastTimestamp)/60000);
-            before.perMinute *= before.count;
-            before.lastTimestamp = now;
-        }
-        return before;
+    }
+    if (null === before.lastTimestamp) {
+        before.lastTimestamp = new Date().getTime();
+        before.perMinute = Infinity;
+        before.count = 1;
+    }
+    else { 
+        before.perMinute /= before.count++;
+        const now = new Date().getTime();
+        before.perMinute = 1/(1/before.perMinute
+            + (now - before.lastTimestamp)/60000);
+        before.perMinute *= before.count;
+        before.lastTimestamp = now;
+    }
+    return before;
+}
+
+/*******************************************************************72*/
+private readonly modulesPath = "modules";
+
+constructor()
+{
+    super(new Print(Kernel.name));
+    this.log.info("Initializing...");
+
+    if (undefined === process.env.TPBOT) {
+        this.log.warn("TPBOT environment variable is undefined.");
+        throw new Error("Cannot start any bot without TOKEN");
     }
 
-    private readonly botManagerPath = "BotManagers";
+    // const tpbotJson = JSON.parse(process.env.TPBOT);
+    const botToken: string | undefined = process.env.TPBOT; 
+    // for the moment, we get token directly @TODO
+    const botName = "Beta";
+    this.summonLoader(botToken, botName);
 
-    public constructor()
-    {
-        super(new Print(Kernel.name));
-        this.log.info("Initializing...");
+    // this.awaitStdin();
+}
 
-        if (undefined === process.env.TPBOT) {
-            this.log.warn("TPBOT environment variable is undefined.");
-            throw new Error("Cannot start any bot without TOKEN");
-        }
+summonLoader(botToken: string, botName: string, crashInfo?: CrashInfo)
+{
+    let bot: Minion<BotData>;
+    bot = this.summon(this.modulesPath, botName, Kernel.name, 
+        (error) => this.whenLoaderCrashes(bot, error), 
+        { token: botToken, crash: crashInfo });
+}
 
-        // const tpbotJson = JSON.parse(process.env.TPBOT);
-        const botToken: string | undefined = process.env.TPBOT; // for the moment, we get token directly
-        const botName = "Beta";
-        this.summonLoader(botToken, botName);
+private whenLoaderCrashes(bot: Minion<BotData>, error: Error | unknown)
+{
+    bot.data.crash = Kernel.Increase(bot.data.crash);
+    this.log.error(`Exception level: BotManager[name=${bot.name}, `
+        + `crashes=${bot.data.crash.perMinute}/m]`);
+    this.log.exception(error);
 
-        // this.awaitStdin();
+    // if the bot manager is crashing very fast when summon after summon,
+    // stop it launching more
+    if (bot.data.crash.count > 5 && bot.data.crash.perMinute > 6) {
+        this.log.warn(`${bot.name} is stopped due crashing too fast. `
+            + `[crashes=${bot.data.crash.perMinute}]`);
+        return;
     }
+    this.summonLoader(bot.data.token, bot.name, bot.data.crash);
+}
 
-    public summonLoader(botToken: string, botName: string, crashInfo?: CrashInfo)
-    {
-        let bot: Minion<BotData>;
-        bot = this.summon(this.botManagerPath, botName, Kernel.name, (error) => this.whenLoaderCrashes(bot, error), { token: botToken, crash: crashInfo });
-        bot.when("message", message => {
-            this.log.from(bot.name).info(message);
-            bot.emit("message", "Pong");
-        });
-    }
+private awaitStdin()
+{
 
-    private whenLoaderCrashes(bot: Minion<BotData>, error: Error | unknown)
-    {
-        bot.data.crash = Kernel.Increase(bot.data.crash);
-        this.log.error(`Exception level: BotManager[name=${bot.name}, `
-            + `crashes=${bot.data.crash.perMinute}/m]`);
-        this.log.exception(error);
-
-        // if the bot manager is crashing very fast when summon after summon,
-        // stop it launching more
-        if (bot.data.crash.count > 5 && bot.data.crash.perMinute > 6) {
-            this.log.warn(`${bot.name} is stopped due crashing too fast. `
-                + `[crashes=${bot.data.crash.perMinute}]`);
-            return;
-        }
-        this.summonLoader(bot.data.token, bot.name, bot.data.crash);
-    }
-
-    private awaitStdin()
-    {
-
-        const rl = readline.createInterface({
-            input: process.stdin,
-            output: process.stdout
-        });
-        
-        rl.question('What do you think of Node.js? ', (answer) => {
-            console.log(`Thank you for your valuable feedback: ${answer}`);
-            rl.close();
-        });
-    }
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+    });
+    
+    rl.question('What do you think of Node.js? ', (answer) => {
+        console.log(`Thank you for your valuable feedback: ${answer}`);
+        rl.close();
+    });
+}
+/*******************************************************************72*/
 }

@@ -1,3 +1,4 @@
+/*******************************************************************72*/
 import { Awaitable } from "discord.js";
 import { EventEmitter } from "stream";
 import { MessagePort, Worker } from "worker_threads";
@@ -5,8 +6,9 @@ import { Helper } from "./Helper";
 import { Print } from "./Print";
 
 export interface Events {
-    message: [string],
-    /** Used by minion to inform summoner that its fully initialized and listening events */
+    /** Used by minion to inform summoner that its fully initialized and 
+     *  listening events 
+     */
     awaken: [void],
     /**
      * Used by Summoner to acknowledge the risen event by minion
@@ -17,49 +19,57 @@ export interface Events {
 }
 export class Minion<T>
 {
-    private log: Print;
-    private ack: boolean = false;
-    private worker: Worker;
-    public constructor(public name: string, path: string, errorCallback: (error: Error) => void, public data: T)
-    {
-        this.log = new Print(`Minion<${name}>`);
-        this.worker = new Worker(path, { workerData: data });
-        this.worker.on("error", errorCallback);
-        this.once("awaken", () => {
-            this.ack = true;
-        });
-    }
+/*******************************************************************72*/
+private log: Print;
+private ack: boolean = false;
+private worker: Worker;
+constructor(public name: string, path: string, 
+    errorCallback: (error: Error) => void, public data: T)
+{
+    this.log = new Print(`Minion<${name}>`);
+    this.worker = new Worker(path, { workerData: data });
+    this.worker.on("error", errorCallback);
+    this.once("awaken", () => {
+        this.ack = true;
+    });
+}
+async awaken()
+{
+    if (this.ack)
+        return;
 
-    public async awaken()
-    {
-        if (this.ack)
-            return;
+    let counter = 0;
+    while (false === this.ack) {
 
-        let counter = 0;
-        while (false === this.ack) {
-
-            this.log.info(`await minion awakening N=${++counter}`);
-            await Helper.sleep(100);
-        }
+        this.log.info(`await minion awakening N=${++counter}`);
+        await Helper.sleep(100);
     }
-    public emit<E extends keyof Events>(event: E, ...args: Events[E])
-    {
-        return this.worker.postMessage([event, ...args]);
+}
+emit<E extends keyof Events>(event: E, ...args: Events[E])
+{
+    return this.worker.postMessage([event, ...args]);
+}
+when<E extends keyof Events>(event: E, 
+    listener: (...args: Events[E]) => Awaitable<void>)
+{
+    this.worker.on("message", 
+        (pair) => this.splitPairToListener(pair, event, listener));
+}
+once<E extends keyof Events>(event: E, 
+    listener: (...args: Events[E]) => Awaitable<void>)
+{
+    this.worker.once("message", 
+        (pair) => this.splitPairToListener(pair, event, listener));
+}
+private splitPairToListener<E extends keyof Events>(pair: any, event: E, 
+    listener: (...args: Events[E]) => Awaitable<void>)
+{
+    // unpack the tuple and check if events match, 
+    // if so call the listener with args
+    const [pairEvent, ...pairArgs] = pair;
+    if (pairEvent === event) {
+        listener(...pairArgs);
     }
-    public when<E extends keyof Events>(event: E, listener: (...args: Events[E]) => Awaitable<void>)
-    {
-        this.worker.on("message", (pair) => this.splitPairToListener(pair, event, listener));
-    }
-    public once<E extends keyof Events>(event: E, listener: (...args: Events[E]) => Awaitable<void>)
-    {
-        this.worker.once("message", (pair) => this.splitPairToListener(pair, event, listener));
-    }
-    private splitPairToListener<E extends keyof Events>(pair: any, event: E, listener: (...args: Events[E]) => Awaitable<void>)
-    {
-        // unpack the tuple and check if events match, if so call the listener with args
-        const [pairEvent, ...pairArgs] = pair;
-        if (pairEvent === event) {
-            listener(...pairArgs);
-        }
-    }
+}
+/*******************************************************************72*/
 }

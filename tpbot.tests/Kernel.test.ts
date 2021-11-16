@@ -1,10 +1,9 @@
-describe("Kernel", () => {
+describe("Kernel", () => 
+{
+/*******************************************************************72*/
 
-    it("loads bot managers", () => {
-        
-    });
+it("loads bot managers");
+it("does not crash when bot manager crashes");
 
-    it("does not crash when bot manager crashes", () => {
-
-    });
+/*******************************************************************72*/
 });
