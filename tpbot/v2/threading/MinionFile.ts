@@ -1,9 +1,9 @@
 /*******************************************************************72*/
 import { Awaitable } from "discord.js";
 import { MessagePort, parentPort } from "worker_threads";
-import { Helper } from "./Helper";
+import { Helper } from "../Helper";
+import { Print } from "../Print";
 import { Events } from "./Minion";
-import { Print } from "./Print";
 
 export abstract class MinionFile
 {

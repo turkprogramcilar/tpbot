@@ -1,9 +1,8 @@
 /*******************************************************************72*/
 import { Awaitable } from "discord.js";
-import { EventEmitter } from "stream";
 import { MessagePort, Worker } from "worker_threads";
-import { Helper } from "./Helper";
-import { Print } from "./Print";
+import { Helper } from "../Helper";
+import { Print } from "../Print";
 
 export interface Events {
     /** Used by minion to inform summoner that its fully initialized and 
