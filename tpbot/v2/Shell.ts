@@ -22,12 +22,6 @@ constructor()
     // or started manually @TODO
     this.login(data.token).catch(this.print.exception);
 }
-    fromSummoner(arg0: string, arg1: (summonerName: any) => void) {
-        throw new Error("Method not implemented.");
-    }
-    toSummoner(arg0: string) {
-        throw new Error("Method not implemented.");
-    }
 login(token: string, intent: number = 32767)
 {
     const client = new Client({intents: [intent]});
