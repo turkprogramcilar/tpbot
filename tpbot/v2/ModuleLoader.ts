@@ -5,15 +5,13 @@ import { Print } from "./common/Print";
 import { Crasher } from "./modules/Crasher";
 import { BotData } from "./Kernel";
 import { MinionFile } from "./threading/MinionFile";
-
-// tslint:disable-next-line: no-unused-expression
-new class Shell extends MinionFile
+export class ModuleLoader extends MinionFile
 {
 /*******************************************************************72*/
-private print: Print = new Print(Shell.name);
+private print: Print = new Print(ModuleLoader.name);
 constructor()
 {
-    super(Shell.name);
+    super(ModuleLoader.name);
     const data: BotData = workerData;
     this.fromSummoner("updateSummonerName", 
         summonerName => { this.print.from(summonerName); });
@@ -48,4 +46,7 @@ login(token: string, intent: number = 32767)
 }
 // Logoff(token: string) { } @TODO
 /*******************************************************************72*/
-}();
+}
+if (workerData !== null)
+// tslint:disable-next-line: no-unused-expression
+    new ModuleLoader();

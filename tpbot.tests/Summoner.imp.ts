@@ -1,5 +1,5 @@
 /*******************************************************************72*/
-import { MinionFile } from "../tpbot/v2/MinionFile";
+import { MinionFile } from "../tpbot/v2/threading/MinionFile";
 
 // tslint:disable-next-line: no-unused-expression
 new class Imp extends MinionFile

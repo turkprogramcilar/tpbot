@@ -9,10 +9,9 @@ export class Summoner<T>
 /*******************************************************************72*/
 constructor(protected log: Print) { }
 
-summon(file: string, minionName: string, summonerName: string, 
+summon(fullpath: string, minionName: string, summonerName: string, 
     errorCallback: (error: Error | unknown) => void, data: T)
 {
-    const fullpath = path.resolve(__dirname, file);
     this.log.info("Loading file at "+fullpath);
     const minion = new Minion<T>(minionName, fullpath, errorCallback, data);
 

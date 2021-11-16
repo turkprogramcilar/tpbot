@@ -4,6 +4,8 @@ import { Summoner } from "./threading/Summoner";
 
 import readline from 'readline';
 import { Minion } from "./threading/Minion";
+import { Helper } from "./common/Helper";
+import { ModuleLoader } from "./ModuleLoader";
 
 export type timestamp = number;
 export interface CrashInfo
@@ -45,10 +47,7 @@ static Increase(before: CrashInfo | undefined): CrashInfo
     }
     return before;
 }
-
 /*******************************************************************72*/
-private readonly modulesPath = "modules";
-
 constructor()
 {
     super(new Print(Kernel.name));
@@ -71,7 +70,7 @@ constructor()
 summonLoader(botToken: string, botName: string, crashInfo?: CrashInfo)
 {
     let bot: Minion<BotData>;
-    bot = this.summon(this.modulesPath, botName, Kernel.name, 
+    bot = this.summon(Helper.fromVLatestCompiled(ModuleLoader.name), botName, Kernel.name, 
         (error) => this.whenLoaderCrashes(bot, error), 
         { token: botToken, crash: crashInfo });
 }
@@ -79,7 +78,7 @@ summonLoader(botToken: string, botName: string, crashInfo?: CrashInfo)
 private whenLoaderCrashes(bot: Minion<BotData>, error: Error | unknown)
 {
     bot.data.crash = Kernel.Increase(bot.data.crash);
-    this.log.error(`Exception level: BotManager[name=${bot.name}, `
+    this.log.error(`Exception level: ${ModuleLoader.name}[name=${bot.name}, `
         + `crashes=${bot.data.crash.perMinute}/m]`);
     this.log.exception(error);
 
