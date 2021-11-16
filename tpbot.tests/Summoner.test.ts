@@ -1,7 +1,7 @@
 /*******************************************************************72*/
 import { expect } from "chai";
 import { Helper } from "../tpbot/v2/Helper";
-import { Print } from "../tpbot/v2/Print";
+import { Print } from "../tpbot/v2/common/Print";
 import { Summoner } from "../tpbot/v2/threading/Summoner";
 
 describe("Summoner", () => 

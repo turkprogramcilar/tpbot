@@ -1,6 +1,6 @@
 /*******************************************************************72*/
 import { Client } from "discord.js";
-import { Print } from "./Print";
+import { Print } from "./common/Print";
 export class Module
 {
 /*******************************************************************72*/

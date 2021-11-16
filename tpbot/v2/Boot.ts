@@ -1,6 +1,6 @@
 /*******************************************************************72*/
 import { Kernel } from "./Kernel";
-import { Print } from "./Print";
+import { Print } from "./common/Print";
 
 import fs from 'fs'
 import YAML from 'yaml'

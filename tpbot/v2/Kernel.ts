@@ -1,5 +1,5 @@
 /*******************************************************************72*/
-import { Print } from "./Print";
+import { Print } from "./common/Print";
 import { Summoner } from "./threading/Summoner";
 
 import readline from 'readline';

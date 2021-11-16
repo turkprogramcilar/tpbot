@@ -1,6 +1,6 @@
 /*******************************************************************72*/
 import path from "path";
-import { Print } from "../Print";
+import { Print } from "../common/Print";
 import { Minion } from "./Minion";
 
 /*******************************************************************72*/

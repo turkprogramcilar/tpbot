@@ -1,7 +1,7 @@
 /*******************************************************************72*/
 import { Client } from "discord.js";
 import { workerData } from "worker_threads";
-import { Print } from "./Print";
+import { Print } from "./common/Print";
 import { Crasher } from "./modules/Crasher";
 import { BotData } from "./Kernel";
 import { MinionFile } from "./threading/MinionFile";
