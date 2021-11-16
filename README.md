@@ -122,12 +122,15 @@ private fonksiyonlarArasiBoslukBirakilmazSaflariSikTutalimCemaat()
 }
 ```
 Herhangi bir satır 80 karakteri aşamaz. Aşıldığında yeni satıra bölünmelidir.
+
+Veri tipi isimlendirmeleri `PascalCase` yapılmalıdır. Geri kalan herşey için 
+`camelCase` notasyonu kullanılır.
 ```ts
-class bok
+class VeriTipleriPascalCaseOlmalidir
 {
 // ...
 
-private cokUzun<E extends keyof T>(digerParametreyiYeniSatiraAcmakZorundayim: E,
+private digerHerseyCamelCase<E extends keyof T>(digerParametreYeniSatira: E,
     dinleyici: (...milletAc: E[T]) => Lazim)
 {
     this.log("fonksiyonu cok uzun bir string mesaji bastiracagim o kadar uzun"
