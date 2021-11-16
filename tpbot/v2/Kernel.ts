@@ -1,6 +1,6 @@
 /*******************************************************************72*/
 import { Print } from "./Print";
-import { Summoner } from "./Summoner";
+import { Summoner } from "./threading/Summoner";
 import { Minion } from "./Minion";
 
 import readline from 'readline';

@@ -2,7 +2,7 @@
 import { expect } from "chai";
 import { Helper } from "../tpbot/v2/Helper";
 import { Print } from "../tpbot/v2/Print";
-import { Summoner } from "../tpbot/v2/Summoner";
+import { Summoner } from "../tpbot/v2/threading/Summoner";
 
 describe("Summoner", () => 
 {
