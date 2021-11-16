@@ -1,4 +1,3 @@
-/*******************************************************************72*/
 import { expect } from "chai";
 import { Helper } from "../tpbot/v2/common/Helper";
 import { Print } from "../tpbot/v2/common/Print";

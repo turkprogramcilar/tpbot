@@ -1,4 +1,3 @@
-/*******************************************************************72*/
 import { Kernel } from "./Kernel";
 import { Print } from "./common/Print";
 

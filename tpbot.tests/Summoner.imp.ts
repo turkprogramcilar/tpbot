@@ -1,4 +1,3 @@
-/*******************************************************************72*/
 import { MinionFile } from "../tpbot/v2/threading/MinionFile";
 
 // tslint:disable-next-line: no-unused-expression

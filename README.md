@@ -39,7 +39,7 @@ kanalından kimlerin shell komutu çalıştıracağını tanımlayabilirsiniz.
 Süslü parantezler `class` ve fonksiyonlarda satır başı, diğer heryerde
 satır sonundan açılır. `import` tanımlamaları dosyanın başında yapılır.
 
-Dosyanın başında, `class` ilk süslü parantezinden sonra ve son süslü parantezden
+`class` ilk süslü parantezinden sonra ve son süslü parantezden
 önce, `class` içerisinde static ve sınıf tanımlamaları arasında 72 karakterlik
 yorum satırı ayracı kullanılır.
 
@@ -53,7 +53,6 @@ yazılmaz, `typescript` varsayılan olarak public yapar. `private` değişkenler
 başına özel olmaları için yazmak zorundayız ve bu alanlar `public` alanlardan
 sonra gelirler.
 ```ts
-/*******************************************************************72*/
 import { baslangicta } from "yapilir"
 class susluParantezlerYeniSatira
 {

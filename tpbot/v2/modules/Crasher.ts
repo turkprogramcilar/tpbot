@@ -1,4 +1,3 @@
-/*******************************************************************72*/
 import { Client } from "discord.js";
 import { Module } from "../Module";
 import { Print } from "../common/Print";

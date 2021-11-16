@@ -1,4 +1,3 @@
-/*******************************************************************72*/
 import { Awaitable } from "discord.js";
 import { MessagePort, parentPort } from "worker_threads";
 import { Helper } from "../common/Helper";

@@ -1,4 +1,3 @@
-/*******************************************************************72*/
 import { Client } from "discord.js";
 import { workerData } from "worker_threads";
 import { Print } from "./common/Print";

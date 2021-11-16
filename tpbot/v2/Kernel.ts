@@ -1,4 +1,3 @@
-/*******************************************************************72*/
 import { Print } from "./common/Print";
 import { Summoner } from "./threading/Summoner";
 
