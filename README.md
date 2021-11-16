@@ -59,9 +59,14 @@ class susluParantezlerYeniSatira
 /*******************************************************************72*/
 static publicAlanOnceGelirEnFazlaYetkiOnce: string;
 static readonly okumalikSonraGelirBirazAzYetki: number;
+protected static hayatindaProtectedBirStaticAlan: undefined;
+protected readonly static yazmayiBirakGormemissindirBile: null;
 private static alanlarEnSonGelirOzelAlan: Date[];
 private static readonly bayaKisitliBirAlan: {[key in string]: number};
 static publicAlanBasinaPublicYazilmaz()
+{
+}
+protected static protectedVePrivateIcinYazilir()
 {
 }
 private static fonksiyonEnSondaKaldi()
@@ -70,6 +75,8 @@ private static fonksiyonEnSondaKaldi()
 /*******************************************************************72*/
 publicBirAlan: number;
 readonly sadeceOkumaHakkiVar: string;
+protected kalitimaAcik: boolean;
+protected readonly kalitimaOkumayaAcik: number;
 private ozelAlan;
 private readonly devletSirri: null | undefined;
 constructor()
@@ -99,6 +106,9 @@ fonksiyonSusluParantezYeniSatira()
     default:
         break;
     }
+}
+protected sanirimSenBuIsiCozdun()
+{
 }
 private fonksiyonlarArasiBoslukBirakilmazSaflariSikTutalimCemaat()
 {
