@@ -1,4 +1,4 @@
-import { Client } from "discord.js";
+import { Client, Message } from "discord.js";
 import { Module } from "../Module";
 import { Print } from "../common/Print";
 
@@ -7,24 +7,27 @@ export class Crasher extends Module
 /*******************************************************************72*/
 constructor(client: Client)
 {
-    super(client, new Print(Crasher.name));
+    super(Crasher.name, client);
 
     client.on("messageCreate", async message => {
         
-        try
-        {
-            if (message.author.username === "0xdeadc0de") {
-                this.checkCrash(message.content);
-                this.checkCrashAsync(message.content);
-                await this.checkCrashAsyncAwaited(message.content);
-            }
-            this.print.info(message.content);
-        }
-        catch (error)
-        {
-            this.print.exception(error);
-        }
     })
+}
+protected async textMessage(message: Message)
+{
+    try
+    {
+        if (message.author.username === "0xdeadc0de") {
+            this.checkCrash(message.content);
+            this.checkCrashAsync(message.content);
+            await this.checkCrashAsyncAwaited(message.content);
+        }
+        this.print.info(message.content);
+    }
+    catch (error)
+    {
+        this.print.exception(error);
+    }
 }
 private async checkCrashAsyncAwaited(message: string)
 {
@@ -56,11 +59,11 @@ private checkCrash(message: string)
 private crasher() 
 {
     // tslint:disable-next-line: no-floating-promises
-    this.client.guilds.fetch("asdasd");
+    this.guild("asd");
 }
 private async awaitedCrasher() 
 {
-    await this.client.guilds.fetch("asdasd");
+    await this.guild("asdasd");
 }
 /*******************************************************************72*/
 }
