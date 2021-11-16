@@ -7,13 +7,13 @@ import { BotData } from "./Kernel";
 import { MinionFile } from "./threading/MinionFile";
 
 // tslint:disable-next-line: no-unused-expression
-new class Loader extends MinionFile
+new class Shell extends MinionFile
 {
 /*******************************************************************72*/
-private print: Print = new Print(Loader.name);
+private print: Print = new Print(Shell.name);
 constructor()
 {
-    super(Loader.name);
+    super(Shell.name);
     const data: BotData = workerData;
     this.fromSummoner("updateSummonerName", 
         summonerName => { this.print.from(summonerName); });
