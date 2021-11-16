@@ -50,10 +50,10 @@ static Increase(before: CrashInfo | undefined): CrashInfo
 constructor()
 {
     super(new Print(Kernel.name));
-    this.log.info("Initializing...");
+    this.print.info("Constructor has called");
 
     if (undefined === process.env.TPBOT) {
-        this.log.warn("TPBOT environment variable is undefined.");
+        this.print.warn("TPBOT environment variable is undefined.");
         throw new Error("Cannot start any bot without TOKEN");
     }
 
@@ -63,6 +63,7 @@ constructor()
     const botName = "Beta";
     this.summonLoader(botToken, botName);
 
+    this.print.info("Constructor ended");
     // this.awaitStdin();
 }
 
@@ -77,15 +78,15 @@ summonLoader(botToken: string, botName: string, crashInfo?: CrashInfo)
 private whenLoaderCrashes(bot: Minion<BotData>, error: Error | unknown)
 {
     bot.data.crash = Kernel.Increase(bot.data.crash);
-    this.log.error(`Exception level: ${ModuleLoader.name}[name=${bot.name}, `
+    this.print.error(`Exception level: ${ModuleLoader.name}[name=${bot.name}, `
         + `crashes=${bot.data.crash.count},`
         + ` ${bot.data.crash.perMinute.toFixed(2)}/m]`);
-    this.log.exception(error);
+    this.print.exception(error);
 
     // if the bot manager is crashing very fast when summon after summon,
     // stop it launching more
     if (bot.data.crash.count >= 5 && bot.data.crash.perMinute > 6) {
-        this.log.warn(`${bot.name} is stopped due crashing too fast. `
+        this.print.warn(`${bot.name} is stopped due crashing too fast. `
             + `[crashes=${bot.data.crash.perMinute}]`);
         return;
     }

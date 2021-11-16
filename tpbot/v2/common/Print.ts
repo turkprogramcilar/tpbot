@@ -5,19 +5,25 @@ export type userInfo = {
 export class Print
 {
 /*******************************************************************72*/
-private _from: string | undefined = undefined;
+private from: string | undefined = undefined;
 private readonly nodejsConsole = console;
-constructor(private name: string) { }
+constructor(private name: string, private surname?: string) { }
 
 private format(message: string | unknown, user?: userInfo): string
 {
-    return `[${this.name}]: ` + (this._from ? `(from=${this._from}) ` : ``)
+    const msg = `[${this.name}` + (this.surname ? `|${this.surname}` : ``) 
+        +`]: ` + (this.from ? `(from=${this.from}) ` : ``)
         + `${message}` 
         + (user ? ` (user_info: name=${user.name} id=${user.id})` : ``);
+    this.from = undefined;
+    return msg;
 };
-
-from(name: string) {
-    this._from = name;
+setSurname(name: string) {
+    this.surname = name;
+    return this;
+}
+setFrom(name: string) {
+    this.from = name;
     return this;
 }
 info(message: string, user?: userInfo) 

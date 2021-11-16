@@ -17,7 +17,7 @@ static load(env: string): string
 }
 static fromRoot(...pathSegments: string[])
 {
-    const distance = pathSegments.reduce((a,_) => a+="../", "");
+    const distance = pathSegments.reduce((a,_) => a+="../", "../");
     const nested = pathSegments.join("/");
     return path.resolve(__dirname, this.rootDistance, distance, nested);
 }

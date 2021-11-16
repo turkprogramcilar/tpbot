@@ -5,12 +5,12 @@ import { Minion } from "./Minion";
 export class Summoner<T>
 {
 /*******************************************************************72*/
-constructor(protected log: Print) { }
+constructor(protected print: Print) { }
 
 summon(fullpath: string, minionName: string, summonerName: string, 
     errorCallback: (error: Error | unknown) => void, data: T)
 {
-    this.log.info("Loading file at "+fullpath);
+    this.print.info("Loading file at "+fullpath);
     const minion = new Minion<T>(minionName, fullpath, errorCallback, data);
 
     minion.once("awaken", () => {
@@ -18,7 +18,7 @@ summon(fullpath: string, minionName: string, summonerName: string,
         minion.emit("updateSummonerName", summonerName);
     });
     minion.when("updateMinionName", newName => {
-        this.log.info(`Renamed "${minionName}" to "${newName}"`);
+        this.print.info(`Renamed "${minionName}" to "${newName}"`);
         minion.name = minionName = newName;
     });
 

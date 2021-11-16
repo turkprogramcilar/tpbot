@@ -22,6 +22,7 @@ moduleMapping:
     # These TOKENs will be logged in and account names are then matched with the
     # following tag name with its module description below
     -
-        tag: "Beta Göetze 2#0621"
+        tag: "Beta Testçi Göetcü#6503"
         shellBot: true
-        modules: []
+        modules:
+        - Crasher

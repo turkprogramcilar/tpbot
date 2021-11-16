@@ -4,7 +4,8 @@ import { Print } from "./common/Print";
 import { Crasher } from "./modules/Crasher";
 import { BotData } from "./Kernel";
 import { MinionFile } from "./threading/MinionFile";
-import { worker } from "cluster";
+import { Boot } from "./Boot"
+import { Module } from "./Module";
 export class ModuleLoader extends MinionFile
 {
 /*******************************************************************72*/
@@ -16,9 +17,6 @@ constructor(private readonly token: string,
     super(ModuleLoader.name);
     this.client = new Client({intents: [this.intent]});
 
-    this.fromSummoner("updateSummonerName", 
-        summonerName => { this.print.from(summonerName); });
-    this.toSummoner("awaken");
     // following is an auto-login, normally this must be configured
     // or started manually @TODO
     this.login().catch(this.print.exception);
@@ -26,6 +24,7 @@ constructor(private readonly token: string,
 login()
 {
     
+    // @TODO events here should not be exposed like this. find a better way
     this.client.on("error", (error) => {
         this.print.error(error);
     });
@@ -33,15 +32,26 @@ login()
 
         if (this.client.user !== undefined && this.client.user !== null) {
             this.toSummoner("updateMinionName", this.client.user.tag);
+            this.print.setSurname(this.client.user.tag);
         }
         else {
             this.print.warn("Can't update descriptive name because client.user "
             + " is either null or undefined");
         }
-        this.print.info(`Logged in [${this.client.user?.tag}]`);
-        // following is an auto-load, normally this must be configured
-        // or loaded manually @TODO
-        new Crasher(this.client);
+        this.print.info(`Logged in succesfully.`);
+
+        // @TODO right now only strongly typed module loading is possible
+        // and defined below at compile time. how about hot loading feature?
+        // if it is required then we woudl have no ways to know about a type.
+        // therefore wouldn't be sure about new T(). 
+        const moduleDirectory: {[key: string]: (c: Client) => Module} = {
+            [Crasher.name]: c => new Crasher(c),
+        }
+        const a = Boot.getParsedYaml().moduleMapping
+        const b = a
+            .filter(x => x.tag === this.client.user?.tag)
+        const c = b
+            .map(x => x.modules.map(y => moduleDirectory[y](this.client)))
     })
 
     return this.client.login(this.token);

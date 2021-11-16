@@ -1,7 +1,8 @@
 /*******************************************************************72*/
 import { Boot } from "./Boot";
+// tslint:disable: no-console
+console.log(`[Power]: `+new Date())
 const bootloader = new Boot();
-// tslint:disable-next-line: no-console
-process.on('uncaughtException', e => console.error(`[POWER]:`, e));
+process.on('uncaughtException', e => console.error(`[Power]: `, e));
 bootloader.run();
 /*******************************************************************72*/

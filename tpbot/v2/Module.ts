@@ -7,13 +7,14 @@ protected readonly print: Print;
 constructor(public readonly moduleName: string,
     protected readonly client: Client) 
 { 
-    this.print = new Print(moduleName);
+    this.print = new Print(moduleName, this.client.user?.tag);
     const pairs: [[keyof ClientEvents, (args: any) => Promise<void>]] = [
         ["messageCreate", this.textMessage],
     ];
     for (const [event, listener] of pairs) {
         this.client.on(event, listener.bind(this) as any);
     }
+    this.print.info("Super constructor ended");
 }
 protected abstract textMessage(message: Message): Promise<void>;
 protected guild(id: string)
