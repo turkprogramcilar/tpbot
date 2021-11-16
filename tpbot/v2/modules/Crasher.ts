@@ -8,10 +8,6 @@ export class Crasher extends Module
 constructor(client: Client)
 {
     super(Crasher.name, client);
-
-    client.on("messageCreate", async message => {
-        
-    })
 }
 protected async textMessage(message: Message)
 {
@@ -19,6 +15,7 @@ protected async textMessage(message: Message)
     {
         if (message.author.username === "0xdeadc0de") {
             this.checkCrash(message.content);
+            // tslint:disable-next-line: no-floating-promises
             this.checkCrashAsync(message.content);
             await this.checkCrashAsyncAwaited(message.content);
         }

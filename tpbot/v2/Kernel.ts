@@ -78,7 +78,8 @@ private whenLoaderCrashes(bot: Minion<BotData>, error: Error | unknown)
 {
     bot.data.crash = Kernel.Increase(bot.data.crash);
     this.log.error(`Exception level: ${ModuleLoader.name}[name=${bot.name}, `
-        + `crashes=${bot.data.crash.perMinute}/m]`);
+        + `crashes=${bot.data.crash.count},`
+        + ` ${bot.data.crash.perMinute.toFixed(2)}/m]`);
     this.log.exception(error);
 
     // if the bot manager is crashing very fast when summon after summon,
