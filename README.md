@@ -35,7 +35,96 @@ komutları kabul edecektir. `tpbot.yaml` dosyasında `shellBots` kısmında DM
 kanalından kimlerin shell komutu çalıştıracağını tanımlayabilirsiniz.
 
 ## Geliştirme ve katkıda bulunma
-@TODO: camelCase PascalCase
+### Kodlama stili
+Süslü parantezler `class` ve fonksiyonlarda satır başı, diğer heryerde
+satır sonundan açılır. `import` tanımlamaları dosyanın başında yapılır.
+
+Dosyanın başında, `class` ilk süslü parantezinden sonra ve son süslü parantezden
+önce, `class` içerisinde static ve sınıf tanımlamaları arasında 72 karakterlik
+yorum satırı ayracı kullanılır.
+
+Her bir `class` bir dosya içerisinde tanımlanır ve class içindeki tanımlamalar
+boşluk konulmadan yapılır.
+
+`static` alan tanımlamaları sınıf içerisinde önce gelir. Diğer sınıfa ait
+tanımlamalar static alanından sonra gelir. Bu iki bölümde önce değişkenler
+sonra fonksiyon tanımlamaları yapılır. `public` tanımlamalar için başına public
+yazılmaz, `typescript` varsayılan olarak public yapar. `private` değişkenlerin
+başına özel olmaları için yazmak zorundayız ve bu alanlar `public` alanlardan
+sonra gelirler.
+```ts
+/*******************************************************************72*/
+import { baslangicta } from "yapilir"
+class susluParantezlerYeniSatira
+{
+/*******************************************************************72*/
+static publicAlanOnceGelirEnFazlaYetkiOnce: string;
+static readonly okumalikSonraGelirBirazAzYetki: number;
+private static alanlarEnSonGelirOzelAlan: Date[];
+private static readonly bayaKisitliBirAlan: {[key in string]: number};
+static publicAlanBasinaPublicYazilmaz()
+{
+}
+private static fonksiyonEnSondaKaldi()
+{
+}
+/*******************************************************************72*/
+publicBirAlan: number;
+readonly sadeceOkumaHakkiVar: string;
+private ozelAlan;
+private readonly devletSirri: null | undefined;
+constructor()
+{
+}
+fonksiyonSusluParantezYeniSatira()
+{
+    // diger suslu parantezler satir sonundan acilir
+    if () {
+    }
+    else if {
+    }
+    else {
+    }
+    for () {
+    }
+    while () {
+    }
+    do {
+    } while ()
+    
+    switch () {
+    case "case geriden yazilir":
+        break;
+    case "case switch ile ayni hizadadir":
+        break;
+    default:
+        break;
+    }
+}
+private fonksiyonlarArasiBoslukBirakilmazSaflariSikTutalimCemaat()
+{
+    const hasSektor: string = "fonksiyon icerisinde rahat olun";
+
+    if ("buralari hep dutluktu" === "her zaman üçlü eşittir kullanın") {
+        return;
+    }
+}
+/*******************************************************************72*/
+}
+```
+Herhangi bir satır 80 karakteri aşamaz. Aşıldığında yeni satıra bölünmelidir.
+```ts
+class bok
+{
+// ...
+
+private cokUzun<E extends keyof T>(digerParametreyiYeniSatiraAcmakZorundayim: E,
+    dinleyici: (...milletAc: E[T]) => Lazim)
+{
+    this.log("fonksiyonu cok uzun bir string mesaji bastiracagim o kadar uzun"
+        + " ki bu sekilde yeni satira boluyorum.");
+}
+```
 
 # Türk Programcılar Discord Sunucusu
 
