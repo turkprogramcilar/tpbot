@@ -5,7 +5,11 @@ import { Minion } from "./Minion";
 export class Summoner<T>
 {
 /*******************************************************************72*/
-constructor(protected print: Print) { }
+public readonly print: Print;
+constructor(typeName: string) 
+{ 
+    this.print = new Print(Summoner.name, undefined, typeName);
+}
 
 summon(fullpath: string, minionName: string, summonerName: string, 
     errorCallback: (error: Error | unknown) => void, data: T)

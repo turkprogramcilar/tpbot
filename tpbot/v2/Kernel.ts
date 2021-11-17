@@ -19,7 +19,7 @@ export interface BotData
     token: string,
     crash?: CrashInfo,
 }
-export class Kernel extends Summoner<BotData>
+export class Kernel
 {
 /*******************************************************************72*/
 static Increase(before: CrashInfo | undefined): CrashInfo
@@ -47,9 +47,10 @@ static Increase(before: CrashInfo | undefined): CrashInfo
     return before;
 }
 /*******************************************************************72*/
+private readonly print = new Print(Kernel.name);
+private readonly summoner = new Summoner<BotData>(Kernel.name);
 constructor()
 {
-    super(new Print(Kernel.name));
     this.print.info("Constructor has called");
 
     if (undefined === process.env.TPBOT) {
@@ -67,10 +68,10 @@ constructor()
     // this.awaitStdin();
 }
 
-summonLoader(botToken: string, botName: string, crashInfo?: CrashInfo)
+private summonLoader(botToken: string, botName: string, crashInfo?: CrashInfo)
 {
     let bot: Minion<BotData>;
-    bot = this.summon(Helper.fromVLatestCompiled(ModuleLoader.name), botName, Kernel.name, 
+    bot = this.summoner.summon(Helper.fromVLatestCompiled(ModuleLoader.name), botName, Kernel.name, 
         (error) => this.whenLoaderCrashes(bot, error), 
         { token: botToken, crash: crashInfo });
 }

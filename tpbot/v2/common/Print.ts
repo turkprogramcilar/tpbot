@@ -7,11 +7,13 @@ export class Print
 /*******************************************************************72*/
 private from: string | undefined = undefined;
 private readonly nodejsConsole = console;
-constructor(private name: string, private surname?: string) { }
+constructor(private name: string, private surname?: string,
+    private typeName?: string) { }
 
 private format(message: string | unknown, user?: userInfo): string
 {
-    const msg = `[${this.name}` + (this.surname ? `|${this.surname}` : ``) 
+    const msg = `[${this.name}` + (this.typeName ? `<${this.typeName}>` : ``) 
+        + (this.surname ? `|${this.surname}` : ``) 
         +`]: ` + (this.from ? `(from=${this.from}) ` : ``)
         + `${message}` 
         + (user ? ` (user_info: name=${user.name} id=${user.id})` : ``);

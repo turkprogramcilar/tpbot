@@ -2,16 +2,16 @@ import { Awaitable } from "discord.js";
 import { MessagePort, parentPort } from "worker_threads";
 import { Helper } from "../common/Helper";
 import { Print } from "../common/Print";
-import { Events } from "./Minion";
+import { Events, Minion } from "./Minion";
 
 export abstract class MinionFile
 {
 /*******************************************************************72*/
 private ack = false;
-protected readonly log;
-constructor(minionName: string)
+protected readonly print;
+constructor(typeName: string)
 {
-    this.log = new Print(`MinionFile<${minionName}>`);
+    this.print = new Print(MinionFile.name, undefined, typeName);
 }
 async synchronize(onAcknowledge?: () => void): Promise<void>
 {
@@ -27,7 +27,7 @@ async synchronize(onAcknowledge?: () => void): Promise<void>
     let counter = 0;
     while (false === this.ack) {
 
-        this.log.info(`ping awaken to summoner N=${++counter}`);
+        this.print.info(`ping awaken to summoner N=${++counter}`);
         this.toSummoner("awaken");
         await Helper.sleep(100);
     }

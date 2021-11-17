@@ -12,7 +12,7 @@ constructor()
         await this.synchronize();
         // ping update event
         this.toSummoner("updateMinionName", "A new name");
-    })().catch(e => this.log.exception(e));
+    })().catch(e => this.print.exception(e));
 }
 /*******************************************************************72*/
 }()

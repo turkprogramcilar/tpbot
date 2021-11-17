@@ -6,11 +6,12 @@ import { BotData } from "./Kernel";
 import { MinionFile } from "./threading/MinionFile";
 import { Boot } from "./Boot"
 import { Module } from "./Module";
+import { Summoner } from "./threading/Summoner";
 export class ModuleLoader extends MinionFile
 {
 /*******************************************************************72*/
-private print: Print = new Print(ModuleLoader.name);
-private client: Client;
+private readonly client: Client;
+private readonly summoner = new Summoner(ModuleLoader.name);
 constructor(private readonly token: string,
     private readonly intent: number = Math.pow(2, 15) - 1)
 {
@@ -21,7 +22,7 @@ constructor(private readonly token: string,
     // or started manually @TODO
     this.login().catch(this.print.exception);
 }
-login()
+private login()
 {
     
     // @TODO events here should not be exposed like this. find a better way
@@ -47,11 +48,9 @@ login()
         const moduleDirectory: {[key: string]: (c: Client) => Module} = {
             [Crasher.name]: c => new Crasher(c),
         }
-        const a = Boot.getParsedYaml().moduleMapping
-        const b = a
+        Boot.getParsedYaml().moduleMapping
             .filter(x => x.tag === this.client.user?.tag)
-        const c = b
-            .map(x => x.modules.map(y => moduleDirectory[y](this.client)))
+            .map(x => x.modules.map(y => moduleDirectory[y](this.client)));
     })
 
     return this.client.login(this.token);

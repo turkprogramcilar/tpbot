@@ -12,11 +12,12 @@ it("Does not crash when minion module is crashed");
 it("updates minion name when minion requests it to do so", async () =>
 {
     // This test acts as a summoner
-    const log = new Print("Test");
-    const summoner = new Summoner(log);
+    const summoner = new Summoner("Test");
     const minionNameOld = "imp";
     const masterName = "master";
-    const minion = summoner.summon("./../../tpbot.tests/Summoner.imp", minionNameOld, masterName, log.error.bind(log), null);
+    const minion = summoner.summon("./../../tpbot.tests/Summoner.imp",
+        minionNameOld, masterName, summoner.print.error.bind(summoner.print), 
+        null);
     
     expect(minion.name).to.equal(minionNameOld);
 
