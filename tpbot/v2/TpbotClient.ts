@@ -1,22 +1,22 @@
 import { Client } from "discord.js";
 import { workerData } from "worker_threads";
 import { Print } from "./common/Print";
-import { Crasher } from "./modules/Crasher";
+import { Crasher } from "./modules/tpbot/Crasher";
 import { BotData } from "./Kernel";
 import { MinionFile } from "./threading/MinionFile";
 import { Boot } from "./Boot"
-import { Module } from "./Module";
+import { TpbotModule } from "./TpbotModule";
 import { Summoner } from "./threading/Summoner";
 import { Helper } from "./common/Helper";
-export class BotClient extends MinionFile
+export class TpbotClient extends MinionFile
 {
 /*******************************************************************72*/
 private readonly client: Client;
-private readonly summoner = new Summoner(BotClient.name);
+private readonly summoner = new Summoner(TpbotClient.name);
 constructor(private readonly token: string,
     private readonly intent: number = Math.pow(2, 15) - 1)
 {
-    super(BotClient.name);
+    super(TpbotClient.name);
     this.client = new Client({intents: [this.intent]});
 
     // following is an auto-login, normally this must be configured
@@ -46,13 +46,13 @@ private login()
         // and defined below at compile time. how about hot loading feature?
         // if it is required then we woudl have no ways to know about a type.
         // therefore wouldn't be sure about new T(). 
-        const moduleDirectory: {[key: string]: (c: Client) => Module} = {
+        const moduleDirectory: {[key: string]: (c: Client) => TpbotModule} = {
             [Crasher.name]: c => new Crasher(c),
         }
         Boot.getParsedYaml().moduleMapping
             .filter(x => x.tag === this.client.user?.tag)
             .map(x => x.modules.map(y => this.summoner.summon(
-                Helper.fromVLatestModulesCompiled(y), y, BotClient.name)));
+                Helper.fromVLatestModulesCompiled(y), y, TpbotClient.name)));
     })
 
     return this.client.login(this.token);
@@ -63,5 +63,5 @@ private login()
 if (workerData !== null) {
     const data: BotData = workerData;
     // tslint:disable-next-line: no-unused-expression
-    new BotClient(data.token);
+    new TpbotClient(data.token);
 }

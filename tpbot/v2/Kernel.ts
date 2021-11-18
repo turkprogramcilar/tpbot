@@ -4,7 +4,7 @@ import { Summoner } from "./threading/Summoner";
 import readline from 'readline';
 import { Minion } from "./threading/Minion";
 import { Helper } from "./common/Helper";
-import { BotClient } from "./BotClient";
+import { TpbotClient } from "./TpbotClient";
 import { MinionCrash } from "./threading/MinionCrash";
 
 export interface BotData
@@ -38,7 +38,7 @@ constructor()
 private summonLoader(botToken: string, botName: string)
 {
     let bot: Minion<BotData>;
-    bot = this.summoner.summon(Helper.fromVLatestCompiled(BotClient.name),
+    bot = this.summoner.summon(Helper.fromVLatestCompiled(TpbotClient.name),
         botName, Kernel.name, { token: botToken });
 }
 private awaitStdin()

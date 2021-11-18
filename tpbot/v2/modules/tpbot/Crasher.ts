@@ -1,10 +1,10 @@
 import { Client, Message } from "discord.js";
-import { Module } from "../Module";
-import { Print } from "../common/Print";
+import { TpbotModule } from "../../TpbotModule";
+import { Print } from "../../common/Print";
 import { createShorthandPropertyAssignment } from "typescript";
 import { workerData } from "worker_threads";
 
-export class Crasher extends Module
+export class Crasher extends TpbotModule
 {
 /*******************************************************************72*/
 constructor(client: Client)

@@ -1,6 +1,6 @@
 import { Client, ClientEvents, Message } from "discord.js";
 import { Print } from "./common/Print";
-export abstract class Module
+export abstract class TpbotModule
 {
 /*******************************************************************72*/
 protected readonly print: Print;
