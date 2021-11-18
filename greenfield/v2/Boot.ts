@@ -26,7 +26,7 @@ private static _parsedYaml: TpbotYaml | null = null;
 static getParsedYaml(): TpbotYaml
 {
     if (this._parsedYaml === null) {
-        const fullPath = Path.greenfield("tpbot.yaml");
+        const fullPath = Path.greenfieldNonBuilt("tpbot.yaml");
         const file = fs.readFileSync(fullPath, 'utf8');
         this._parsedYaml = YAML.parse(file) as TpbotYaml;
     }
