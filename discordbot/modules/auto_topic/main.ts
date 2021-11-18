@@ -36,7 +36,7 @@ export const m = new class auto_topic extends dcmodule {
             }
         };
 
-        for (const word of msg.content.split(" ")) {
+        for (const word of msg.content.split(/\s/)) {
             
             const url = get_url(word);
             if (url && url.hostname === "github.com") {
