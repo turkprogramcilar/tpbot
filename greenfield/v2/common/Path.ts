@@ -1,20 +1,9 @@
 import path from "path";
+import { Helper } from "./Helper";
 export abstract class Path
 /*******************************************************************72*/
 {
-static readonly rootDistance: string = this.load("TPBOT_ROOT_DIR");
-static sleep(ms: number)
-{
-    return new Promise(res => setTimeout(res, ms));
-}
-static load(env: string): string
-{
-    const loaded = process.env[env];
-    if (!loaded) {
-        throw new Error(env+" environment value is undefined.");
-    }
-    return loaded;
-}
+private static readonly rootDistance: string = Helper.load("TPBOT_ROOT_DIR");
 static root(...pathSegments: string[])
 {
     const distance = pathSegments.reduce((a,_) => a+="../", "../");

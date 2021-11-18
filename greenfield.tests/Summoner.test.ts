@@ -1,6 +1,5 @@
 import { expect } from "chai";
-import { Path } from "../greenfield/v2/common/Path";
-import { Print } from "../greenfield/v2/common/Print";
+import { Helper } from "../greenfield/v2/common/Helper";
 import { Summoner } from "../greenfield/v2/threading/Summoner";
 
 describe("Summoner", () => 
@@ -23,7 +22,7 @@ it("updates minion name when minion requests it to do so", async () =>
     // wait until we receive the risen signal event from minion
     await minion.awaken();
 
-    await Path.sleep(100);
+    await Helper.sleep(100);
 
     expect(minion.name).to.not.equal(minionNameOld);
 });

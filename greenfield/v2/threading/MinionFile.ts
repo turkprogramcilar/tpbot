@@ -1,8 +1,8 @@
 import { Awaitable } from "discord.js";
-import { MessagePort, parentPort } from "worker_threads";
-import { Path } from "../common/Path";
+import { parentPort } from "worker_threads";
+import { Helper } from "../common/Helper";
 import { Print } from "../common/Print";
-import { Events, Minion } from "./Minion";
+import { Events } from "./Minion";
 
 export abstract class MinionFile
 {
@@ -29,7 +29,7 @@ async synchronize(onAcknowledge?: () => void): Promise<void>
 
         this.print.info(`ping awaken to summoner N=${++counter}`);
         this.toSummoner("awaken");
-        await Path.sleep(100);
+        await Helper.sleep(100);
     }
 }
 toSummoner<E extends keyof Events>(event: E, ...args: Events[E])
