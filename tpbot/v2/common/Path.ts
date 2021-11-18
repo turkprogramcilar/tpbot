@@ -15,32 +15,32 @@ static load(env: string): string
     }
     return loaded;
 }
-static fromRoot(...pathSegments: string[])
+static root(...pathSegments: string[])
 {
     const distance = pathSegments.reduce((a,_) => a+="../", "../");
     const nested = pathSegments.join("/");
     return path.resolve(__dirname, this.rootDistance, distance, nested);
 }
-static fromTpbotCompiled(...pathSegments: string[])
+static rootTpbot(...pathSegments: string[])
 {
     return path.resolve(__dirname, "../../", ...pathSegments);
 }
-static fromVLatestCompiled(...pathSegments: string[])
+static latestVersion(...pathSegments: string[])
 {
-    return this.fromTpbotCompiled("v2", ...pathSegments);
+    return this.rootTpbot("v2", ...pathSegments);
 }
-static fromVLatestModulesCompiled(...pathSegments: string[])
+static modules(...pathSegments: string[])
 {
-    return this.fromVLatestCompiled("modules", ...pathSegments);
+    return this.latestVersion("modules", ...pathSegments);
 }
-static fromVLatestTpbotModulesCompiled(module: string)
+static tpbot(module: string)
 {
-    return this.fromVLatestModulesCompiled("tpbot", module.toLowerCase(),
+    return this.modules("tpbot", module.toLowerCase(),
         "Main");
 }
-static fromVLatestFreeModulesCompiled(...pathSegments: string[])
+static freestyle(...pathSegments: string[])
 {
-    return this.fromVLatestModulesCompiled("freestyle", ...pathSegments);
+    return this.modules("freestyle", ...pathSegments);
 }
 /*******************************************************************72*/
 }

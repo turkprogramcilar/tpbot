@@ -33,7 +33,7 @@ constructor()
         .map(x => x.modules?.freestyle ?? []).flat();
     for (const freestyle of freestyleModules) {
         this.summoner.summon(
-            Helper.fromVLatestFreeModulesCompiled(freestyle),
+            Helper.freestyle(freestyle),
             freestyle, `freestyle/${freestyle}`);
     }
 
@@ -44,7 +44,7 @@ constructor()
 private summonLoader(botToken: string, botName: string)
 {
     let bot: Minion<BotData>;
-    bot = this.summoner.summon(Helper.fromVLatestCompiled(TpbotClient.name),
+    bot = this.summoner.summon(Helper.latestVersion(TpbotClient.name),
         botName, Kernel.name, { token: botToken });
 }
 private awaitStdin()

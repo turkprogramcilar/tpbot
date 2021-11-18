@@ -43,7 +43,7 @@ private login()
             .flat();
         for (const tpbotModule of responsibleModules) {
             this.summoner.summon(
-                Helper.fromVLatestTpbotModulesCompiled(tpbotModule),
+                Helper.tpbot(tpbotModule),
                 tpbotModule, this.client.user?.tag ?? TpbotClient.name);
         }
     })
