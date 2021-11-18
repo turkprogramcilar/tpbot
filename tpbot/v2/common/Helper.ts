@@ -29,5 +29,9 @@ static fromVLatestCompiled(...pathSegments: string[])
 {
     return this.fromTpbotCompiled("v2", ...pathSegments);
 }
+static fromVLatestModulesCompiled(module: string)
+{
+    return this.fromVLatestCompiled("modules", module);
+}
 /*******************************************************************72*/
 }

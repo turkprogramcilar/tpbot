@@ -4,48 +4,15 @@ import { Summoner } from "./threading/Summoner";
 import readline from 'readline';
 import { Minion } from "./threading/Minion";
 import { Helper } from "./common/Helper";
-import { ModuleLoader } from "./ModuleLoader";
+import { BotClient } from "./ModuleLoader";
+import { MinionCrash } from "./threading/MinionCrash";
 
-export type timestamp = number;
-export interface CrashInfo
-{
-    count: number,
-    /** Crashes `per minute` */
-    perMinute: number,
-    lastTimestamp: timestamp | null
-}
 export interface BotData
 {
     token: string,
-    crash?: CrashInfo,
 }
 export class Kernel
 {
-/*******************************************************************72*/
-static Increase(before: CrashInfo | undefined): CrashInfo
-{
-    if (undefined === before) {
-        before = {
-            count: 0,
-            perMinute: 0,
-            lastTimestamp: null
-        }
-    }
-    if (null === before.lastTimestamp) {
-        before.lastTimestamp = new Date().getTime();
-        before.perMinute = Infinity;
-        before.count = 1;
-    }
-    else { 
-        before.perMinute /= before.count++;
-        const now = new Date().getTime();
-        before.perMinute = 1/(1/before.perMinute
-            + (now - before.lastTimestamp)/60000);
-        before.perMinute *= before.count;
-        before.lastTimestamp = now;
-    }
-    return before;
-}
 /*******************************************************************72*/
 private readonly print = new Print(Kernel.name);
 private readonly summoner = new Summoner<BotData>(Kernel.name);
@@ -68,32 +35,12 @@ constructor()
     // this.awaitStdin();
 }
 
-private summonLoader(botToken: string, botName: string, crashInfo?: CrashInfo)
+private summonLoader(botToken: string, botName: string)
 {
     let bot: Minion<BotData>;
-    bot = this.summoner.summon(Helper.fromVLatestCompiled(ModuleLoader.name), botName, Kernel.name, 
-        (error) => this.whenLoaderCrashes(bot, error), 
-        { token: botToken, crash: crashInfo });
+    bot = this.summoner.summon(Helper.fromVLatestCompiled(BotClient.name),
+        botName, Kernel.name, { token: botToken });
 }
-
-private whenLoaderCrashes(bot: Minion<BotData>, error: Error | unknown)
-{
-    bot.data.crash = Kernel.Increase(bot.data.crash);
-    this.print.error(`Exception level: ${ModuleLoader.name}[name=${bot.name}, `
-        + `crashes=${bot.data.crash.count},`
-        + ` ${bot.data.crash.perMinute.toFixed(2)}/m]`);
-    this.print.exception(error);
-
-    // if the bot manager is crashing very fast when summon after summon,
-    // stop it launching more
-    if (bot.data.crash.count >= 5 && bot.data.crash.perMinute > 6) {
-        this.print.warn(`${bot.name} is stopped due crashing too fast. `
-            + `[crashes=${bot.data.crash.perMinute}]`);
-        return;
-    }
-    this.summonLoader(bot.data.token, bot.name, bot.data.crash);
-}
-
 private awaitStdin()
 {
 

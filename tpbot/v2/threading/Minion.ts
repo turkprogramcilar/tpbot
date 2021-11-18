@@ -22,7 +22,7 @@ private log: Print;
 private ack: boolean = false;
 private worker: Worker;
 constructor(public name: string, path: string, 
-    errorCallback: (error: Error) => void, public data: T)
+    errorCallback: (error: Error) => void, public data?: T)
 {
     this.log = new Print(`Minion<${name}>`);
     this.worker = new Worker(path, { workerData: data });

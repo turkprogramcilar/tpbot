@@ -7,15 +7,16 @@ import { MinionFile } from "./threading/MinionFile";
 import { Boot } from "./Boot"
 import { Module } from "./Module";
 import { Summoner } from "./threading/Summoner";
-export class ModuleLoader extends MinionFile
+import { Helper } from "./common/Helper";
+export class BotClient extends MinionFile
 {
 /*******************************************************************72*/
 private readonly client: Client;
-private readonly summoner = new Summoner(ModuleLoader.name);
+private readonly summoner = new Summoner(BotClient.name);
 constructor(private readonly token: string,
     private readonly intent: number = Math.pow(2, 15) - 1)
 {
-    super(ModuleLoader.name);
+    super(BotClient.name);
     this.client = new Client({intents: [this.intent]});
 
     // following is an auto-login, normally this must be configured
@@ -50,7 +51,8 @@ private login()
         }
         Boot.getParsedYaml().moduleMapping
             .filter(x => x.tag === this.client.user?.tag)
-            .map(x => x.modules.map(y => moduleDirectory[y](this.client)));
+            .map(x => x.modules.map(y => this.summoner.summon(
+                Helper.fromVLatestModulesCompiled(y), y, BotClient.name)));
     })
 
     return this.client.login(this.token);
@@ -61,5 +63,5 @@ private login()
 if (workerData !== null) {
     const data: BotData = workerData;
     // tslint:disable-next-line: no-unused-expression
-    new ModuleLoader(data.token);
+    new BotClient(data.token);
 }

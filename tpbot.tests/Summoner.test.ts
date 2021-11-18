@@ -16,8 +16,7 @@ it("updates minion name when minion requests it to do so", async () =>
     const minionNameOld = "imp";
     const masterName = "master";
     const minion = summoner.summon("./../../tpbot.tests/Summoner.imp",
-        minionNameOld, masterName, summoner.print.error.bind(summoner.print), 
-        null);
+        minionNameOld, masterName, undefined, summoner.print.error.bind(summoner.print));
     
     expect(minion.name).to.equal(minionNameOld);
 

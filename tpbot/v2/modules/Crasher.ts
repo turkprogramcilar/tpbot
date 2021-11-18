@@ -1,6 +1,8 @@
 import { Client, Message } from "discord.js";
 import { Module } from "../Module";
 import { Print } from "../common/Print";
+import { createShorthandPropertyAssignment } from "typescript";
+import { workerData } from "worker_threads";
 
 export class Crasher extends Module
 {
@@ -63,4 +65,8 @@ private async awaitedCrasher()
     await this.guild("asdasd");
 }
 /*******************************************************************72*/
+}
+if (workerData !== null) {
+    // tslint:disable-next-line: no-unused-expression
+    new Crasher(workerData.client); // @TODO fix this!!!
 }
