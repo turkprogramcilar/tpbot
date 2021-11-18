@@ -26,7 +26,7 @@ constructor()
     for (const [botName, botToken] of tpbotTokens) {
         if (!botToken)
             continue;
-        this.summonLoader(botToken, TpbotClient.name);
+        this.summonTpClient(botToken, TpbotClient.name);
     }
     this.print.info("Loading Freestyle modules.");
     const freestyleModules = Boot.getParsedYaml().tokenMapping
@@ -41,7 +41,7 @@ constructor()
     // this.awaitStdin();
 }
 
-private summonLoader(botToken: string, botName: string)
+private summonTpClient(botToken: string, botName: string)
 {
     let bot: Minion<BotData>;
     bot = this.summoner.summon(Path.latestVersion(TpbotClient.name),

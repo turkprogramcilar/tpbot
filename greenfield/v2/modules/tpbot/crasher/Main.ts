@@ -64,7 +64,3 @@ private async awaitedCrasher()
 }
 /*******************************************************************72*/
 }
-if (workerData !== null) {
-    // tslint:disable-next-line: no-unused-expression
-    new Crasher(workerData.client); // @TODO fix this!!!
-}

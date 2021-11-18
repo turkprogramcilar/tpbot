@@ -6,6 +6,7 @@ import { Boot } from "./Boot"
 import { TpbotModule } from "./TpbotModule";
 import { Summoner } from "./threading/Summoner";
 import { Path } from "./common/Path";
+import { TpbotDirectory } from "./TpbotDirectory";
 export class TpbotClient extends MinionFile
 {
 /*******************************************************************72*/
@@ -41,16 +42,16 @@ private login()
             .filter(x => x.tag === this.client.user?.tag)
             .map(x => x.modules?.tpbot ?? [])
             .flat();
+
         for (const tpbotModule of responsibleModules) {
-            this.summoner.summon(
-                Path.tpbot(tpbotModule),
-                tpbotModule, this.client.user?.tag ?? TpbotClient.name);
+            const constructor = TpbotDirectory.getConstructor(tpbotModule);
+            if (constructor !== null)
+                constructor(this.client);
         }
     })
 
     return this.client.login(this.token);
 }
-// Logoff(token: string) { } @TODO
 /*******************************************************************72*/
 }
 if (workerData !== null) {
