@@ -5,7 +5,7 @@ import { MinionFile } from "./threading/MinionFile";
 import { Boot } from "./Boot"
 import { TpbotModule } from "./TpbotModule";
 import { Summoner } from "./threading/Summoner";
-import { Helper } from "./common/Helper";
+import { Helper } from "./common/Path";
 export class TpbotClient extends MinionFile
 {
 /*******************************************************************72*/

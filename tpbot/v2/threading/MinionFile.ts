@@ -1,6 +1,6 @@
 import { Awaitable } from "discord.js";
 import { MessagePort, parentPort } from "worker_threads";
-import { Helper } from "../common/Helper";
+import { Helper } from "../common/Path";
 import { Print } from "../common/Print";
 import { Events, Minion } from "./Minion";
 

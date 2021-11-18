@@ -1,6 +1,6 @@
 import { Client, Message } from "discord.js";
-import { TpbotModule } from "../../TpbotModule";
 import { workerData } from "worker_threads";
+import { TpbotModule } from "../../../TpbotModule";
 
 export class Crasher extends TpbotModule
 {

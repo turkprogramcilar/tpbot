@@ -3,7 +3,7 @@ import { Print } from "./common/Print";
 
 import fs from 'fs'
 import YAML from 'yaml'
-import { Helper } from "./common/Helper";
+import { Helper } from "./common/Path";
 interface TpbotYaml {
     shellAccess: {
         tag: string,

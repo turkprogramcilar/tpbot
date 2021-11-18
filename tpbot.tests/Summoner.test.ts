@@ -1,5 +1,5 @@
 import { expect } from "chai";
-import { Helper } from "../tpbot/v2/common/Helper";
+import { Helper } from "../tpbot/v2/common/Path";
 import { Print } from "../tpbot/v2/common/Print";
 import { Summoner } from "../tpbot/v2/threading/Summoner";
 

@@ -35,7 +35,8 @@ static fromVLatestModulesCompiled(...pathSegments: string[])
 }
 static fromVLatestTpbotModulesCompiled(module: string)
 {
-    return this.fromVLatestModulesCompiled("tpbot", module, "main");
+    return this.fromVLatestModulesCompiled("tpbot", module.toLowerCase(),
+        "Main");
 }
 static fromVLatestFreeModulesCompiled(...pathSegments: string[])
 {
