@@ -13,5 +13,9 @@ static load(env: string): string
     }
     return loaded;
 }
+static check(env: string): boolean
+{
+    return !process.env[env];
+}
 /*******************************************************************72*/
 }

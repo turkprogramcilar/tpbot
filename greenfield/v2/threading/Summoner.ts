@@ -1,6 +1,7 @@
 import { Print } from "../common/Print";
 import { MinionCrash } from "./MinionCrash";
 import { Minion } from "./Minion";
+import { Helper } from "../common/Helper";
 
 export class Summoner<T>
 {
@@ -58,7 +59,8 @@ private handleCrash(error: Error | unknown, crash: MinionCrash<T>, name: string)
 
     // if the bot manager is crashing very fast when summon after summon,
     // stop it launching more
-    if (crash.count >= crash.crashLimit && crash.perMinute > 6) {
+    if (crash.count >= crash.crashLimit && crash.perMinute > 6
+        || Helper.check("TPBOT_DEBUG")) {
         this.print.warn(`${name} is stopped reloading due crashing too fast.`
             + ` [crashes=${crash.count},`
             + ` ${crash.perMinute.toFixed(2)}/m]`);
