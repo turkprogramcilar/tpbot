@@ -21,13 +21,13 @@ static root(...pathSegments: string[])
     const nested = pathSegments.join("/");
     return path.resolve(__dirname, this.rootDistance, distance, nested);
 }
-static rootTpbot(...pathSegments: string[])
+static greenfield(...pathSegments: string[])
 {
     return path.resolve(__dirname, "../../", ...pathSegments);
 }
 static latestVersion(...pathSegments: string[])
 {
-    return this.rootTpbot("v2", ...pathSegments);
+    return this.greenfield("v2", ...pathSegments);
 }
 static modules(...pathSegments: string[])
 {
