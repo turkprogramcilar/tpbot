@@ -25,4 +25,5 @@ moduleMapping:
         tag: "Beta Testçi Göetcü#6503"
         shellBot: true
         modules:
-        - Crasher
+            javascript:
+                - Ping
