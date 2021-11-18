@@ -48,8 +48,8 @@ private summonInternal(fullpath: string, minionName: string, summonerName: strin
 private handleCrash(error: Error | unknown, crash: MinionCrash<T>, name: string)
 {
     crash.increase();
-    this.print.error(`${name} has crashed. [`
-        + `crashes=${crash.count},`
+    this.print.error(`${name} has crashed.`
+        + ` [crashes=${crash.count},`
         + ` ${crash.perMinute.toFixed(2)}/m]`);
     this.print.exception(error);
 
@@ -59,8 +59,9 @@ private handleCrash(error: Error | unknown, crash: MinionCrash<T>, name: string)
     // if the bot manager is crashing very fast when summon after summon,
     // stop it launching more
     if (crash.count >= crash.crashLimit && crash.perMinute > 6) {
-        this.print.warn(`${name} is stopped reloading due crashing too fast. `
-            + `[crashes=${crash.perMinute}]`);
+        this.print.warn(`${name} is stopped reloading due crashing too fast.`
+            + ` [crashes=${crash.count},`
+            + ` ${crash.perMinute.toFixed(2)}/m]`);
         return;
     }
 
