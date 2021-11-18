@@ -1,5 +1,5 @@
 import path from "path";
-export abstract class Helper
+export abstract class Path
 /*******************************************************************72*/
 {
 static readonly rootDistance: string = this.load("TPBOT_ROOT_DIR");

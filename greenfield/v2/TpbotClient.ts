@@ -5,7 +5,7 @@ import { MinionFile } from "./threading/MinionFile";
 import { Boot } from "./Boot"
 import { TpbotModule } from "./TpbotModule";
 import { Summoner } from "./threading/Summoner";
-import { Helper } from "./common/Path";
+import { Path } from "./common/Path";
 export class TpbotClient extends MinionFile
 {
 /*******************************************************************72*/
@@ -43,7 +43,7 @@ private login()
             .flat();
         for (const tpbotModule of responsibleModules) {
             this.summoner.summon(
-                Helper.tpbot(tpbotModule),
+                Path.tpbot(tpbotModule),
                 tpbotModule, this.client.user?.tag ?? TpbotClient.name);
         }
     })

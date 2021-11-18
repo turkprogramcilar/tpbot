@@ -3,7 +3,7 @@ import { Summoner } from "./threading/Summoner";
 
 import readline from 'readline';
 import { Minion } from "./threading/Minion";
-import { Helper } from "./common/Path";
+import { Path } from "./common/Path";
 import { TpbotClient } from "./TpbotClient";
 import { Boot } from "./Boot";
 
@@ -33,7 +33,7 @@ constructor()
         .map(x => x.modules?.freestyle ?? []).flat();
     for (const freestyle of freestyleModules) {
         this.summoner.summon(
-            Helper.freestyle(freestyle),
+            Path.freestyle(freestyle),
             freestyle, `freestyle/${freestyle}`);
     }
 
@@ -44,7 +44,7 @@ constructor()
 private summonLoader(botToken: string, botName: string)
 {
     let bot: Minion<BotData>;
-    bot = this.summoner.summon(Helper.latestVersion(TpbotClient.name),
+    bot = this.summoner.summon(Path.latestVersion(TpbotClient.name),
         botName, Kernel.name, { token: botToken });
 }
 private awaitStdin()

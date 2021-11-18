@@ -1,6 +1,6 @@
 import { Awaitable } from "discord.js";
 import { MessagePort, Worker } from "worker_threads";
-import { Helper } from "../common/Path";
+import { Path } from "../common/Path";
 import { Print } from "../common/Print";
 
 export interface Events {
@@ -42,7 +42,7 @@ async awaken()
     while (false === this.ack) {
 
         this.log.info(`await minion awakening N=${++counter}`);
-        await Helper.sleep(100);
+        await Path.sleep(100);
     }
 }
 emit<E extends keyof Events>(event: E, ...args: Events[E])

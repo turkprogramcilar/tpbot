@@ -3,7 +3,7 @@ import { Print } from "./common/Print";
 
 import fs from 'fs'
 import YAML from 'yaml'
-import { Helper } from "./common/Path";
+import { Path } from "./common/Path";
 interface TpbotYaml {
     shellAccess: {
         tag: string,
@@ -26,7 +26,7 @@ private static _parsedYaml: TpbotYaml | null = null;
 static getParsedYaml(): TpbotYaml
 {
     if (this._parsedYaml === null) {
-        const fullPath = Helper.greenfield("tpbot.yaml");
+        const fullPath = Path.greenfield("tpbot.yaml");
         const file = fs.readFileSync(fullPath, 'utf8');
         this._parsedYaml = YAML.parse(file) as TpbotYaml;
     }
