@@ -8,6 +8,9 @@ export const m = new class auto_topic extends dcmodule {
     
     public async on_message(msg : Message) {
 
+        if (msg.author.bot)
+            return;
+            
         if (!(msg.channel instanceof TextChannel))
             return;
 
