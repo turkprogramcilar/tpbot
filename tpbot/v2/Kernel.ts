@@ -4,7 +4,7 @@ import { Summoner } from "./threading/Summoner";
 import readline from 'readline';
 import { Minion } from "./threading/Minion";
 import { Helper } from "./common/Helper";
-import { BotClient } from "./ModuleLoader";
+import { BotClient } from "./BotClient";
 import { MinionCrash } from "./threading/MinionCrash";
 
 export interface BotData
