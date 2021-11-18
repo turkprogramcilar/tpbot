@@ -20,7 +20,7 @@ tokenMapping:
     #    TPBOT__TOKEN   TPBOT_1_TOKEN
     #
     # These TOKENs will be logged in and account names are then matched with the
-    # following tag name with its module description below
+    # following tag name with its module defined below 
     -
         tag: "TPBOT DEBUG 1#6503"
         shellBot: true
