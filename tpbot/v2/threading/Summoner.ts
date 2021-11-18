@@ -23,7 +23,7 @@ summon(fullpath: string, minionName: string, summonerName: string,
 private summonInternal(fullpath: string, minionName: string, summonerName: string, 
     crash: MinionCrash<T>, data?: T, errorCallback?: (error: Error | unknown) => void) 
 {
-    this.print.info("Loading file at "+fullpath);
+    this.print.info(`Loading MinionFile<${minionName}> at `+fullpath);
 
 
     const minion = new Minion<T>(minionName, fullpath,

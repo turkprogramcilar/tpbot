@@ -5,7 +5,7 @@ import readline from 'readline';
 import { Minion } from "./threading/Minion";
 import { Helper } from "./common/Helper";
 import { TpbotClient } from "./TpbotClient";
-import { MinionCrash } from "./threading/MinionCrash";
+import { Boot } from "./Boot";
 
 export interface BotData
 {
@@ -20,16 +20,22 @@ constructor()
 {
     this.print.info("Constructor has called");
 
-    if (undefined === process.env.TPBOT) {
-        this.print.warn("TPBOT environment variable is undefined.");
-        throw new Error("Cannot start any bot without TOKEN");
+    this.print.info("Loading Tpbot modules.");
+    const tpbotTokens = Object.entries(process.env)
+        .filter(([k, v]) => k.startsWith("TPBOT_TOKEN"));
+    for (const [botName, botToken] of tpbotTokens) {
+        if (!botToken)
+            continue;
+        this.summonLoader(botToken, TpbotClient.name);
     }
-
-    // const tpbotJson = JSON.parse(process.env.TPBOT);
-    const botToken: string | undefined = process.env.TPBOT; 
-    // for the moment, we get token directly @TODO
-    const botName = "Beta";
-    this.summonLoader(botToken, botName);
+    this.print.info("Loading Freestyle modules.");
+    const freestyleModules = Boot.getParsedYaml().tokenMapping
+        .map(x => x.modules?.freestyle ?? []).flat();
+    for (const freestyle of freestyleModules) {
+        this.summoner.summon(
+            Helper.fromVLatestFreeModulesCompiled(freestyle),
+            freestyle, `freestyle/${freestyle}`);
+    }
 
     this.print.info("Constructor ended");
     // this.awaitStdin();

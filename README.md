@@ -23,7 +23,7 @@ TPBOT_TOKEN ile başlayan her ortam değişkeni (environment variable) sistem
 tarafından TOKEN olarak kabul edilir. Örneğin:
     `TPBOT_TOKEN`    `TPBOT_TOKEN123`    `TPBOT_TOKEN_BOT`
 Birden fazla TOKEN belirtmeniz dahilinde tüm bot hesapları `tpbot.yaml` dosyası 
-altında modül yükleme görevi tanımlanmışsa `moduleMapping` kısmında veya 
+altında modül yükleme görevi tanımlanmışsa `tokenMapping` kısmında veya 
 `shellBots` altında tanımlanmışsa her biri ilgili görev için yüklenecektir.
 
 ## tpbot.yaml ayar dosyası

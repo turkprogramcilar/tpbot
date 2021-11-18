@@ -10,10 +10,13 @@ interface TpbotYaml {
         id: string,
         access: boolean
     }[],
-    moduleMapping: {
+    tokenMapping: {
         tag: string,
-        shellBot: boolean,
-        modules: string[]
+        shellBot?: boolean,
+        modules?: {
+            freestyle?: string[],
+            tpbot?: string[]
+        }
     }[],
 }
 export class Boot
@@ -35,10 +38,6 @@ readonly print = new Print(Boot.name);
 run()
 {
     this.print.info("Run has called.");
-
-    if (undefined === process.env.TPBOT) {
-        throw new Error("TPBOT environment value is undefined.");
-    }
 
     const kernel = new Kernel();
 

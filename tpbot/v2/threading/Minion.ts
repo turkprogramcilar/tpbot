@@ -26,7 +26,9 @@ constructor(public name: string, path: string,
 {
     this.log = new Print(`Minion<${name}>`);
     this.worker = new Worker(path, { workerData: data });
-    this.worker.on("error", errorCallback);
+    this.worker.on("error", (error) => {
+        errorCallback(error)
+    });
     this.once("awaken", () => {
         this.ack = true;
     });

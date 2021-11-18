@@ -1,7 +1,5 @@
 import { Client, Message } from "discord.js";
 import { TpbotModule } from "../../TpbotModule";
-import { Print } from "../../common/Print";
-import { createShorthandPropertyAssignment } from "typescript";
 import { workerData } from "worker_threads";
 
 export class Crasher extends TpbotModule

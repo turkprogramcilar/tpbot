@@ -29,9 +29,17 @@ static fromVLatestCompiled(...pathSegments: string[])
 {
     return this.fromTpbotCompiled("v2", ...pathSegments);
 }
-static fromVLatestModulesCompiled(module: string)
+static fromVLatestModulesCompiled(...pathSegments: string[])
 {
-    return this.fromVLatestCompiled("modules", module);
+    return this.fromVLatestCompiled("modules", ...pathSegments);
+}
+static fromVLatestTpbotModulesCompiled(module: string)
+{
+    return this.fromVLatestModulesCompiled("tpbot", module, "main");
+}
+static fromVLatestFreeModulesCompiled(...pathSegments: string[])
+{
+    return this.fromVLatestModulesCompiled("freestyle", ...pathSegments);
 }
 /*******************************************************************72*/
 }

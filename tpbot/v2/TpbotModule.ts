@@ -16,7 +16,9 @@ constructor(public readonly moduleName: string,
     }
     this.print.info("Super constructor ended");
 }
-protected abstract textMessage(message: Message): Promise<void>;
+// tslint:disable: no-empty
+protected async textMessage(message: Message): Promise<void> { }
+// tslint:enable: no-empty
 protected guild(id: string)
 {
     return this.client.guilds.fetch(id);

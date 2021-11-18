@@ -9,7 +9,7 @@ shellAccess:
         id: "824573651390562325"
         access: true
 
-moduleMapping:
+tokenMapping:
     # Provide bot's account TOKENs in TPBOT_TOKEN1, TPBOT_TOKEN2... TPBOT_TOKENX
     # environment values. We understand that you mean you provided a token when 
     # you begin any environment name with TPBOT_TOKEN. The all following 
@@ -22,8 +22,15 @@ moduleMapping:
     # These TOKENs will be logged in and account names are then matched with the
     # following tag name with its module description below
     -
-        tag: "Beta Testçi Göetcü#6503"
+        tag: "TPBOT DEBUG 1#6503"
         shellBot: true
         modules:
-            javascript:
-                - Ping
+            tpbot:
+                - Crasher
+    -
+        tag: "TPBOT DEBUG 2#0621"
+        modules:
+            freestyle:
+                - examples/PingTs
+    -
+        tag: "TPBOT DEBUG 3#7380"

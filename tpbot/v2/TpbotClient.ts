@@ -1,7 +1,5 @@
 import { Client } from "discord.js";
 import { workerData } from "worker_threads";
-import { Print } from "./common/Print";
-import { Crasher } from "./modules/tpbot/Crasher";
 import { BotData } from "./Kernel";
 import { MinionFile } from "./threading/MinionFile";
 import { Boot } from "./Boot"
@@ -18,10 +16,7 @@ constructor(private readonly token: string,
 {
     super(TpbotClient.name);
     this.client = new Client({intents: [this.intent]});
-
-    // following is an auto-login, normally this must be configured
-    // or started manually @TODO
-    this.login().catch(this.print.exception);
+    this.login();
 }
 private login()
 {
@@ -42,17 +37,15 @@ private login()
         }
         this.print.info(`Logged in succesfully.`);
 
-        // @TODO right now only strongly typed module loading is possible
-        // and defined below at compile time. how about hot loading feature?
-        // if it is required then we woudl have no ways to know about a type.
-        // therefore wouldn't be sure about new T(). 
-        const moduleDirectory: {[key: string]: (c: Client) => TpbotModule} = {
-            [Crasher.name]: c => new Crasher(c),
-        }
-        Boot.getParsedYaml().moduleMapping
+        const responsibleModules = Boot.getParsedYaml().tokenMapping
             .filter(x => x.tag === this.client.user?.tag)
-            .map(x => x.modules.map(y => this.summoner.summon(
-                Helper.fromVLatestModulesCompiled(y), y, TpbotClient.name)));
+            .map(x => x.modules?.tpbot ?? [])
+            .flat();
+        for (const tpbotModule of responsibleModules) {
+            this.summoner.summon(
+                Helper.fromVLatestTpbotModulesCompiled(tpbotModule),
+                tpbotModule, this.client.user?.tag ?? TpbotClient.name);
+        }
     })
 
     return this.client.login(this.token);
