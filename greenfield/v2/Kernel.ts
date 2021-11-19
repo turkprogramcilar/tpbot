@@ -23,10 +23,11 @@ constructor()
     this.print.info("Loading Tpbot modules.");
     const tpbotTokens = Object.entries(process.env)
         .filter(([k, v]) => k.startsWith("TPBOT_TOKEN"));
-    for (const [botName, botToken] of tpbotTokens) {
-        if (!botToken)
+    for (const [environmentKey, token] of tpbotTokens) {
+        if (!token)
             continue;
-        this.summonTpClient(botToken, TpbotClient.name);
+        this.print.info(`Summoning ${environmentKey}`)
+        this.summonTpClient(token, TpbotClient.name);
     }
     this.print.info("Loading Freestyle modules.");
     const freestyleModules = Boot.getParsedYaml().tokenMapping

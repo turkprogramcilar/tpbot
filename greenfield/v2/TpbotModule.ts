@@ -12,8 +12,11 @@ constructor(public readonly moduleName: string,
         ["messageCreate", this.textMessage],
     ];
     for (const [event, listener] of pairs) {
-        this.client.on(event, listener.bind(this) as any);
+        //this.client.on(event, (...args) => listener(args));
     }
+    this.client.on("messageCreate", (message) => {
+        this.print.info(message.content); 
+    });
     this.print.info("Super constructor ended");
 }
 // tslint:disable: no-empty

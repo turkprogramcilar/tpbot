@@ -6,13 +6,13 @@ import { TpbotModule } from "./TpbotModule";
 export abstract class TpbotDirectory
 {
 /*******************************************************************72*/
-static getConstructor(moduleName: string): (c: Client) => TpbotModule | null
+static instantiate(moduleName: string, client: Client): TpbotModule | null
 {
-    const moduleDirectory: {[key: string]: (c: Client) => TpbotModule} = {
-        [Crasher.name]: c => new Crasher(c),
-        [Ping.name]: c => new Ping(c),
+    switch(moduleName) {
+    case Crasher.name: return new Crasher(client);
+    case Ping.name:    return new Ping(client);
+    default: return null;
     }
-    return moduleDirectory[moduleName] ?? null;
 }
 /*******************************************************************72*/
 }

@@ -29,6 +29,7 @@ tokenMapping:
         modules:
             tpbot:
                 - "Crasher"
+                #- "Ping"
     -
         tag: "TPBOT DEBUG 3#7380"
         modules:

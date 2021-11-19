@@ -3,10 +3,10 @@ import { workerData } from "worker_threads";
 import { BotData } from "./Kernel";
 import { MinionFile } from "./threading/MinionFile";
 import { Boot } from "./Boot"
-import { TpbotModule } from "./TpbotModule";
 import { Summoner } from "./threading/Summoner";
-import { Path } from "./common/Path";
 import { TpbotDirectory } from "./TpbotDirectory";
+import { Crasher } from "./modules/tpbot/crasher/Main";
+import { TpbotModule } from "./TpbotModule";
 export class TpbotClient extends MinionFile
 {
 /*******************************************************************72*/
@@ -26,7 +26,7 @@ private login()
     this.client.on("error", (error) => {
         this.print.error(error);
     });
-    this.client.on("ready", () => {
+    this.client.on("ready", async () => {
 
         if (this.client.user !== undefined && this.client.user !== null) {
             this.toSummoner("updateMinionName", this.client.user.tag);
@@ -36,20 +36,16 @@ private login()
             this.print.warn("Can't update descriptive name because client.user "
             + " is either null or undefined");
         }
-        this.print.info(`Logged in succesfully.`);
+        this.print.info(`Logged in succesfully.`
+            + ` [guilds=${(await this.client.guilds.fetch()).map(x => x.name)
+                .join(", ")}]`);
 
-        const responsibleModules = Boot.getParsedYaml().tokenMapping
+        Boot.getParsedYaml().tokenMapping
             .filter(x => x.tag === this.client.user?.tag)
             .map(x => x.modules?.tpbot ?? [])
-            .flat();
-
-        for (const tpbotModule of responsibleModules) {
-            const constructor = TpbotDirectory.getConstructor(tpbotModule);
-            if (constructor !== null)
-                constructor(this.client);
-        }
-    })
-
+            .flat()
+            .forEach(x => TpbotDirectory.instantiate(x, this.client));
+    });
     return this.client.login(this.token);
 }
 /*******************************************************************72*/
