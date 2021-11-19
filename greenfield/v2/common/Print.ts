@@ -1,6 +1,6 @@
 export type userInfo = {
     id: string,
-    name: string,
+    username: string,
 }
 export class Print
 {
@@ -16,7 +16,7 @@ private format(message: string | unknown, user?: userInfo): string
         + (this.surname ? `|${this.surname}` : ``) 
         +`]: ` + (this.from ? `(from=${this.from}) ` : ``)
         + `${message}` 
-        + (user ? ` (user_info: name=${user.name} id=${user.id})` : ``);
+        + (user ? ` (user_info: name=${user.username} id=${user.id})` : ``);
     this.from = undefined;
     return msg;
 };
