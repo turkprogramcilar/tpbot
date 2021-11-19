@@ -4,24 +4,6 @@ import { Print } from "./common/Print";
 export abstract class TpbotModule
 {
 /*******************************************************************72*/
-static hasShell<T extends User | Message | null | undefined>(arg: T)
-{
-    if (null === arg || undefined === arg)
-        return;
-    const u = arg instanceof User 
-        ? arg.id
-        : arg instanceof Message 
-            ? (
-                arg.member !== null 
-                    ? arg.member!.id
-                    : arg.author.id
-            )
-            : null;
-    if (null === u || undefined === u || "" === u)
-        return false;
-    return Boot.getParsedYaml().shellAccess.some(x => x.id === u);
-}
-/*******************************************************************72*/
 protected readonly print: Print;
 constructor(public readonly moduleName: string,
     protected readonly client: Client) 
