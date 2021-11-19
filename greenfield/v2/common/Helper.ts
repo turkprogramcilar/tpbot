@@ -35,7 +35,7 @@ static hasShell<T extends User | Message | null | undefined>(arg: T)
             : null;
     if (null === u || undefined === u || "" === u)
         return false;
-    return Boot.getParsedYaml().shellAccess.some(x => x.id === u);
+    return (Boot.getParsedYaml().shellAccess ?? []).some(x => x.id === u);
 }
 /*******************************************************************72*/
 }

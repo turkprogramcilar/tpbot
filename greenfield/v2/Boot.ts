@@ -5,14 +5,14 @@ import fs from 'fs'
 import YAML from 'yaml'
 import { Path } from "./common/Path";
 interface TpbotYaml {
-    shellAccess: {
+    shellAccess?: {
         tag: string,
         id: string,
         access: boolean
     }[],
-    tokenMapping: {
+    shellBots?: string[], 
+    tokenMapping?: {
         tag: string,
-        shellBot?: boolean,
         modules?: {
             freestyle?: string[],
             tpbot?: string[]

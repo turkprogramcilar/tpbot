@@ -3,9 +3,9 @@ import { Summoner } from "./threading/Summoner";
 
 import readline from 'readline';
 import { Minion } from "./threading/Minion";
-import { Path } from "./common/Path";
 import { TpbotClient } from "./TpbotClient";
 import { Boot } from "./Boot";
+import { Path } from "./common/Path";
 
 export interface BotData
 {
@@ -19,7 +19,13 @@ private readonly summoner = new Summoner<BotData>(Kernel.name);
 constructor()
 {
     this.print.info("Constructor has called");
-
+    this.loadFreestyles();
+    this.loadTpbotModules();
+    this.print.info("Constructor ended");
+    // this.awaitStdin();
+}
+private loadTpbotModules()
+{
     this.print.info("Loading Tpbot modules.");
     const tpbotTokens = Object.entries(process.env)
         .filter(([k, v]) => k.startsWith("TPBOT_TOKEN"));
@@ -29,19 +35,18 @@ constructor()
         this.print.info(`Summoning ${environmentKey}`)
         this.summonTpClient(token, TpbotClient.name);
     }
+}
+private loadFreestyles()
+{
     this.print.info("Loading Freestyle modules.");
-    const freestyleModules = Boot.getParsedYaml().tokenMapping
+    const freestyleModules = (Boot.getParsedYaml().tokenMapping ?? [])
         .map(x => x.modules?.freestyle ?? []).flat();
     for (const freestyle of freestyleModules) {
         this.summoner.summon(
             Path.freestyle(freestyle),
             freestyle, `freestyle/${freestyle}`);
     }
-
-    this.print.info("Constructor ended");
-    // this.awaitStdin();
 }
-
 private summonTpClient(botToken: string, botName: string)
 {
     let bot: Minion<BotData>;

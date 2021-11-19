@@ -8,9 +8,9 @@ shellAccess:
         tag: "0xdeadc0de#9615"
         id: "824573651390562325"
         access: true
-shellTags:
-    - "TPBOT DEBUG 1#6503"
 
+shellBots:
+    - "TPBOT DEBUG 1#6503"
 
 tokenMapping:
     # Provide bot's account TOKENs in TPBOT_TOKEN1, TPBOT_TOKEN2... TPBOT_TOKENX
@@ -28,10 +28,10 @@ tokenMapping:
         tag: "TPBOT DEBUG 2#0621"
         modules:
             tpbot:
-                - "Crasher"
-                #- "Ping"
+                #- "Crasher"
+                - "Ping"
     -
         tag: "TPBOT DEBUG 3#7380"
         modules:
             freestyle:
-                - "examples/PingTs"
+                - "examples/PingJs"

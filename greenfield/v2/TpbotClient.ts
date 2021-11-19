@@ -5,7 +5,7 @@ import { MinionFile } from "./threading/MinionFile";
 import { Boot } from "./Boot"
 import { Summoner } from "./threading/Summoner";
 import { TpbotFactory } from "./TpbotFactory";
-import { Helper } from "./common/Helper";
+import { Shell } from "./modules/tpbot/shell/Main";
 export class TpbotClient extends MinionFile
 {
 /*******************************************************************72*/
@@ -43,7 +43,13 @@ private login()
             + ` [guilds=${(await this.client.guilds.fetch()).map(x => x.name)
                 .join(", ")}]`);
 
-        Boot.getParsedYaml().tokenMapping
+        if ((Boot.getParsedYaml().shellBots ?? [])
+            .some(x => x === this.client.user?.tag ?? "")) {
+
+            new Shell(this.client);
+            return;
+        }
+        (Boot.getParsedYaml().tokenMapping ?? [])
             .filter(x => x.tag === this.client.user?.tag)
             .map(x => x.modules?.tpbot ?? [])
             .flat()
