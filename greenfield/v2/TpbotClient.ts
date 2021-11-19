@@ -4,7 +4,7 @@ import { BotData } from "./Kernel";
 import { MinionFile } from "./threading/MinionFile";
 import { Boot } from "./Boot"
 import { Summoner } from "./threading/Summoner";
-import { TpbotDirectory } from "./TpbotDirectory";
+import { TpbotFactory } from "./TpbotFactory";
 import { Crasher } from "./modules/tpbot/crasher/Main";
 import { TpbotModule } from "./TpbotModule";
 export class TpbotClient extends MinionFile
@@ -44,7 +44,7 @@ private login()
             .filter(x => x.tag === this.client.user?.tag)
             .map(x => x.modules?.tpbot ?? [])
             .flat()
-            .forEach(x => TpbotDirectory.instantiate(x, this.client));
+            .forEach(x => TpbotFactory.instantiate(x, this.client));
     });
     return this.client.login(this.token);
 }

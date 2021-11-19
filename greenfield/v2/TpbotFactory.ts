@@ -3,7 +3,7 @@ import { Crasher } from "./modules/tpbot/crasher/Main";
 import { Ping } from "./modules/tpbot/ping/Main";
 import { TpbotModule } from "./TpbotModule";
 
-export abstract class TpbotDirectory
+export abstract class TpbotFactory
 {
 /*******************************************************************72*/
 static instantiate(moduleName: string, client: Client): TpbotModule | null
