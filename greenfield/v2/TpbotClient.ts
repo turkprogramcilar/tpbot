@@ -11,8 +11,7 @@ export class TpbotClient extends MinionFile
 /*******************************************************************72*/
 private readonly client: Client;
 private readonly summoner = new Summoner(TpbotClient.name);
-constructor(private readonly token: string,
-    private readonly intent: number = Helper.allIntents)
+constructor(private readonly token: string)
 {
     super(TpbotClient.name);
 
