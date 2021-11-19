@@ -12,8 +12,12 @@ export interface Events {
      * Used by Summoner to acknowledge the risen event by minion
      */
     awakenAcknowledge: [void],
+
     updateMinionName: [string],
     updateSummonerName: [string],
+
+    request: [string],
+    response: [string],
 }
 export class Minion<T>
 {
@@ -65,7 +69,7 @@ private splitPairToListener<E extends keyof Events>(pair: any, event: E,
     listener: (...args: Events[E]) => Awaitable<void>)
 {
     // unpack the tuple and check if events match, 
-    // if so call the listener with args
+    // if so call the listener with args @TODO make pair type-safe
     const [pairEvent, ...pairArgs] = pair;
     if (pairEvent === event) {
         listener(...pairArgs);

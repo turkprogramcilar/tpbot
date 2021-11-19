@@ -20,7 +20,7 @@ static check(env: string): boolean
 {
     return !process.env[env];
 }
-static hasShell<T extends User | Message | null | undefined>(arg: T)
+static isRoot<T extends User | Message | null | undefined>(arg: T)
 {
     if (null === arg || undefined === arg)
         return;

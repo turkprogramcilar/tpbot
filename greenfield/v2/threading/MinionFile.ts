@@ -4,6 +4,7 @@ import { Helper } from "../common/Helper";
 import { Print } from "../common/Print";
 import { Events } from "./Minion";
 
+export type milisecond = number;
 export abstract class MinionFile
 {
 /*******************************************************************72*/
@@ -31,6 +32,17 @@ async synchronize(onAcknowledge?: () => void): Promise<void>
         this.toSummoner("awaken");
         await Helper.sleep(100);
     }
+}
+async request(body: string, timeout: milisecond = 1000): Promise<string>
+{
+    return new Promise(async (resolve, reject) => {
+        this.fromSummonerOnce("response", (response) => {
+            return resolve(response);
+        })
+        this.toSummoner("request", body);
+        await Helper.sleep(timeout);
+        reject(`Request has timedout by ${timeout} milisecond(s).`);
+    });
 }
 toSummoner<E extends keyof Events>(event: E, ...args: Events[E])
 {

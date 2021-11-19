@@ -3,14 +3,12 @@ import { workerData } from "worker_threads";
 import { BotData } from "./Kernel";
 import { MinionFile } from "./threading/MinionFile";
 import { Boot } from "./Boot"
-import { Summoner } from "./threading/Summoner";
 import { TpbotFactory } from "./TpbotFactory";
-import { Shell } from "./modules/tpbot/shell/Main";
+import { TpbotShell } from "./TpbotShell";
 export class TpbotClient extends MinionFile
 {
 /*******************************************************************72*/
 private readonly client: Client;
-private readonly summoner = new Summoner(TpbotClient.name);
 constructor(private readonly token: string)
 {
     super(TpbotClient.name);
@@ -46,7 +44,7 @@ private login()
         if ((Boot.getParsedYaml().shellBots ?? [])
             .some(x => x === this.client.user?.tag ?? "")) {
 
-            new Shell(this.client);
+            new TpbotShell(this.client, this);
             return;
         }
         (Boot.getParsedYaml().tokenMapping ?? [])
