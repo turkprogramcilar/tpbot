@@ -13,16 +13,19 @@ constructor(typeName: string)
 }
 summon(fullpath: string, minionName: string, summonerName: string, 
     data?: T, errorCallback?: (error: Error | unknown) => void,
-    autoReload = true, crashLimit = 5)
+    reloadCallback?: (minion: Minion<T>) => void, autoReload = true, 
+    crashLimit = 5)
 {
     let crashData: MinionCrash<T>;
     const loader = () => this.summonInternal(fullpath, minionName, summonerName,
-        crashData, data, errorCallback);
+        crashData, data, errorCallback, reloadCallback);
     crashData = new MinionCrash(autoReload, crashLimit, loader);
     return crashData.loader();
 }
-private summonInternal(fullpath: string, minionName: string, summonerName: string, 
-    crash: MinionCrash<T>, data?: T, errorCallback?: (error: Error | unknown) => void) 
+private summonInternal(fullpath: string, minionName: string, 
+    summonerName: string, crash: MinionCrash<T>, data?: T, 
+    errorCallback?: (error: Error | unknown) => void,
+    reloadCallback?: (minion: Minion<T>) => void)
 {
     this.print.info(`Loading MinionFile<${minionName}> at `+fullpath);
 
@@ -31,7 +34,9 @@ private summonInternal(fullpath: string, minionName: string, summonerName: strin
         (error) => { 
             if (errorCallback) 
                 errorCallback(error); 
-            this.handleCrash(error, crash, minionName); 
+            const _minion = this.handleCrash(error, crash, minionName); 
+            if (_minion && reloadCallback)
+                reloadCallback(_minion);
         }, data);
 
     minion.once("awaken", () => {
@@ -67,7 +72,7 @@ private handleCrash(error: Error | unknown, crash: MinionCrash<T>, name: string)
         return;
     }
 
-    crash.loader();
+    return crash.loader();
 }
 /*******************************************************************72*/
 }

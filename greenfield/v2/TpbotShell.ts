@@ -36,12 +36,13 @@ protected async textMessage(message: Message)
 
     const id = message.author.id;
     const user = message.author.username;
+    const text = message.content;
 
     let session = this.sessions[id];
     if (undefined === session) {
 
         const regex = /ssh\s+(?:root)?<@!?([0-9]+)>/;
-        if (!(message.content.match(regex)?.[1] === this.client.user?.id)) 
+        if (!(text.match(regex)?.[1] === this.client.user?.id)) 
             return;
         
         session = await this.createSession(message);
@@ -51,22 +52,34 @@ protected async textMessage(message: Message)
 
     let buffer = session[0];
     let shell = session[1];
-    buffer += `${message.content}`;
+    buffer += `${text}`;
     shell = await shell.edit(buffer+this.q);
 
     try {
-        switch (message.content.substring(0, 4)) {
+        switch (text.substring(0, 4)) {
         case "exit": 
             buffer += `\nGoodbye. . .`; 
             delete this.sessions[id]; 
             await shell.edit(buffer+this.q);
             return;
-        case "ping": buffer += `\nPong!`; break;
-        case "echo": buffer += `\n${message.content.substring(4)}`; break; 
-        default:
-            const response = await this.kernelsMinion.request(message.content);
-            buffer += `\n${response}`;
+        case "ping":
+            buffer += `\nPong!`;
             break;
+        case "sudo":
+        case "echo": if (text.length > 5 && text[4].match(/\s/)) {
+            if (text[0] === 's') {
+                const response = 
+                    await this.kernelsMinion.request(text.substring(5));
+                buffer += `\n${response}`;
+            } else {
+                buffer += `\n${text.substring(5)}`;
+            }
+            break;
+        }
+        // else it falls to default with unknown command
+        default: 
+            buffer += `\nUnknown command: ${text}`; 
+            break; 
         } 
     }
     catch (error) {

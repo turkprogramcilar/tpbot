@@ -33,7 +33,7 @@ async synchronize(onAcknowledge?: () => void): Promise<void>
         await Helper.sleep(100);
     }
 }
-async request(body: string, timeout: milisecond = 1000): Promise<string>
+async request(body: string, timeout: milisecond = 3000): Promise<string>
 {
     return new Promise(async (resolve, reject) => {
         this.fromSummonerOnce("response", (response) => {
