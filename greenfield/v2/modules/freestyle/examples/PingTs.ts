@@ -1,8 +1,11 @@
-import { Client } from "discord.js";
+import { Client, ClientOptions } from "discord.js";
 import path from "path";
 
-const intent = Math.pow(2, 15) - 1;
-const client = new Client({intents: [intent]});
+const options: ClientOptions = {
+    intents: [32767], 
+    partials: ["CHANNEL", "GUILD_MEMBER", "MESSAGE", "REACTION", "USER"]
+};
+const client = new Client(options);
 client.on("messageCreate", async (message) => {
 
     if (!message.channel.isText())

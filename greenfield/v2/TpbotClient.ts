@@ -1,22 +1,26 @@
-import { Client } from "discord.js";
+import { Client, ClientOptions } from "discord.js";
 import { workerData } from "worker_threads";
 import { BotData } from "./Kernel";
 import { MinionFile } from "./threading/MinionFile";
 import { Boot } from "./Boot"
 import { Summoner } from "./threading/Summoner";
 import { TpbotFactory } from "./TpbotFactory";
-import { Crasher } from "./modules/tpbot/crasher/Main";
-import { TpbotModule } from "./TpbotModule";
+import { Helper } from "./common/Helper";
 export class TpbotClient extends MinionFile
 {
 /*******************************************************************72*/
 private readonly client: Client;
 private readonly summoner = new Summoner(TpbotClient.name);
 constructor(private readonly token: string,
-    private readonly intent: number = Math.pow(2, 15) - 1)
+    private readonly intent: number = Helper.allIntents)
 {
     super(TpbotClient.name);
-    this.client = new Client({intents: [this.intent]});
+
+    const options: ClientOptions = {
+        intents: [32767], 
+        partials: ["CHANNEL", "GUILD_MEMBER", "MESSAGE", "REACTION", "USER"]
+    };
+    this.client = new Client(options);
     this.login();
 }
 private login()

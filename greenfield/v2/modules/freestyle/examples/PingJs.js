@@ -1,8 +1,11 @@
 const { Client }  = require("discord.js");
 const path = require("path");
 
-const intent = Math.pow(2, 15) - 1;
-const client = new Client({intents: [intent]});
+const options = {
+    intents: [32767], 
+    partials: ["CHANNEL", "GUILD_MEMBER", "MESSAGE", "REACTION", "USER"]
+};
+const client = new Client(options);
 client.on("messageCreate", (message) => {
 
     if (!message.channel.isText())
