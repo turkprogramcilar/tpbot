@@ -3,12 +3,11 @@ import { Helper } from "./Helper";
 export abstract class Path
 /*******************************************************************72*/
 {
-private static readonly rootDistance: string = Helper.load("TPBOT_ROOT_DIR");
 static root(...pathSegments: string[])
 {
     const distance = pathSegments.reduce((a,_) => a+="../", "../");
     const nested = pathSegments.join("/");
-    return path.resolve(__dirname, this.rootDistance, distance, nested);
+    return path.resolve(__dirname, Helper.load("TPBOT_ROOT_DIR"), distance, nested);
 }
 static greenfieldNonBuilt(file: string)
 {
