@@ -37,5 +37,25 @@ static isRoot<T extends User | Message | null | undefined>(arg: T)
         return false;
     return (Boot.getParsedYaml().shellAccess ?? []).some(x => x.id === u);
 }
+/**
+ * ps: plural singular
+ * returns the given extension if something is larger than 1 unit
+ * @param n the count of something countable
+ * @param plural default is "s"
+ * @param singular default is ""
+ */
+static ps(n: number, plural = "s", singular = "")
+{
+    return n > 1 ? plural : singular;
+}
+/**
+ * ai: are is
+ * returns "is" if something is larger than 1 else "are"
+ * @param n the count of something countable
+ */
+static ai(n: number)
+{
+    return this.ps(n, "are", "is");
+}
 /*******************************************************************72*/
 }
