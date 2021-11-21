@@ -66,7 +66,7 @@ export const m = new class join_leave extends dcmodule
         await channel.send({embeds: [new MessageEmbed()
             .setAuthor(member.user.username, member.avatarURL() ?? member.displayAvatarURL())
             .setThumbnail(tp.gifs.keke)
-            .setDescription(`YIHAHO <@${member.id}>, **Türk Programcılar** discord sunucusuna hoşgeldin!`)
+            .setDescription(`YIHAHO <@!${member.id}>, **Türk Programcılar** discord sunucusuna hoşgeldin!`)
             .setImage(tp.gifs.hosgeldin)
         ]});
     }
