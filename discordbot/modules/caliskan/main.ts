@@ -71,8 +71,8 @@ export const m = new class caliskan extends dcmodule
                 .addField("return code", st(result?.run?.code), true)
                 .setDescription("```ts\n"+(result?.run?.output ?? JSON.stringify(result))+"```")
                 .setImage(result?.run?.code === 0
-                    ? (x => x[Math.random()*x.length])(tp.gifs.risitas_matrix_duel)
-                    : (x => x[Math.random()*x.length])(tp.gifs.yoda_much_learn))
+                    ? (x => x[Math.floor(Math.random()*x.length)])(tp.gifs.risitas_matrix_duel)
+                    : (x => x[Math.floor(Math.random()*x.length)])(tp.gifs.yoda_much_learn))
                 ]};
         }
         catch (error) {
