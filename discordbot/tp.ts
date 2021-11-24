@@ -24,8 +24,17 @@ export abstract class tp
         nvidia: "906998783370465352",
     }
     static readonly gifs = {
-        risitas_matrix_duel: "https://media3.giphy.com/media/26m03IIIGdBCR1g5g2/giphy.gif?cid=790b76114ae9caac9bee1bb038db1ed0d1769e80007612e4&rid=giphy.gif&ct=g",
-        yoda_much_learn: "https://c.tenor.com/eRHkHUa_dt4AAAAC/yoda-star-wars.gif",
+        risitas_matrix_duel: [
+            "https://media3.giphy.com/media/26m03IIIGdBCR1g5g2/giphy.gif?cid=790b76114ae9caac9bee1bb038db1ed0d1769e80007612e4&rid=giphy.gif&ct=g",
+            "https://cdn.discordapp.com/attachments/698972054740795456/912972138372276254/5vc2jy.gif",
+            "https://cdn.discordapp.com/attachments/698972054740795456/912972162506309683/5vc2ow.gif",
+        ],
+        yoda_much_learn: [
+            "https://c.tenor.com/eRHkHUa_dt4AAAAC/yoda-star-wars.gif",
+            "https://c.tenor.com/gK9Yd_xrxrIAAAAC/yoda-star-wars.gif",
+            "https://c.tenor.com/qApSFXI7oZMAAAAC/sometimes-you-learn-from-the-worst-learn-from-the-worst.gif",
+            "https://c.tenor.com/ixtUKavels0AAAAC/learning-learnding.gif",
+        ],
         keke: "https://media1.giphy.com/media/KSrNm2ThozpYnh3abh/giphy.gif",
         hosgeldin: "https://media4.giphy.com/media/mTTuI8qkiXMtVjjqmq/giphy.gif",
         // hosbuldum komutu nasil kullanilir gifli anlatim:
