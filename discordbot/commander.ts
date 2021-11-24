@@ -27,7 +27,6 @@ type command_name = string;
 
 export class commander extends dcmodule
 {
-    
     protected commands: {[key: string]: command} = {};
     private command_states : { [key: user_id] : command_user_state } = {};
 
@@ -103,6 +102,7 @@ export class commander extends dcmodule
 
             for (const file of command_files) {
                 const _command: command = require("../../"+root+file.substring(0, file.length-3)).c;
+                _command.set_client(this.get_client());
                 _command.prefix = this.state.prefix ?? _command.prefix;
                 // Set a new item in the Collection
                 // With the key as the command name and the value as the exported module

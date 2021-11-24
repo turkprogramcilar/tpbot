@@ -1,5 +1,5 @@
 import { ContextMenuCommandBuilder, SlashCommandBuilder } from "@discordjs/builders";
-import { User } from "discord.js";
+import { Client, User } from "discord.js";
 import { log, user_info } from "./log";
 import { known_interactions, command_user_state } from "./commander";
 
@@ -18,6 +18,7 @@ export class operation<T>
 // tslint:disable-next-line: max-classes-per-file
 export abstract class command
 {
+    protected asagi: Client | undefined;
     protected log: log;
     public data: any;
     public permissions: any;
@@ -30,6 +31,16 @@ export abstract class command
             this.command_name = "debug_"+this.command_name;
         }
         this.log = new log(command_name);
+    }
+    public set_client(client: Client)
+    {
+        this.asagi = client;
+    }
+    protected get_client()
+    {
+        if (this.asagi === undefined)
+            throw new Error("Is called when client is undefined");
+        return this.asagi;
     }
 
     protected is_in_range<T extends object>(enum_t: T, value: number) {

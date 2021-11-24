@@ -15,6 +15,7 @@ export abstract class tp
     static readonly user_id = {
         deadcode: "824573651390562325",
         logbot: "841479314519752784",
+        ayrankot: "730885117656039466",
         chunk: "272044185689915392",
     }
     //
@@ -23,6 +24,8 @@ export abstract class tp
         nvidia: "906998783370465352",
     }
     static readonly gifs = {
+        risitas_matrix_duel: "https://media3.giphy.com/media/26m03IIIGdBCR1g5g2/giphy.gif?cid=790b76114ae9caac9bee1bb038db1ed0d1769e80007612e4&rid=giphy.gif&ct=g",
+        yoda_much_learn: "https://c.tenor.com/eRHkHUa_dt4AAAAC/yoda-star-wars.gif",
         keke: "https://media1.giphy.com/media/KSrNm2ThozpYnh3abh/giphy.gif",
         hosgeldin: "https://media4.giphy.com/media/mTTuI8qkiXMtVjjqmq/giphy.gif",
         // hosbuldum komutu nasil kullanilir gifli anlatim:
@@ -33,6 +36,7 @@ export abstract class tp
     }
     //
     static readonly channel_id = {
+        caliskan: "912770742419062844",
         onay: "900650376762626078",
         bir_bak_buraya: constants.cid.bir_bak_buraya,
         roller: constants.cid.roller,

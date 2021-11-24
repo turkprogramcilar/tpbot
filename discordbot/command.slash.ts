@@ -9,11 +9,13 @@ export abstract class slash_command extends command
 {
     public data: SlashCommandBuilder;
 
-    public constructor(command_name: string, description: string, public readonly permissions: ApplicationCommandPermissionData[] | undefined = undefined, everyone: boolean = false)
+    public constructor(command_name: string, description: string,
+        public readonly permissions: ApplicationCommandPermissionData[] | undefined = undefined,
+        everyone: boolean = false, builder: (s: SlashCommandBuilder) => SlashCommandBuilder = x => x)
     {
         super(command_name);
         
-        this.data = new SlashCommandBuilder()
+        this.data = builder(new SlashCommandBuilder())
             .setName(this.command_name)
             .setDescription(description)
             ;

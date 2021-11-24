@@ -163,6 +163,10 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
         for (const m of modules) 
             m.on_event('messageReactionAdd', {reaction: reaction, user: user});
     });
+    client.on('messageUpdate', async (msgOld ,msgNew) => {
+        for (const m of modules) 
+            m.on_event('messageUpdate', {msgOld, msgNew});
+    });
     client.on('messageCreate', async msg => {
 
         const content = msg.content;
