@@ -1,10 +1,10 @@
 // package imports
 import { Message, Client, Channel } from "discord.js";
 // local imports
-const constants = require("../../../../legacy/discordbot/constants");
-const parser    = require("../../../../legacy/discordbot/cmdparser");
-const db        = require("../../../../legacy/discordbot/mongodb");
-const tools     = require("../../../../legacy/discordbot/tools");
+const constants = require("../constants");
+const parser    = require("../cmdparser");
+const db        = require("../mongodb");
+const tools     = require("../tools");
 import { log } from '../log';
 import { tp } from "../tp";
 

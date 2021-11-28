@@ -1,5 +1,5 @@
 // tslint:disable-next-line: no-var-requires
-const constants = require("../../discordbot/constants");
+const constants = require("./constants");
 // turk programcilar discord sunucusu ile ilgili tanimlamalar
 export abstract class tp
 {

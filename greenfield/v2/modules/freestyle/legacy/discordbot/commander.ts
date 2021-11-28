@@ -7,7 +7,7 @@ import { command } from './command';
 import { log } from './log';
 import { tp } from './tp';
 
-const tools = require("../../discordbot/tools");
+const tools = require("./tools");
 
 
 export type first_interactions = CommandInteraction | ContextMenuInteraction
@@ -111,12 +111,12 @@ export class commander extends dcmodule
             return undefined;
         
         try {
-            const root = `build/discordbot/modules/${this.module_name}/commands/`;
+            const root = `./modules/${this.module_name}/commands/`;
             const commands_folder_files : string[] = tools.get_files_sync(root);
             const command_files = commands_folder_files.filter(file => file.endsWith('.js'));
 
             for (const file of command_files) {
-                const _command: command = require("../../"+root+file.substring(0, file.length-3)).c;
+                const _command: command = require(root+file.substring(0, file.length-3)).c;
                 _command.set_client(this.get_client());
                 _command.prefix = this.state.prefix ?? _command.prefix;
                 // Set a new item in the Collection

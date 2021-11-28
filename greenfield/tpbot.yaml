@@ -34,4 +34,4 @@ tokenMapping:
         tag: "TPBOT DEBUG 3#7380"
         modules:
             freestyle:
-                - "examples/PingJs"
+                - "legacy/main"

@@ -5,7 +5,7 @@ const fs      = require("fs").promises;
 const php     = require("./php.js");
 const tools   = require("./tools.js");
 const parser  = require("./cmdparser.js");
-const logger     = require("../build/discordbot/log.js");
+const logger  = require("./log.js");
 
 const Discord = require('discord.js');
 const htmlp   = require('node-html-parser');
@@ -42,28 +42,29 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
         let path = null, test = null;
         let cloned_state = {...state};
 
+        const path_v2_fix = (old_path) => {
+            /* old path structure was something like :
+                /build/discordbot/
+
+            */
+        }
         const legacy_loader = async (test) => {
-            if (await tools.fs_exists(test)) {
-                path = test.substring(0, test.length - 3);
+            if (await tools.fs_exists(__dirname+test)) {
+                path = __dirname+test.substring(0, test.length - 3);
                 return true;
             } 
             else
                 return false;
         }
 
-        // is this a legacy js module?
-        if (await legacy_loader(`./legacy/discordbot/modules/${m}.js`)){
+        // is this a legacy js-ts module?
+        if (await legacy_loader(`/modules/${m}.js`)){
 
         }
-        // is this a legacy ts module?
-        else if (await legacy_loader(`./build/legacy/discordbot/modules/${m}.js`)){
-
-        }
-
         // is this a modern ts folder module?
-        else if (await tools.fs_exists("./build/legacy/discordbot/modules/"+m)) {
+        else if (await legacy_loader("/modules/"+m)) {
 
-            if (await legacy_loader(`./build/legacy/discordbot/modules/${m}/main.js`)) {
+            if (await legacy_loader(`/modules/${m}/main.js`)) {
                 cloned_state.command_support = true;
                 cloned_state.modern_boilerplate = true;
             }
@@ -79,8 +80,8 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
         }
         
         const loaded = cloned_state.modern_boilerplate == true 
-            ? require("./../."+path).m
-            : require("./../."+path)
+            ? require(path).m
+            : require(path)
             ;
         if (!loaded.init)
             throw Error("Module has no init method defined at " +path);
@@ -109,7 +110,7 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
 
         // load empty modern module for static function calls
         log.verbose("LOAD EMPTY MODERN");
-        const modern = require("../build/discordbot/commander.js");
+        const modern = require(__dirname+"/commander.js");
         log.verbose("LOADED=",modern.modern);
         const name_id_pairs = await modern.commander.register_commands(all_commands, client);
         log.verbose("NAME_ID_PAIRS=",name_id_pairs);

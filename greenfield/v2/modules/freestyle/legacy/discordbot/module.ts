@@ -5,10 +5,10 @@ import { log } from './log';
 import { tp } from "./tp";
 
 // local imports
-const db        = require("../../../legacy/discordbot/mongodb");
-const tools     = require("../../../legacy/discordbot/tools");
-const parser    = require("../../../legacy/discordbot/cmdparser");
-const constants = require("../../../legacy/discordbot/constants");
+const db        = require("./mongodb");
+const tools     = require("./tools");
+const parser    = require("./cmdparser");
+const constants = require("./constants");
 
 /**
  * 
