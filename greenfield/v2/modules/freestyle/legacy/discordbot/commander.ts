@@ -111,7 +111,7 @@ export class commander extends dcmodule
             return undefined;
         
         try {
-            const root = `./modules/${this.module_name}/commands/`;
+            const root = __dirname+`/modules/${this.module_name}/commands/`;
             const commands_folder_files : string[] = tools.get_files_sync(root);
             const command_files = commands_folder_files.filter(file => file.endsWith('.js'));
 
@@ -182,6 +182,9 @@ export class commander extends dcmodule
             _command = module;
 
             // if user already started a command, dont start another one
+            if (undefined === this.command_states[user_id])
+                this.command_states[user_id] = {};
+            
             state = this.command_states[user_id][id]
             if (state) {
                 if (state.reset === true) {
