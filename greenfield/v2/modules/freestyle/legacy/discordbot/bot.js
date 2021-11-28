@@ -5,7 +5,7 @@ const fs      = require("fs").promises;
 const php     = require("./php.js");
 const tools   = require("./tools.js");
 const parser  = require("./cmdparser.js");
-const logger     = require("../build/discordbot/log.js.js");
+const logger     = require("../build/discordbot/log.js");
 
 const Discord = require('discord.js');
 const htmlp   = require('node-html-parser');
@@ -109,7 +109,7 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
 
         // load empty modern module for static function calls
         log.verbose("LOAD EMPTY MODERN");
-        const modern = require("../build/discordbot/commander.js.js");
+        const modern = require("../build/discordbot/commander.js");
         log.verbose("LOADED=",modern.modern);
         const name_id_pairs = await modern.commander.register_commands(all_commands, client);
         log.verbose("NAME_ID_PAIRS=",name_id_pairs);
