@@ -6,4 +6,10 @@ export abstract class helper
         o = o.filter(x => !isNaN(Number(x)) && Number(x).toString() === x);
         return o as unknown[] as number[];
     }
+    static sleep(ms: number)
+    {
+        return new Promise((resolve, reject) => {
+            setTimeout(resolve, ms);
+        });
+    }
 }

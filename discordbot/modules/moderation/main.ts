@@ -1,6 +1,7 @@
 import { Message, TextChannel } from "discord.js";
 import { commander } from "../../commander";
 import { dcmodule } from "../../module";
+import { tp } from "../../tp";
 export const m = new class moderation extends commander {
 
     private saved_topics: string[] | null = null;
@@ -30,9 +31,9 @@ export const m = new class moderation extends commander {
             this.log.error("Can't fetch user");
             return;
         }
-        await user.roles.add(dcmodule.role_id_gozalti);
+        await user.roles.add(tp.role_id_gozalti);
         setTimeout(async () => {
-            await user.roles.remove(dcmodule.role_id_gozalti);
+            await user.roles.remove(tp.role_id_gozalti);
         }, 2*60*1000);
     }
     private async kural(msg: Message)
@@ -52,7 +53,7 @@ export const m = new class moderation extends commander {
             || null === this.saved_topics) {
 
             const channel = await msg.guild?.channels
-                .fetch(dcmodule.channel_id.bir_bak_buraya);
+                .fetch(tp.channel_id.bir_bak_buraya);
 
             if (undefined === channel
             || null === channel
@@ -80,7 +81,7 @@ export const m = new class moderation extends commander {
                 const rules = [...x[1].matchAll(
                     /([-#!]\s[\w\düğıçşöÜĞİÇŞÖ\-\.\;\"\?\, ]+)\s+/g)];
 
-                return rules.map(x => x[1]);
+                return rules.map(xx => xx[1]);
             });
         }
         const topic = this.saved_topics[topic_index];

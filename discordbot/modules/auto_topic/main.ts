@@ -8,6 +8,9 @@ export const m = new class auto_topic extends dcmodule {
     
     public async on_message(msg : Message) {
 
+        if (msg.author.bot)
+            return;
+            
         if (!(msg.channel instanceof TextChannel))
             return;
 
@@ -36,7 +39,7 @@ export const m = new class auto_topic extends dcmodule {
             }
         };
 
-        for (const word of msg.content.split(" ")) {
+        for (const word of msg.content.split(/\s/)) {
             
             const url = get_url(word);
             if (url && url.hostname === "github.com") {

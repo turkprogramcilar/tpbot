@@ -5,6 +5,7 @@ import { REST } from "@discordjs/rest";
 import { SlashCommandBuilder } from '@discordjs/builders';
 import { command } from './command';
 import { log } from './log';
+import { tp } from './tp';
 
 const tools = require("../../discordbot/tools");
 
@@ -29,7 +30,6 @@ export interface custom_data
 }
 export class commander extends dcmodule
 {
-    
     protected commands: {[key: string]: command} = {};
     private command_states : { [key: user_id] : { [key: string]: command_user_state } } = {};
 
@@ -55,7 +55,7 @@ export class commander extends dcmodule
             throw new Error("can't register commands. id or token is null");
         }
 
-        const tpid = dcmodule.guild_id_tp
+        const tpid = tp.guild_id_tp
         const rest = new REST({ version: '9' }).setToken(token);
 
         const flatten = commands.reduce((a, c) => a={...a,...c} , {});
@@ -91,7 +91,7 @@ export class commander extends dcmodule
 
                 if (!client.application?.owner) await client.application?.fetch();
 
-                const app_command = await client.guilds.cache.get(dcmodule.guild_id_tp)?.commands.fetch(_command_id);
+                const app_command = await client.guilds.cache.get(tp.guild_id_tp)?.commands.fetch(_command_id);
                 if (!app_command) throw Error ("Can't fetch application command");
                 
                 await app_command.permissions.set({
@@ -117,6 +117,7 @@ export class commander extends dcmodule
 
             for (const file of command_files) {
                 const _command: command = require("../../"+root+file.substring(0, file.length-3)).c;
+                _command.set_client(this.get_client());
                 _command.prefix = this.state.prefix ?? _command.prefix;
                 // Set a new item in the Collection
                 // With the key as the command name and the value as the exported module

@@ -25,6 +25,7 @@
     "express": "^4.17.1",
     "jimp": "^0.16.1",
     "mongodb": "^3.7.3",
+    "node-fetch": "^2.6.6",
     "node-html-parser": "^3.3.6",
     "utf-8-validate": "^5.0.7",
     "ws": "^7.5.5",
