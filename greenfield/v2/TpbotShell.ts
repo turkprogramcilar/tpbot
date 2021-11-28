@@ -8,12 +8,13 @@ export class TpbotShell extends TpbotModule
 {
 /*******************************************************************72*/
 private sessions: {[key: userId]: [string, Message]} = {};
-private readonly q = "```";
+private readonly shellEnd = "```";
+private readonly shellHead = "```shell\n"
 constructor(client: Client, private kernelsMinion: MinionFile)
 {
     super(TpbotShell.name, client);
 }
-private async updateTerminal(id: userId, append: string, user: string)
+private async updateTerminal(id: userId, append: string)
 {
     let [buffer, shell] = this.sessions[id];
     if (buffer === undefined || shell === undefined) {
@@ -22,20 +23,28 @@ private async updateTerminal(id: userId, append: string, user: string)
         return;
     }
     buffer += append;
-    buffer += this.prompt(user);
-    const newMessage = await shell.reply(buffer+this.q);
-    const pair: [string, Message] = [buffer, newMessage];
+
+    const newMessage = (buffer+this.shellEnd).length < 2000
+        ? await shell.edit(buffer+this.shellEnd)
+        : (this.shellHead+append+this.shellEnd).length < 2000
+            ? await shell.reply(this.shellHead+append+this.shellEnd)
+            : await shell.reply("Output is too long to append. We need"
+                + " split mechanism ASAAP @DEVELOPERS @TODO")
+        ;
+    const pair: [string, Message] = [
+        newMessage.content.slice(0, -this.shellEnd.length),
+        newMessage];
     this.sessions[id] = pair;
 }
 private async createSession(message: Message)
 {
     const user = message.author.username;
     const id = message.author.id;
-    const buffer = "```shell\n"
+    const buffer = this.shellHead
     + `\nAccess granted. Welcome to Tpbot v2`
     + `\n`
     ;
-    const shell = await message.reply(buffer+this.q);
+    const shell = await message.reply(buffer+this.shellEnd);
         this.sessions[id] = [buffer, shell];
 
     const tokens = await this.kernelsMinion.request("ls tokens");
@@ -46,7 +55,8 @@ private async createSession(message: Message)
     + `\n${-1} bot${H.ps(0)} ${H.ai(0)} logged in.`
     + `\n${-1} freestyle modules are running`
     // + `\n${tn} tpbot module${H.ps(tn)} ${H.ai(tn)} running`
-    await this.updateTerminal(id, append, user);
+    + this.prompt(user);
+    await this.updateTerminal(id, append);
     return this.sessions[id]
 }
 private prompt(user: string)
@@ -78,46 +88,43 @@ protected async textMessage(message: Message)
         return;
     }
 
-    let buffer = session[0];
-    let shell = session[1];
-    buffer += `${text}`;
-    shell = await shell.edit(buffer+this.q);
+    await this.updateTerminal(id, text);
+    let append = "";
 
     try {
         switch (text.substring(0, 4)) {
         case "exit": 
-            buffer += `\nGoodbye. . .`; 
+            append += `\nGoodbye. . .`; 
+            await this.updateTerminal(id, append);
             delete this.sessions[id]; 
-            await shell.edit(buffer+this.q);
             return;
         case "ping":
-            buffer += `\nPong!`;
+            append += `\nPong!`;
             break;
         case "sudo":
         case "echo": if (this.hasArg(text, 4)) {
             if (text[0] === 's') {
                 const response = 
                     await this.kernelsMinion.request(text.substring(5));
-                buffer += `\n${response}`;
+                append += `\n${response}`;
             } else {
-                buffer += `\n${text.substring(5)}`;
+                append += `\n${text.substring(5)}`;
             }
             break;
         }
         // else it falls to default with unknown command
         default: 
-            buffer += `\nUnknown command: ${text}`; 
+            append += `\nUnknown command: ${text}`; 
             break; 
         } 
     }
     catch (error) {
-        buffer += `\n${error}`
+        append += `\n${error}`
     }
     finally {
-        buffer += this.prompt(user);
+        append += this.prompt(user);
     }
-    shell = await shell.edit(buffer+this.q);
-    this.sessions[id] = [buffer, shell];
+    await this.updateTerminal(id, append);
 }
 /*******************************************************************72*/
 }
