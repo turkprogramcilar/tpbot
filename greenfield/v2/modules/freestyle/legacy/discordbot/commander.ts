@@ -20,32 +20,17 @@ export interface command_user_state {
 }
 
 type user_id = string;
+type command_id = string;
 type command_name = string;
 
 
-export interface custom_data
-{
-    command_id: string,
-    custom_id: string,
-}
+
 export class commander extends dcmodule
 {
     protected commands: {[key: string]: command} = {};
-    private command_states : { [key: user_id] : { [key: string]: command_user_state } } = {};
+    private command_states : { [key: user_id] : command_user_state } = {};
 
-    static split(customId: string): custom_data
-    {
-        const [id, ...cid] = customId.split(" ");
-        return {
-            command_id: id,
-            custom_id: cid.join(" ")
-        };
-    }
-    static make(data: custom_data): string
-    {
-        return `${data.command_id} ${data.custom_id}`;
-    }
-    static async register_commands(commands: {[key: string]: command}[], client: Client): Promise<[command_name, string][]> {
+    static async register_commands(commands: {[key: string]: command}[], client: Client): Promise<[command_name, command_id][]> {
         const print = new log("MODERN_STATIC_REGISTER_COMMANDS");
         print.verbose("COMMANDS", commands);
 
@@ -133,10 +118,10 @@ export class commander extends dcmodule
         this.log.verbose("RETURNING SAFELY FROM GET_COMMANDS FOR MODULE: "+this.module_name);
         return this.commands;
     }
-    public set_command_ids(name_id_pairs: [command_name, string][]): void {
+    public set_command_ids(name_id_pairs: [command_name, command_id][]): void {
 
         this.log.verbose("SET_COMMAND_IDS BEFORE FOR "+this.module_name,this.commands);
-        const switch_to_ids: {[key: string]: command} = {};
+        const switch_to_ids: {[key: command_id]: command} = {};
         for (const [name, id] of name_id_pairs) {
 
             const command: command | undefined = this.commands[name];
@@ -165,7 +150,6 @@ export class commander extends dcmodule
 
         // process commands
         const user_id = interaction.user.id;
-        let id: string;
         const user_info = command.get_user_info(interaction.user);
 
         let state: command_user_state;
@@ -173,7 +157,7 @@ export class commander extends dcmodule
 
         if (commander.is_first_interaction(interaction)) {
 
-            id = interaction.commandId;
+            const id: command_id = interaction.commandId;
             const module: command | undefined = this.commands[id];
             if (undefined === module) {
                 // its not in our command scope
@@ -182,13 +166,10 @@ export class commander extends dcmodule
             _command = module;
 
             // if user already started a command, dont start another one
-            if (undefined === this.command_states[user_id])
-                this.command_states[user_id] = {};
-            
-            state = this.command_states[user_id][id]
+            state = this.command_states[user_id] 
             if (state) {
-                if (state.reset === true) {
-                    delete this.command_states[user_id][id];
+                if (state.reset == true) {
+                    delete this.command_states[user_id];
                     return await interaction.reply({content: "`Komut süreci sıfırlandı. Komutu artık baştan tekrar başlatabilirsiniz.`", ephemeral: true });
                 }
                 else {
@@ -202,7 +183,7 @@ export class commander extends dcmodule
 
             // if user_id exists already, it will be overridden with state = 0
             // so that it pushes user to the first stage of the command
-            state = this.command_states[user_id][id] = {
+            state = this.command_states[user_id] = {
                 command_id: id,
                 state: 0,
                 reset: false,
@@ -210,16 +191,15 @@ export class commander extends dcmodule
         }
         else if (commander.is_second_interaction(interaction)) {
             
-            const {command_id, custom_id} = commander.split(interaction.customId);
-            id = command_id;
             // assuming button is always triggered from a command
-            state = this.command_states[user_id][command_id];
+            state = this.command_states[user_id];
 
             if (undefined === state) {
                 // its not in our scope
                 return;
             }
             
+            const id = state.command_id;
             const module = this.commands[id];
             if (undefined === module) {
                 this.log.warn(`command id[${id}] is not found in commands when interacting with button or select menu`, user_info)
@@ -227,7 +207,7 @@ export class commander extends dcmodule
             }
             _command = module;
             
-            state = this.command_states[user_id][command_id];
+            state = this.command_states[user_id];
         }
         else {
 
@@ -238,11 +218,11 @@ export class commander extends dcmodule
         try {
             const operation = await _command.execute(interaction, state);
             if (operation.is_complete()) 
-                delete this.command_states[user_id][id];
+                delete this.command_states[user_id];
 
         } catch (error) {
             this.log.error(error, user_info);
-            delete this.command_states[user_id][id];
+            delete this.command_states[user_id];
             await command.respond_interaction_failure_to_user(interaction);
         }
     }
