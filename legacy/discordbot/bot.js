@@ -5,6 +5,7 @@ const fs      = require("fs").promises;
 const php     = require("./php.js");
 const tools   = require("./tools.js");
 const parser  = require("./cmdparser.js");
+const logger     = require("../build/discordbot/log.js");
 
 const Discord = require('discord.js');
 const htmlp   = require('node-html-parser');
@@ -31,8 +32,10 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
             }
         },
     };
+    const log = new logger.log("BOTJS_VERBOSE");
 
     let modules = [];
+    let all_command_ids = [];
     const promises = [];
     for (const m of mods) {
 
@@ -87,13 +90,45 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
     }
     client.login(token);
 
-    client.on('ready', () => {
-        console.log(`Logged in as ${client.user.tag}! (for modules=[${mods}])`);
-        for (const m of modules) 
+    client.on('ready', async () => {
+
+        const all_commands = [];
+        const modern_modules = [];
+        for (const m of modules) {
+
             m.on_event('ready', {});
 
+            if (m.get_commands !== undefined) {
+                
+                log.verbose("GET_COMMANDS FOR "+m.module_name);
+                all_commands.push(m.get_commands());
+                modern_modules.push(m);
+            }
+        }
+        log.verbose("all_commands",all_commands);
+
+        // load empty modern module for static function calls
+        log.verbose("LOAD EMPTY MODERN");
+        const modern = require("../build/discordbot/commander.js");
+        log.verbose("LOADED=",modern.modern);
+        const name_id_pairs = await modern.commander.register_commands(all_commands, client);
+        log.verbose("NAME_ID_PAIRS=",name_id_pairs);
+
+        // broadcast all loaded command id's from discord server
+        for (const m of modern_modules) {
+
+            log.verbose("SET_COMMAND_IDS FOR MODULE="+m.module_name);
+            m.set_command_ids(name_id_pairs);
+        }
+
+        all_command_ids = name_id_pairs.map(x => x[1]);
+        all_command_names = name_id_pairs.map(x => x[0])
         
-            require("./marquee_status.js").init(client, msg_status);
+        const cmds = modern_modules.map(x => x.module_name);
+        console.log(`Logged in as ${client.user.tag}! (for modules=[${mods}], commands=[${all_command_names}])`);
+        
+        // load status switcher module
+        require("./marquee_status.js").init(client, msg_status);
     });
 
     for (const evt of ['presenceUpdate']) {
@@ -104,8 +139,24 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
         }); 
     }
     client.on('interactionCreate', async interaction => {
+        log.verbose(`INTERACTION_CREATE`, interaction)
+
+        if (interaction.isCommand() && false == all_command_ids.includes(interaction.commandId)) {
+            console.warn(`command id[${interaction.id}] is not found in commands when first executing command [user=${interaction.user.username},id=${interaction.user.id}]`);
+            return;
+        }
+        
+        log.verbose(`FOR LOOP MODULES\n${modules}\n`);
         for (const m of modules) 
             m.on_event('interactionCreate', {interaction: interaction});
+    });
+    client.on('guildMemberAdd', async (member) => {
+        for (const m of modules) 
+            m.on_event('guildMemberAdd', {member: member});
+    });
+    client.on('guildMemberRemove', async (member) => {
+        for (const m of modules) 
+            m.on_event('guildMemberRemove', {member: member});
     });
     client.on('messageReactionRemove', async (reaction,user) => {
         for (const m of modules) 
@@ -115,9 +166,11 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
         for (const m of modules) 
             m.on_event('messageReactionAdd', {reaction: reaction, user: user});
     });
+    client.on('messageUpdate', async (msgOld ,msgNew) => {
+        for (const m of modules) 
+            m.on_event('messageUpdate', {msgOld, msgNew});
+    });
     client.on('messageCreate', async msg => {
-        if (msg.author == client.user)
-            return;
 
         const content = msg.content;
         const evt = msg.channel.type == 'dm' ? 'dm' : 'message';

@@ -1,12 +1,11 @@
-import { ButtonInteraction, CommandInteraction, Message, MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
+import { ButtonInteraction, MessageActionRow, MessageButton, MessageEmbed } from "discord.js";
 
-import { SlashCommandBuilder } from '@discordjs/builders';
 import { ApplicationCommandPermissionTypes, MessageButtonStyles } from "discord.js/typings/enums";
-import { command_user_state, dcmodule, known_interactions } from "../../../module";
+import { known_interactions } from "../../../commander";
 import { assert } from "console";
-import { log } from "../../../log";
-import { command } from "../../../command";
 import { status, click_interaction, dfa_command } from "../../../command.dfa";
+import { command } from "../../../command";
+import { tp } from "../../../tp";
 
 // https://en.wikipedia.org/wiki/Deterministic_finite_automaton
 enum Q {
@@ -34,7 +33,8 @@ const d : { [key in Q]: Q[] } = {
     [Q.roller]: [Q.bitir],
     [Q.bitir]: [],
 };
-const choice_thanks = ["Teşekkürler"];
+const choice_alright = ["Anlaşıldı"];
+const choice_thanks  = ["Teşekkürler"];
 const choice_topics = [
     "Yazılım ile ilgili",
     "Bilgisayar, donanım, teknik veya bir arıza ile ilgili",
@@ -53,16 +53,16 @@ const choice_labels : { [key in Q]: string[] } = {
     ],
     
     [Q.yardim]: choice_topics,
-    [Q.sohbet]: choice_thanks,
-    [Q.proje] : choice_thanks,
-    [Q.reklam]: choice_thanks,
+    [Q.sohbet]: choice_alright,
+    [Q.proje] : choice_alright,
+    [Q.reklam]: choice_alright,
 
     [Q.yazilim]   : choice_priorities,
     [Q.bilgisayar]: choice_priorities,
-    [Q.diger]     : choice_thanks,
+    [Q.diger]     : choice_alright,
 
-    [Q.acil]   : choice_thanks,
-    [Q.sabirli]: choice_thanks,
+    [Q.acil]   : choice_alright,
+    [Q.sabirli]: choice_alright,
 
     [Q.roller]  : choice_thanks,
     [Q.bitir]  : [],
@@ -72,17 +72,17 @@ const channel_mentions : { [key in Q]: string } = {
     
     [Q.yardim]: "",
     [Q.sohbet]: "",
-    [Q.proje] : `<#${dcmodule.channel_id.proje_paylas}>`,
-    [Q.reklam]: `<#${dcmodule.channel_id.istek_oneri_sikayet}>`,
+    [Q.proje] : `<#${tp.channel_id.proje_paylas}>`,
+    [Q.reklam]: `<#${tp.channel_id.istek_oneri_sikayet}>`,
 
-    [Q.yazilim]   : `<#${dcmodule.channel_id.yazilim_sor}>`,
-    [Q.bilgisayar]: `<#${dcmodule.channel_id.kodlama_disi_sor}>`,
-    [Q.diger]     : `<#${dcmodule.channel_id.kafamda_deli_sorular}>`,
+    [Q.yazilim]   : `<#${tp.channel_id.yazilim_sor}>`,
+    [Q.bilgisayar]: `<#${tp.channel_id.kodlama_disi_sor}>`,
+    [Q.diger]     : `<#${tp.channel_id.kafamda_deli_sorular}>`,
 
     [Q.acil]   : ``,
     [Q.sabirli]: ``,
 
-    [Q.roller]: `<#${dcmodule.channel_id.roller}> ve <#${dcmodule.channel_id.bir_bak_buraya}>`,
+    [Q.roller]: `<#${tp.channel_id.roller}> ve <#${tp.channel_id.bir_bak_buraya}>`,
     [Q.bitir]: ``,
 };
 
@@ -158,7 +158,7 @@ const get_enum_keys = <T extends object>(enum_t : T) : (keyof T)[] => {
 for (const key of get_enum_keys(d)) {
     const expected = d[key].length;
     const actual   = choice_labels[key].length;
-    assert(expected == actual);
+    assert(expected === actual);
 }
 // empty scope
 {
@@ -166,9 +166,9 @@ for (const key of get_enum_keys(d)) {
     const actual   = get_enum_keys(embed_bodies).length;
     const actual2  = get_enum_keys(choice_labels).length;
     const actual3  = get_enum_keys(channel_mentions).length;
-    assert(expected == actual);
-    assert(expected == actual2);
-    assert(expected == actual3);
+    assert(expected === actual);
+    assert(expected === actual2);
+    assert(expected === actual3);
 }
 export const c = new class hosbuldum extends dfa_command<Q>
 {
@@ -177,10 +177,10 @@ export const c = new class hosbuldum extends dfa_command<Q>
     {
 
         const permissions = [
-            { id: dcmodule.role_id_tp_uyesi, type: ApplicationCommandPermissionTypes.ROLE, permission: false, },
-            { id: dcmodule.role_id_gozalti,  type: ApplicationCommandPermissionTypes.ROLE, permission: false, },
-            { id: dcmodule.role_id_kidemli,  type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
-            { id: dcmodule.role_id_kurucu,   type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
+            { id: tp.role_id_tp_uyesi, type: ApplicationCommandPermissionTypes.ROLE, permission: false, },
+            { id: tp.role_id_gozalti,  type: ApplicationCommandPermissionTypes.ROLE, permission: false, },
+            { id: tp.role_id_kidemli,  type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
+            { id: tp.role_id_kurucu,   type: ApplicationCommandPermissionTypes.ROLE, permission: true, },
         ];
         super(
             Object(Q),
@@ -188,7 +188,8 @@ export const c = new class hosbuldum extends dfa_command<Q>
             Q.basla,
             hosbuldum.name, 
             "Türk programcılar onay sistemini başlatır",
-            permissions);
+            permissions,
+            true);
     }
 
     public async get_choice_index(interaction: click_interaction)
@@ -208,9 +209,9 @@ export const c = new class hosbuldum extends dfa_command<Q>
         const question = embed_bodies[new_q];
         const choices  = choice_labels[new_q];
 
-        let buttons = new MessageActionRow()
+        const buttons = new MessageActionRow()
             .addComponents(
-                choices.map((x, i) => new MessageButton().setCustomId(i+"").setLabel(x).setStyle(MessageButtonStyles.PRIMARY))
+                choices.map((x, _i) => new MessageButton().setCustomId(_i+"").setLabel(x).setStyle(MessageButtonStyles.PRIMARY))
             );
 
         const embed = new MessageEmbed()
@@ -219,27 +220,27 @@ export const c = new class hosbuldum extends dfa_command<Q>
 
         const image_path = images[new_q];
         if (image_path !== undefined) {
-            if (new_q == Q.bitir)
+            if (new_q === Q.bitir)
                 embed.setThumbnail(image_path);
             else
                 embed.setImage(image_path);
         }
 
         // if its beginning, send panel as reply
-        if (new_q == Q.basla) {
+        if (new_q === Q.basla) {
             const response = { ephemeral: true, embeds: [embed], components: [buttons] };
             await interaction.reply(response);
         }
         // if its not beginning, send panel as update
         else {
             interaction = interaction as ButtonInteraction;
-            const response = { embeds: [embed], components: choices.length == 0 ? [] : [buttons]};
+            const response = { embeds: [embed], components: choices.length === 0 ? [] : [buttons]};
             await interaction.update(response);
         }
         (async (_i) => {
             const cid = process.env.DCBOT_DEBUG !== undefined
-                ? dcmodule.channel_id.tpbot_test_odasi
-                : dcmodule.channel_id.sicardo_nvidia
+                ? tp.channel_id.tpbot_test_odasi
+                : tp.channel_id.sicardo_nvidia
                 ;
             const channel = await interaction.guild?.channels.fetch(cid);
             if (channel?.isText()) {
@@ -250,19 +251,19 @@ export const c = new class hosbuldum extends dfa_command<Q>
                     ;
                 await channel.send(msg);
             }
-        })(i);
+        })(i).catch(this.log.error.bind(this.log));
 
         // if its end, give user the role
-        if (new_q == Q.bitir) {
+        if (new_q === Q.bitir) {
             // give user role
             const guild_user = await interaction.guild?.members.fetch(interaction.user);
             if (!guild_user) {
                 this.log.error("Can't fetch guild user at the end of hosbuldum command", command.get_user_info(interaction.user));
                 return status.finished;
             }
-            await guild_user.roles.add(dcmodule.role_id_tp_uyesi);
+            await guild_user.roles.add(tp.role_id_tp_uyesi);
             return status.finished;
         }
         return status.in_progress;
     }
-}
+}()

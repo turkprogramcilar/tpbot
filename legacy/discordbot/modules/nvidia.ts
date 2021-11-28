@@ -6,8 +6,9 @@ const parser    = require("../../../../legacy/discordbot/cmdparser");
 const db        = require("../../../../legacy/discordbot/mongodb");
 const tools     = require("../../../../legacy/discordbot/tools");
 import { log } from '../log';
+import { tp } from "../tp";
 
-const nvidia_link : string = "https://tenor.com/view/linus-linus-torvalds-nvidia-fuck-you-gif-18053606";
+const nvidia_link : string = tp.gifs.nvidia;
 const nvidia = [
     '🇳',
     '🇻',

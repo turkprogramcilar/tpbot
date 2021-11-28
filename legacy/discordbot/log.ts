@@ -12,4 +12,5 @@ export class log {
     public info(msg : string, user? : user_info) { console.log( this.format(msg, user) ); }
     public warn(msg : string, user? : user_info) { console.warn( this.format(msg, user) ); }
     public error(msg : string | unknown, user? : user_info) { console.error( this.format(msg, user) ); }
+    public verbose(msg: string, ...args: any[]) { if (process.env.DCBOT_VERBOSE !== undefined) this.info(msg + args.map(x => "\n"+JSON.stringify(x))); }
 }

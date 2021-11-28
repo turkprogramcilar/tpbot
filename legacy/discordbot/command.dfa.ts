@@ -1,15 +1,16 @@
-import { ApplicationCommandPermissionData, ButtonInteraction, CommandInteraction, SelectMenuInteraction } from "discord.js";
-import { command } from "./command";
-import { command_user_state, known_interactions } from "./module";
+import { ApplicationCommandPermissionData, ButtonInteraction, CommandInteraction, ContextMenuInteraction, SelectMenuInteraction } from "discord.js";
+import { operation } from "./command";
+import { slash_command } from "./command.slash";
+import { command_user_state, known_interactions } from "./commander";
 
-export type click_interaction = ButtonInteraction | SelectMenuInteraction;
+export type click_interaction = ButtonInteraction | SelectMenuInteraction | ContextMenuInteraction;
 
 export enum status {
     in_progress,
     finished,
 }
 
-export abstract class dfa_command<Q extends number> extends command
+export abstract class dfa_command<Q extends number> extends slash_command
 {
     public constructor(
         private Q_keys: number[],
@@ -17,9 +18,10 @@ export abstract class dfa_command<Q extends number> extends command
         private readonly start_q : Q,
         command_name: string, 
         description: string, 
-        permissions?: ApplicationCommandPermissionData[])
+        permissions?: ApplicationCommandPermissionData[],
+        everyone: boolean = false)
     {
-        super(command_name, description, permissions);
+        super(command_name, description, permissions, everyone);
     }
 
     public abstract get_choice_index(interaction: click_interaction): Promise<Q | undefined>
@@ -34,11 +36,11 @@ export abstract class dfa_command<Q extends number> extends command
         return n as Q;
     }
 
-    public async execute(interaction: known_interactions, state: command_user_state): Promise<command_user_state | null> 
+    public async execute(interaction: known_interactions, state: command_user_state): Promise<operation<command_user_state | null>> 
     {
         if (false === state.state in this.Q_keys) {
             this.enum_error(state.state, "state.state", "Q_keys", interaction)
-            return null;
+            return operation.complete;
         }
 
         const old_q = state.state as Q;
@@ -52,12 +54,12 @@ export abstract class dfa_command<Q extends number> extends command
         else {
             i = await this.get_choice_index(interaction);
             if (i === undefined)
-                return null;
+                return operation.complete;
 
             // check if index is valid for the given state
             if (false === i in this.d[old_q]) {
                 this.enum_error(i, "n", "this.d[old_q]", interaction)
-                return null;
+                return operation.complete;
             }
             new_q = this.d[old_q][i];
         }
@@ -65,11 +67,11 @@ export abstract class dfa_command<Q extends number> extends command
         state.state = new_q;
 
         try {
-            return await this.process_new_state(new_q, old_q, i, interaction) == status.in_progress ? state : null;
+            return await this.process_new_state(new_q, old_q, i, interaction) == status.in_progress ? operation.on(state) : operation.complete;
         }
         catch (error) {
             this.log.error(error);
-            return null;
+            return operation.complete;
         }
     }
 }

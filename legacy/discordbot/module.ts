@@ -1,11 +1,9 @@
 // package imports
-import { REST } from '@discordjs/rest';
-import { Routes } from 'discord-api-types/v9';
 import { assert } from "console";
-import { Message, Client, User, PartialUser, MessageReaction, Presence, Guild, TextChannel, Interaction, CommandInteraction, Collection, ApplicationCommandPermissionData, ButtonInteraction, SelectMenuInteraction } from "discord.js";
-import { SlashCommandBuilder } from '@discordjs/builders';
+import { Message, Client, User, PartialUser, MessageReaction, Presence, Guild, TextChannel, Interaction, GuildMember } from "discord.js";
 import { log } from './log';
-import { command } from './command';
+import { tp } from "./tp";
+
 // local imports
 const db        = require("../../../legacy/discordbot/mongodb");
 const tools     = require("../../../legacy/discordbot/tools");
@@ -21,18 +19,6 @@ const constants = require("../../../legacy/discordbot/constants");
 export type user_state_value = string | number | boolean | undefined;
 export type module_user_state = {[key : string] : user_state_value};
 
-export type known_interactions = CommandInteraction | ButtonInteraction | SelectMenuInteraction
-export interface command_module {
-    data : SlashCommandBuilder,
-    execute : (interaction : known_interactions, state : command_user_state) => Promise<command_user_state | null>,
-    permissions : ApplicationCommandPermissionData[] | undefined,
-};
-export interface command_user_state {
-    command_id : string,
-    state : number,
-}
-type user_id = string;
-
 const UNNAMED_MODULE : string = "unnamed_module";
 // module state users for dc users
 const MS_DCUSERS : string = "dcusers";
@@ -40,38 +26,10 @@ const MS_BULK : string = "bulkmessages";
 const FORBIDDEN_KEYS : string[] = [MS_DCUSERS, MS_BULK];
 
 export class dcmodule {
-    // some constants
-    static readonly guild_id_tp     : string = constants.sid.tpdc;
-    static readonly role_id_kurucu  : string = constants.rid.kurucu;
-    static readonly role_id_kidemli : string = constants.rid.kidemli;
-    static readonly role_id_tp_uyesi: string = constants.rid.tp_uyesi;
-    static readonly role_id_gozalti : string = constants.rid.gozalti;
-    //
-    static readonly channel_id = {
-        bir_bak_buraya: constants.cid.bir_bak_buraya,
-        roller: constants.cid.roller,
-        // soru sor
-        yazilim_sor: constants.cid.yazilim_sor,
-        kafamda_deli_sorular: constants.cid.kafamda_deli_sorular,
-        kodlama_disi_sor: constants.cid.kodlama_disi_sor,
-        // main
-        sohbet: constants.cid.sohbet,
-        istek_oneri_sikayet: constants.cid.istek_oneri_sikayet,
-        // tp oyunlari
-        sicardo_nvidia: "782713536924221469",
-        // paylasimlar
-        proje_paylas: constants.cid.proje_paylas,
-        // yonetim
-        yonetim_dedikodu: constants.cid.yonetim_dedikodu,
-        // tpbot
-        tpbot_test_odasi: constants.cid.tpbot_test_odasi,
-    }
 
     // fields
-    protected commands = new Collection<string, command_module>();
     protected db_fetch_start : Date | undefined = new Date();
     protected state: any;
-    private command_states : { [key: user_id] : command_user_state } = {};
     private promises_module_state_queue : Promise<void>[] = [];
 
     // public readonly fields
@@ -79,7 +37,11 @@ export class dcmodule {
     // ctor
     constructor(
         protected module_name : string = UNNAMED_MODULE, 
-        protected administative_commands : boolean = false) { }
+        protected administative_commands : boolean = false,
+        private has_commands: boolean = true) 
+    {
+
+    }
     
     // props
     public get_client() : Client { 
@@ -87,13 +49,6 @@ export class dcmodule {
     }
     public is_admin(user_id : string) : boolean {
         return constants.groups.admins.includes(user_id);
-    }
-
-    // static methods
-    static enum_keys<T extends Object>(enum_t : T) : number[] {
-        let o = Object.keys(enum_t);
-        o = o.filter(x => !isNaN(Number(x)) ) ;
-        return  o as unknown[] as number[];
     }
 
     // init for module loader system defined in bot.js
@@ -128,177 +83,41 @@ export class dcmodule {
         await this.after_init();
     }
     // called after bot.js init (can be overridden by child modules)
-    public async after_init() {
-
-    }
+    public async after_init() { }
     // on_event for receiving events from bot.js
     public async on_event(evt: string, args: any) {
 
         switch(evt) {
-            case 'ready'                : await this.on_ready();                              break;
-            case 'message'              : await this.on_message(args.msg);                    break;
-            case 'presenceUpdate'       : await this.on_presence_update(args[0], args[1]);    break;
-            case 'interactionCreate'    : await this.on_interaction_create(args.interaction); break;
+        case 'ready'            : await this.on_ready();                             break;
+        case 'message'          : await this.on_message(args.msg);                   break;
+        case 'messageUpdate'    : await this.on_update(args.msgOld, args.msgNew);    break;
+        case 'presenceUpdate'   : await this.on_presence_update(args[0], args[1]);   break;
+        case 'interactionCreate': await this.on_interaction_create(args.interaction);break;
+        case 'guildMemberAdd'   : await this.on_guild_member_add(args.member);       break;
+        case 'guildMemberRemove': await this.on_guild_member_remove(args.member);    break;
 
-            case 'messageReactionAdd':
-            case 'messageReactionRemove':
-                const reaction : MessageReaction = args.reaction;
-                const user : User | PartialUser = args.user;
-                if (evt == 'messageReactionAdd')                    
-                    await this.on_reaction_add(reaction, user);
-                else
-                    await this.on_reaction_remove(reaction, user);
-            break;
+        case 'messageReactionAdd':
+        case 'messageReactionRemove':
+            const reaction : MessageReaction = args.reaction;
+            const user : User | PartialUser = args.user;
+            if (evt == 'messageReactionAdd')                    
+                await this.on_reaction_add(reaction, user);
+            else
+                await this.on_reaction_remove(reaction, user);
+        break;
         }
     }
-    protected async on_ready() {
-        // load commands
-        if (this.state.command_support !== true)
-            return;
-
-        const id = this.get_client().user?.id;
-        const token = this.get_client().token;
-        if (!id || !token) {
-            throw new Error("can't register commands. id or token is null");
-        }
-        const tpid = dcmodule.guild_id_tp
-        const rest = new REST({ version: '9' }).setToken(token);
-        (async () => {
-        try {
-            this.log.info('Started refreshing application (/) commands.');
-
-            const root = `build/legacy/discordbot/modules/${this.module_name}/commands/`;
-            const commands_folder_files : string[] = tools.get_files_sync(root);
-            const commandFiles = commands_folder_files.filter(file => file.endsWith('.js'));
-
-            for (const file of commandFiles) {
-                const command : command_module = require("../../../"+root+file.substring(0, file.length-3)).c;
-                // Set a new item in the Collection
-                // With the key as the command name and the value as the exported module
-                this.commands.set(command.data.name, command);
-                this.log.info("Require/Loading command file: "+file);
-            }
-            const response = await rest.put(
-                Routes.applicationGuildCommands(id, tpid),
-                { body: this.commands.map(x => x.data.toJSON()) },
-            );
-
-            const res_arr = response as any[];
-            if (!response || !res_arr) {
-                throw Error("invalid response");
-            }
-
-            if (commandFiles.length != res_arr.length) {
-                throw Error("response doesn't match with command length we sent.");
-            }
-
-            const switch_to_ids = new Collection<string, command_module>();
-            let tasks : Promise<void>[] = res_arr.map(async json => {
-                const command_id : string = json.id;
-                const name : string = json.name;
-                const command_module = this.commands.get(name);
-                if (!command_module) {
-                    this.log.error(`json response with command name ${name} is not found on our side.`);
-                    return;
-                }
-                switch_to_ids.set(command_id, command_module);
-                // check if command has defined an permissions for its commands
-                if (command_module.permissions) {
-
-                    const client = this.get_client(); 
-                    if (!client.application?.owner) await client.application?.fetch();
-
-                    const app_command = await client.guilds.cache.get(dcmodule.guild_id_tp)?.commands.fetch(command_id);
-                    if (!app_command) throw Error ("Can't fetch application command");
-                    
-                    await app_command.permissions.set({
-                        permissions: command_module.permissions
-                    });
-                }
-            });
-            await Promise.all(tasks);
-
-            this.commands = switch_to_ids;
-
-            this.log.info('Successfully reloaded application (/) commands.');
-        }
-        catch (error) {
-            this.log.error(error);
-            throw Error("Can't register commands in module.ts body");
-        }})();
-    }
-    protected async on_interaction_create(interaction : Interaction) {
-
-        // process commands
-        if (this.state.command_support !== true)
-            return;
-
-        const user_id = interaction.user.id;
-        const user_info = command.get_user_info(interaction.user);
-
-        let command_module: command_module | undefined;
-        let state: command_user_state;
-
-        if (interaction instanceof CommandInteraction) {
-
-            const comm_id = interaction.commandId;
-            command_module = this.commands.get(comm_id);
-            if (!command_module) {
-                this.log.warn(`command id[${comm_id}] is not found in commands when first executing command`, user_info)
-                return;
-            }
-    
-            // if user already started a command, dont start another one
-            state = this.command_states[user_id] 
-            if (state)
-                return await interaction.reply({content: "Lütfen önceden çalıştırdığınız komutu tamamlayınız.", ephemeral: true });
-            
-            // if user_id exists already, it will be overridden with state = 0
-            // so that it pushes user to the first stage of the command
-            state = this.command_states[user_id] = {
-                command_id: comm_id,
-                state: 0,
-            }
-        }
-        else if (interaction.isButton() || interaction.isSelectMenu()) {
-            
-            // assuming button is always triggered from a command
-            const user_state = this.command_states[user_id];
-
-            if (undefined === user_state) {
-                this.log.warn("A button or select menu interaction's user_state cannot be found.", user_info);
-                await command.respond_interaction_failure_to_user(interaction);
-                return;
-            }
-
-            const comm_id = user_state.command_id;
-            command_module = this.commands.get(comm_id);
-            if (undefined === command_module) {
-                this.log.warn(`command id[${comm_id}] is not found in commands when interacting with button or select menu`, user_info)
-                return;
-            }
-            
-            state = this.command_states[user_id];
-        }
-        else {
-
-            this.log.error("An interaction neither button, select menu nor command is received", user_info)
-            return;
-        }
-
-        try {
-            const command_complete = await command_module.execute(interaction, state) === null;
-            if (command_complete) 
-                delete this.command_states[user_id];
-
-        } catch (error) {
-            this.log.error(error, user_info);
-            await command.respond_interaction_failure_to_user(interaction);
-        }
+    protected async on_guild_member_add(member: GuildMember) { }
+    protected async on_guild_member_remove(member: GuildMember) { }
+    protected async on_ready() { }
+    protected async on_update(old: Message, newM: Message) { }
+    protected async on_interaction_create(interaction : Interaction)
+    {
+        this.log.verbose("MODULE.TS ON_INTERACTION_CREATE", interaction);
     }
     protected async on_message(msg : Message)
     {
-        this.administrative_channel_adjust(msg);
+        await this.administrative_channel_adjust(msg);
     }
     protected async on_reaction_add(reaction : MessageReaction, user : User | PartialUser) {}
     protected async on_reaction_remove(reaction : MessageReaction, user : User | PartialUser) {}
@@ -310,6 +129,40 @@ export class dcmodule {
     }
     public fetch_guild_member(guild : Guild, user_id : string) { 
         return guild.members.cache.get(user_id);
+    }
+    public async fetch_channel(channel_id: string, retry: number = 5)
+    {
+        try {
+            const channel = await this.get_client().channels.fetch(channel_id);
+            if (!channel) {
+                throw new Error("channel is null");
+            }
+            if (!channel.isText()) {
+                throw new Error("channel is not text");
+            }
+            const text_channel = channel as TextChannel;
+            await text_channel.messages.fetch();
+
+        } catch (error) {
+
+            retry -= 1;
+            this.log.warn(`An error occurred in ${this.fetch_channel.name}... Will retry if retry[${retry}] != 0`);
+            this.log.error(error);
+            if (retry !== 0)
+                setTimeout(() => this.fetch_channel(channel_id, retry), 1000);
+        }
+    
+    }
+
+    // p2p
+    public async p2p_sicardo(id: string, msg_id: string, chan_id: string)
+    {
+        const p2p = await (await this.get_client().guilds.fetch(tp.guild_id_tp)).channels.fetch(tp.channel_id.tpbot_p2p);
+        try {
+            await (p2p as TextChannel).send(`sicardo_nvidia ${id} ${chan_id} ${msg_id}`);
+        } catch(error) {
+            this.log.error("Can't send sicardo to p2p");
+        }         
     }
 
     // database and module state methods
@@ -391,6 +244,14 @@ export class dcmodule {
     }
     protected is_word(msg : Message, word : string) : boolean {
         return parser.is(msg, word);
+    }
+    protected is_regex(msg : Message, regex: RegExp) : RegExpMatchArray | null {
+        let result : RegExpMatchArray | null = null;
+        const save = msg.content;
+        parser.r_arg(msg, regex, (x : any) => result = x);
+        if (result)
+            return save.match(regex);
+        return result;
     }
     protected async switch_word(msg : Message, cases : [string, () => void | Promise<void>][]) : Promise<boolean> {
         for (const [word, func] of cases) {

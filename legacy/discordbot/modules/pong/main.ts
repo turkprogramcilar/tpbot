@@ -1,11 +1,10 @@
 import { Message, MessageReaction, PartialUser, Presence, User } from "discord.js";
-import { dcmodule } from "../../module";
+import { commander } from "../../commander";
 
-export const m = new class pong extends dcmodule {
+export const m = new class pong extends commander {
     
-    constructor() { super(pong.name, false); }
+    constructor() { super(pong.name); }
     
-    public async after_init() { }
     public async on_message(msg : Message) {
 
         // if message is not prefixed, return
@@ -15,6 +14,4 @@ export const m = new class pong extends dcmodule {
         if (this.is_word(msg, "ping"))
             return await this.affirm(msg, "pong");
     }
-    public async on_reaction(reaction : MessageReaction, user : User | PartialUser) { }
-    public async on_presence_update(old_p: Presence | undefined, new_p: Presence) { }
 };
