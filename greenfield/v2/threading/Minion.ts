@@ -25,7 +25,7 @@ export class Minion<T>
 private log: Print;
 private ack: boolean = false;
 private worker: Worker;
-constructor(public name: string, path: string, 
+constructor(public name: string, public path: string, 
     errorCallback: (error: Error) => void, public data?: T)
 {
     this.log = new Print(`Minion<${name}>`);
@@ -36,6 +36,10 @@ constructor(public name: string, path: string,
     this.once("awaken", () => {
         this.ack = true;
     });
+}
+kill()
+{
+    return this.worker.terminate();
 }
 async awaken()
 {

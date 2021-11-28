@@ -1,5 +1,5 @@
 import { Client, Message } from "discord.js";
-import { Helper as H } from "./common/Helper";
+import { Helper as H, Helper } from "./common/Helper";
 import { MinionFile } from "./threading/MinionFile";
 import { TpbotModule } from "./TpbotModule";
 
@@ -13,7 +13,7 @@ constructor(client: Client, private kernelsMinion: MinionFile)
 {
     super(TpbotShell.name, client);
 }
-private async updateTerminal(id: userId, append: string)
+private async updateTerminal(id: userId, append: string, user: string)
 {
     let [buffer, shell] = this.sessions[id];
     if (buffer === undefined || shell === undefined) {
@@ -22,6 +22,7 @@ private async updateTerminal(id: userId, append: string)
         return;
     }
     buffer += append;
+    buffer += this.prompt(user);
     const newMessage = await shell.reply(buffer+this.q);
     const pair: [string, Message] = [buffer, newMessage];
     this.sessions[id] = pair;
@@ -36,15 +37,16 @@ private async createSession(message: Message)
     ;
     const shell = await message.reply(buffer+this.q);
         this.sessions[id] = [buffer, shell];
-    // get countables
 
-    const append =  
-    + `\n${0} total tpbot token${H.ps(0)} ${H.ai(0)}`
+    const tokens = await this.kernelsMinion.request("ls tokens");
+    const tn = tokens.split("\n").length - 1;
+    const append = ""
+    + `\n${tn} total tpbot token${H.ps(tn)} ${H.ai(tn)}`
         + ` available in the environment.`
-    + `\n${0} bot${H.ps(0)} ${H.ai(0)} logged in.`
-    + `\n${0} freestyle modules are running`
-    + `\n${0} tpbot module${H.ps(0)} ${H.ai(0)} running`
-    await this.updateTerminal(id, append);
+    + `\n${-1} bot${H.ps(0)} ${H.ai(0)} logged in.`
+    + `\n${-1} freestyle modules are running`
+    // + `\n${tn} tpbot module${H.ps(tn)} ${H.ai(tn)} running`
+    await this.updateTerminal(id, append, user);
     return this.sessions[id]
 }
 private prompt(user: string)

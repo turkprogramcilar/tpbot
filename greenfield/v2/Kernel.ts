@@ -27,28 +27,30 @@ constructor()
 private loadTpbotModules()
 {
     this.print.info("Loading Tpbot modules.");
-    const tpbotTokens = Object.entries(process.env)
-        .filter(([k, v]) => k.startsWith("TPBOT_TOKEN"));
-    for (const [environmentKey, token] of tpbotTokens) {
+    for (const [environmentKey, token] of this.environmentKeyTokens()) {
         if (!token)
             continue;
-        this.print.info(`Summoning ${environmentKey}`)
-        this.summonTpClient(token, TpbotClient.name);
+        this.summonTpClient(token, TpbotClient.name, environmentKey);
     }
 }
 private loadFreestyles()
 {
     this.print.info("Loading Freestyle modules.");
-    const freestyleModules = (Boot.getParsedYaml().tokenMapping ?? [])
-        .map(x => x.modules?.freestyle ?? []).flat();
-    for (const freestyle of freestyleModules) {
-        this.summoner.summon(
-            Path.freestyle(freestyle),
-            freestyle, `freestyle/${freestyle}`);
+    for (const freestyle of this.yamlFreestyles()) {
+        this.summonFreestyle(freestyle);
     }
 }
-private summonTpClient(botToken: string, botName: string)
+private summonFreestyle(freestyle: string)
 {
+    this.print.info(`Summoning ${freestyle}`);
+    this.summoner.summon(
+        Path.freestyle(freestyle),
+        freestyle, `freestyle/${freestyle}`);
+}
+private summonTpClient(botToken: string, botName: string, 
+    environmentKey: string)
+{
+    this.print.info(`Summoning ${environmentKey}`)
     let bot: Minion<BotData>;
     bot = this.summoner.summon(Path.latestVersion(TpbotClient.name),
         botName, Kernel.name, { token: botToken }, 
@@ -64,25 +66,90 @@ private handleTpClientCrash(error: Error | unknown)
 {
     this.print.exception(error);
 }
-private handleRequest(body: string, minion: Minion<BotData>)
+private async handleRequest(body: string, minion: Minion<BotData>)
 {
     const text = body;
     let buffer = "Kernel: ";
-    switch (text.substring(0, 4)) {
-    case "ping":
-        buffer += `Pong!`;
-        break;
-    case "echo":
-        if (text.length > 5 && text[4].match(/\s/)) {
-            buffer += `${text.substring(5)}`;
+    let pass: RegExpMatchArray | null;
+    // tslint:disable: no-conditional-assignment
+    if (pass = text.match(/^ping$/)) {
+        buffer += "Pong!";
+    }
+    else if (pass = text.match(/^kill\s*(\d+)$/)) {
+        const id = Number(pass[1]);
+        const result = await this.summoner.killMinion(id);
+        if (null === result)
+            buffer += `Minion with id ${id} is not found.`;
+        else
+            buffer += `Minion is terminated with exit code ${result}.`;
+    }
+    else if (pass = text.match(/^echo\s*(.+)/)) {
+        buffer += pass[1];
+    }
+    else if (pass = text.match(/^ls\s*(?:(minion)s?|(freestyle)s?|(token)s?)/)) {
+        const m = pass.filter(x=>x)[1]; // m: match
+        switch (m) {
+        case "minion":
+            buffer += this.summoner.minionInfos().reduce((a, c) => {
+                return a + `\n${c.id} - ${c.name} - ${c.path}`;
+            }, "Minions currently running in the system:");
+            break;
+        case "freestyle":
+            buffer += "Freestyle definitions in the yaml configuration:\n"
+            buffer += this.yamlFreestyles().join("\n");
+            break;
+        case "token":
+            buffer += "Tokens with prefix found in the environment:\n"
+            buffer += this.environmentKeyTokens().map(([k, v]) => k).join("\n");
+            break;
+        default:
+            throw Error("This line is impossible to match. Sort of... Unless" +
+            " a lazy developer forgets to implement the case... It's..." +
+            " terrible.");
+        }
+    }
+    else if (pass = text.match(/^init\s*(tpbot|freestyle)\s*(.+)$/)) {
+
+        switch (pass[1]) {
+
+        case "tpbot":
+
+            const keyTokens = this.environmentKeyTokens();
+            const pair = this.environmentKeyTokens()
+                    .find(([k, v]) => k===pass![2]);
+            if (pair) {
+                if (!pair[1]) {
+                    buffer += `Token is found but it has empty string value.`
+                }
+                else {
+                    this.summonTpClient(pair[1], TpbotClient.name, pair[0])
+                    buffer += `Summoning ${pair[0]}`;
+                }
+            }
+            else {
+                buffer += `${pass[1]} token is not found in the environment.`;
+            }
+            break;
+        case "freestyle":
             break;
         }
-        // else it falls to default with unknown command
-    default: 
-        buffer += `Unknown command: ${text}`; 
-        break; 
     }
+    // else if (pass = text.match(/^$/))
+    else {
+        buffer += `Unknown command: ${text}`; 
+    }
+    // tslint:enable: no-conditional-assignment
     minion.emit("response", buffer);
+}
+private yamlFreestyles()
+{
+    return (Boot.getParsedYaml().tokenMapping ?? [])
+        .map(x => x.modules?.freestyle ?? []).flat();
+}
+private environmentKeyTokens()
+{
+    return Object.entries(process.env)
+        .filter(([k, v]) => k.startsWith("TPBOT_TOKEN"));
 }
 private awaitStdin()
 {

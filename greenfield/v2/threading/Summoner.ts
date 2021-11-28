@@ -2,14 +2,38 @@ import { Print } from "../common/Print";
 import { MinionCrash } from "./MinionCrash";
 import { Minion } from "./Minion";
 import { Helper } from "../common/Helper";
+import { mapDefined } from "tslint/lib/utils";
 
 export class Summoner<T>
 {
 /*******************************************************************72*/
 public readonly print: Print;
+private lastMinionId = 0;
+private readonly minions: {[key: number]: Minion<T>} = {}
 constructor(typeName: string) 
 { 
     this.print = new Print(Summoner.name, undefined, typeName);
+}
+minionInfos()
+{
+    return Object.entries(this.minions).map(([stringId, minion]) => { return {
+        id: Number(stringId),
+        name: minion.name,
+        path: minion.path,
+    };});
+}
+/**
+ * Returns exit code if successfull, otherwise null if minion with id is not
+ * found
+ * @param id minion Id to kill
+ */
+killMinion(id: number): Promise<number> | null
+{
+    if (!this.minions[id])
+        return null;
+    const promise = this.minions[id].kill();
+    delete this.minions[id];
+    return promise;
 }
 summon(fullpath: string, minionName: string, summonerName: string, 
     data?: T, errorCallback?: (error: Error | unknown) => void,
@@ -29,12 +53,12 @@ private summonInternal(fullpath: string, minionName: string,
 {
     this.print.info(`Loading MinionFile<${minionName}> at `+fullpath);
 
-
-    const minion = new Minion<T>(minionName, fullpath,
+    const minionId = ++this.lastMinionId;
+    const minion = this.minions[minionId] = new Minion<T>(minionName, fullpath,
         (error) => { 
             if (errorCallback) 
                 errorCallback(error); 
-            const _minion = this.handleCrash(error, crash, minionName); 
+            const _minion = this.handleCrash(error, crash, minionName, minionId); 
             if (_minion && reloadCallback)
                 reloadCallback(_minion);
         }, data);
@@ -51,8 +75,10 @@ private summonInternal(fullpath: string, minionName: string,
 
     return minion;
 }
-private handleCrash(error: Error | unknown, crash: MinionCrash<T>, name: string)
+private handleCrash(error: Error | unknown, crash: MinionCrash<T>, name: string,
+    minionId: number)
 {
+    delete this.minions[minionId];
     crash.increase();
     this.print.error(`${name} has crashed.`
         + ` [crashes=${crash.count},`
