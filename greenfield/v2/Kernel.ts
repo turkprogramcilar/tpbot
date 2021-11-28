@@ -131,6 +131,14 @@ private async handleRequest(body: string, minion: Minion<BotData>)
             }
             break;
         case "freestyle":
+
+            if (this.yamlFreestyles().includes(pass[2])) {
+                this.summonFreestyle(pass[2]);
+                buffer += `Summoning ${pass[2]}`;
+            }
+            else {
+                buffer += `${pass[2]} is not defined in yaml freestyles.`;
+            }
             break;
         }
     }
