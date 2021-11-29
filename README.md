@@ -3,7 +3,7 @@
 [Türk Programcılar Discord Sunucusu Üyeleri](https://disboard.org/server/698972054740795453) tarafından geliştirilen bot
 
 ## Eski mimari
-[README.md](legacy/README.md) dosyasından eski mimari için bilgilere ulaşılabilir. TPBOT yeni mimarisinde eski mimari yüklenmesine izin vermektedir ve geriye dönük uyumludur.
+[README.md](greenfield/v2/modules/freestyle/legacy/README.md) dosyasından eski mimari için bilgilere ulaşılabilir. TPBOT yeni mimarisinde eski mimari yüklenmesine izin vermektedir ve geriye dönük uyumludur.
 
 ## Yeni mimari
 @TODO
