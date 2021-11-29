@@ -38,7 +38,9 @@ killMinion(id: number): Promise<number> | null
 }
 spawn(fullpath: string)
 {
-    spawn("python", [fullpath]);
+    const command = spawn("python", [fullpath]);
+    command.stderr.pipe(process.stderr);
+    command.stdout.pipe(process.stdout);
 }
 summon(fullpath: string, minionName: string, summonerName: string, 
     data?: T, errorCallback?: (error: Error | unknown) => void,
