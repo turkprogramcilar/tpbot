@@ -1,12 +1,11 @@
 import { Print } from "./common/Print";
 import { Summoner } from "./threading/Summoner";
-
-import readline from 'readline';
 import { Minion } from "./threading/Minion";
 import { TpbotClient } from "./TpbotClient";
-import { Boot } from "./Boot";
+import { Boot, Spawn } from "./Boot";
 import { Path } from "./common/Path";
 import { Helper } from "./common/Helper";
+import readline from 'readline';
 
 export interface BotData
 {
@@ -20,10 +19,18 @@ private readonly summoner = new Summoner<BotData>(Kernel.name);
 constructor()
 {
     this.print.info("Constructor has called");
+    this.loadSpawns();
     this.loadFreestyles();
     this.loadTpbotModules();
     this.print.info("Constructor ended");
     // this.awaitStdin();
+}
+private loadSpawns()
+{
+    this.print.info("Loading spawns.");
+    for (const spawn of this.yamlSpawns()) {
+        this.summonSpawn(spawn);
+    }
 }
 private loadTpbotModules()
 {
@@ -39,6 +46,12 @@ private loadFreestyles()
     this.print.info("Loading Freestyle modules.");
     for (const freestyle of this.yamlFreestyles()) {
         this.summonFreestyle(freestyle);
+    }
+}
+private summonSpawn(spawn: Spawn)
+{
+    if (spawn.python) {
+        this.summoner.spawn(Path.freestyleNonBuilt("python", spawn.python));
     }
 }
 private summonFreestyle(freestyle: string)
@@ -149,6 +162,10 @@ private async handleRequest(body: string, minion: Minion<BotData>)
     }
     // tslint:enable: no-conditional-assignment
     minion.emit("response", buffer);
+}
+private yamlSpawns()
+{
+    return (Boot.getParsedYaml().spawn ?? []);
 }
 private yamlFreestyles()
 {

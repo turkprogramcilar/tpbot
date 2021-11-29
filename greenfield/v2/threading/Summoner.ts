@@ -3,6 +3,7 @@ import { MinionCrash } from "./MinionCrash";
 import { Minion } from "./Minion";
 import { Helper } from "../common/Helper";
 import { mapDefined } from "tslint/lib/utils";
+import { spawn } from "child_process";
 
 export class Summoner<T>
 {
@@ -34,6 +35,10 @@ killMinion(id: number): Promise<number> | null
     const promise = this.minions[id].kill();
     delete this.minions[id];
     return promise;
+}
+spawn(fullpath: string)
+{
+    spawn("python", [fullpath]);
 }
 summon(fullpath: string, minionName: string, summonerName: string, 
     data?: T, errorCallback?: (error: Error | unknown) => void,
