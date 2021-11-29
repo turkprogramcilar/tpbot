@@ -23,7 +23,7 @@ static prefixed(env: string)
 }
 static check(env: string): boolean
 {
-    return !process.env[env];
+    return process.env[env] !== undefined;
 }
 static isRoot<T extends User | Message | null | undefined>(arg: T)
 {

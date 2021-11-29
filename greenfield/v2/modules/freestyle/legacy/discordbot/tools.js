@@ -88,11 +88,13 @@ exports.fs_exists = async file =>
         .then(() => true)
         .catch(() => false)
 
-exports.guard_iconpath = async (id) =>
-    (await exports.fs_exists(`${iconpath}/${id}.png`))
+exports.guard_iconpath = async (id) => {
+    const res = (await exports.fs_exists(`${iconpath}/${id}.png`))
      ? `${iconpath}/${id}.png`
      : `${iconpath}/undefined.png`
      ;
+    return res;
+}
 exports.read_icon = async (id) => 
     await fs.readFile(`${iconpath}/${id}.png`)
         .catch(async ()=> fs.readFile(`${iconpath}/undefined.png`))
