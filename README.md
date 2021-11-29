@@ -39,7 +39,8 @@ birbirlerini yükleyebilmeleri için gerekli klasör yollarının çözümlenmes
 gerekiyor. Burada eğer varsayılan değişirse TypeScript çıkartmasının yolu ve
 kök dizine olan uzaklığı değişeceğinden sizin kök dizine olan mesafeyi
 belirtebilmeniz için oluşturulmuştur. Varsayılan değer build/ klasörüne çıkartım
-yapıldığında `../` olmalıdır.
+yapıldığında `../` olmalıdır. Varsayılan değişmediği sürece bu tanımlamanın 
+yapılmasına gerek yoktur. 
 
 ### TPBOT_TOKEN
 TPBOT_TOKEN ile başlayan her ortam değişkeni (environment variable) sistem 

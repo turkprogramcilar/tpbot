@@ -4,12 +4,16 @@ import { Print } from "./common/Print";
 import fs from 'fs'
 import YAML from 'yaml'
 import { Path } from "./common/Path";
+export interface Spawn {
+    python?: string
+}
 interface TpbotYaml {
     shellAccess?: {
         tag: string,
         id: string,
         access: boolean
     }[],
+    spawn?: Spawn[],
     tokenMapping?: {
         tag: string,
         modules?: {

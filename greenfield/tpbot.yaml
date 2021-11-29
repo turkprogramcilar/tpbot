@@ -9,6 +9,10 @@ shellAccess:
         id: "824573651390562325"
         access: true
 
+spawn:
+    -
+        python: "PingPy.py"
+
 tokenMapping:
     # Provide bot's account TOKENs in TPBOT_TOKEN1, TPBOT_TOKEN2... TPBOT_TOKENX
     # environment values. We understand that you mean you provided a token when 
@@ -24,4 +28,4 @@ tokenMapping:
     -
         modules:
             freestyle:
-                - "legacy/main"
+                #- "legacy/main"

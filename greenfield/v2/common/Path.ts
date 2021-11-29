@@ -7,11 +7,30 @@ static root(...pathSegments: string[])
 {
     const distance = pathSegments.reduce((a,_) => a+="../", "../");
     const nested = pathSegments.join("/");
-    return path.resolve(__dirname, Helper.load("TPBOT_ROOT_DIR"), distance, nested);
+    const envRoot = "TPBOT_ROOT_DIR";
+    return path.resolve(__dirname, process.env[envRoot] ?? "../", distance, nested);
 }
-static greenfieldNonBuilt(file: string)
+static greenfieldNonBuilt(...pathSegments: string[])
 {
-    return this.root("greenfield", file);
+    // the following is the literal root.
+    return path.resolve(__dirname, "../../../../", "greenfield", ...pathSegments);
+}
+static latestVersionNonBuilt(...pathSegments: string[])
+{
+    return this.greenfieldNonBuilt("v2", ...pathSegments);
+}
+static modulesNonBuilt(...pathSegments: string[])
+{
+    return this.latestVersionNonBuilt("modules", ...pathSegments);
+}
+static tpbotNonBuilt(module: string)
+{
+    return this.modulesNonBuilt("tpbot", module.toLowerCase(),
+        "Main");
+}
+static freestyleNonBuilt(...pathSegments: string[])
+{
+    return this.modulesNonBuilt("freestyle", ...pathSegments);
 }
 static greenfield(...pathSegments: string[])
 {
