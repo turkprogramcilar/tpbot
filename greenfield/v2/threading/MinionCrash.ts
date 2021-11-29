@@ -19,7 +19,7 @@ increase(): void
 {
     if (null === this.lastTimestamp) {
         this.lastTimestamp = new Date().getTime();
-        this.perMinute = Infinity;
+        this.perMinute = NaN;
         this.count = 1;
     }
     else { 
