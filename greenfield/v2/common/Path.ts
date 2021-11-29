@@ -5,7 +5,11 @@ export abstract class Path
 {
 static realRoot(...pathSegments: string[])
 {
-    return path.resolve(__dirname, "../../../../", ...pathSegments);
+    // Path.js will be in built folder.
+    const builtDistance = "../";
+    const pathTsDistance = "../../../"
+    return path.resolve(__dirname, builtDistance, pathTsDistance,
+        ...pathSegments);
 }
 static greenfieldNonBuilt(...pathSegments: string[])
 {
@@ -31,14 +35,15 @@ static freestyleNonBuilt(...pathSegments: string[])
 /*******************************************************************72*/
 static builtRoot(...pathSegments: string[])
 {
-    const distance = pathSegments.reduce((a,_) => a+="../", "../");
-    const nested = pathSegments.join("/");
-    const envRoot = "TPBOT_ROOT_DIR";
-    return path.resolve(__dirname, process.env[envRoot] ?? "../", distance, nested);
+    return this.realRoot("build", ...pathSegments);
 }
 static builtGreenfield(...pathSegments: string[])
 {
     return this.builtRoot("greenfield", ...pathSegments);
+}
+static builtGreenfieldTests(...pathSegments: string[])
+{
+    return this.builtRoot("greenfield.tests", ...pathSegments);
 }
 static builtLatestVersion(...pathSegments: string[])
 {

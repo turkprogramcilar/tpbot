@@ -1,5 +1,6 @@
 import { expect } from "chai";
 import { Helper } from "../greenfield/v2/common/Helper";
+import { Path } from "../greenfield/v2/common/Path";
 import { Summoner } from "../greenfield/v2/threading/Summoner";
 
 describe("Summoner", () => 
@@ -14,7 +15,7 @@ it("updates minion name when minion requests it to do so", async () =>
     const summoner = new Summoner("Test");
     const minionNameOld = "imp";
     const masterName = "master";
-    const minion = summoner.summon("./../../tpbot.tests/Summoner.imp",
+    const minion = summoner.summon(Path.builtGreenfieldTests("Summoner.imp"),
         minionNameOld, masterName, undefined, summoner.print.error.bind(summoner.print));
     
     expect(minion.name).to.equal(minionNameOld);
