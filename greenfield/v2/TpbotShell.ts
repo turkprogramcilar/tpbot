@@ -68,7 +68,7 @@ private hasArg(text: string, length: number)
     return text.length > length && text[length].match(/\s/);
 }
 /*******************************************************************72*/
-protected async textMessage(message: Message)
+protected async directMessage(message: Message)
 {
     if (false === H.isRoot(message))
         return;

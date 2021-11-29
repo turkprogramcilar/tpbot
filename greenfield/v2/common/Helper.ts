@@ -16,6 +16,11 @@ static load(env: string): string
     }
     return loaded;
 }
+static prefixed(env: string)
+{
+    return Object.entries(process.env)
+        .filter(([k, v]) => k.startsWith(env));
+}
 static check(env: string): boolean
 {
     return !process.env[env];

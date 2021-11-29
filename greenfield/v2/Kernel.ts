@@ -6,6 +6,7 @@ import { Minion } from "./threading/Minion";
 import { TpbotClient } from "./TpbotClient";
 import { Boot } from "./Boot";
 import { Path } from "./common/Path";
+import { Helper } from "./common/Helper";
 
 export interface BotData
 {
@@ -156,8 +157,7 @@ private yamlFreestyles()
 }
 private environmentKeyTokens()
 {
-    return Object.entries(process.env)
-        .filter(([k, v]) => k.startsWith("TPBOT_TOKEN"));
+    return Helper.prefixed("TPBOT_TOKEN");
 }
 private awaitStdin()
 {

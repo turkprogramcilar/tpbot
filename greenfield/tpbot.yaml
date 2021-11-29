@@ -9,8 +9,6 @@ shellAccess:
         id: "824573651390562325"
         access: true
 
-shellBots:
-
 tokenMapping:
     # Provide bot's account TOKENs in TPBOT_TOKEN1, TPBOT_TOKEN2... TPBOT_TOKENX
     # environment values. We understand that you mean you provided a token when 

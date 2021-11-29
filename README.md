@@ -22,10 +22,11 @@ yapıldığında `../` olmalıdır.
 TPBOT_TOKEN ile başlayan her ortam değişkeni (environment variable) sistem 
 tarafından TOKEN olarak kabul edilir. Örneğin:
     `TPBOT_TOKEN`    `TPBOT_TOKEN123`    `TPBOT_TOKEN_BOT`
-Birden fazla TOKEN belirtmeniz dahilinde tüm bot hesapları `tpbot.yaml` dosyası 
-altında modül yükleme görevi tanımlanmışsa `tokenMapping` kısmında veya 
-`shellBots` altında tanımlanmışsa her biri ilgili görev için yüklenecektir.
 
+### TPBOT_SHELL_TOKEN
+TPBOT_SHELL_TOKEN ile başlayan her ortam değişkeni (environment variable) sistem 
+tarafından TOKEN olarak kabul edilir. Örneğin:
+    `TPBOT_SHELL_TOKEN`    `TPBOT_SHELL_TOKEN123`    `TPBOT_SHELL_TOKEN_BOT`
 ## tpbot.yaml ayar dosyası
 ### shellBots
 Shell için kullanılacak olan bot hesabını sunucuya sokmanız gerekmez.

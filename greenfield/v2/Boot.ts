@@ -10,7 +10,6 @@ interface TpbotYaml {
         id: string,
         access: boolean
     }[],
-    shellBots?: string[], 
     tokenMapping?: {
         tag: string,
         modules?: {
