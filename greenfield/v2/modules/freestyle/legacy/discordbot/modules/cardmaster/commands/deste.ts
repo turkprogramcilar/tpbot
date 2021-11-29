@@ -58,16 +58,28 @@ const card_embed = (no: card_no) => {
 export const c = new class deste extends slash_command
 {
 	public constructor() {
-		super(deste.name, "Kart oynama panelini açar");
+		super(deste.name, "Kart oynama panelini açar", undefined, undefined,
+		(s) => s.addBooleanOption(o => o
+			.setDescription("Yeni veya eski set, varsayilan eski")
+			.setName("yeni")) as SlashCommandBuilder
+		);
 	}
 
 	public async execute(interaction: known_interactions, state: command_user_state): Promise<operation<command_user_state | null>>
 	{
+		const yeni = !(interaction instanceof CommandInteraction)
+			? 0
+			: !interaction.options.getBoolean("yeni", false) 
+				? 0
+				: 1
+				;
+			;
+		const s = yeni * 25;
 		const menu = new MessageActionRow().addComponents(new MessageSelectMenu()
 			.setCustomId("menu")
 			.setPlaceholder("Kart seç")
 			.addOptions(
-				helper.get_enum_keys(card_no).map((i: card_no) => {
+				helper.get_enum_keys(card_no).slice(0 + s, 25 + s).map((i: card_no) => {
 					return { label: cards[i].title, value: i.toString(), };
 				})
 			),
@@ -91,6 +103,8 @@ export const c = new class deste extends slash_command
 			}
 			response.embeds = [card_embed(no)];
 			state.state = no;
+			response.components[0] = interaction.message.components?.[0] ??
+				response.components[0];
 			await interaction.update(response);
 		}
 		else if (interaction instanceof ButtonInteraction) {
