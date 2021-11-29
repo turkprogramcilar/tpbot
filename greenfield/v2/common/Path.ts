@@ -3,17 +3,21 @@ import { Helper } from "./Helper";
 export abstract class Path
 /*******************************************************************72*/
 {
-static root(...pathSegments: string[])
+static builtRoot(...pathSegments: string[])
 {
     const distance = pathSegments.reduce((a,_) => a+="../", "../");
     const nested = pathSegments.join("/");
     const envRoot = "TPBOT_ROOT_DIR";
     return path.resolve(__dirname, process.env[envRoot] ?? "../", distance, nested);
 }
+static realRoot(...pathSegments: string[])
+{
+    return path.resolve(__dirname, "../../../../", ...pathSegments);
+
+}
 static greenfieldNonBuilt(...pathSegments: string[])
 {
-    // the following is the literal root.
-    return path.resolve(__dirname, "../../../../", "greenfield", ...pathSegments);
+    return this.realRoot("greenfield", ...pathSegments);
 }
 static latestVersionNonBuilt(...pathSegments: string[])
 {
@@ -32,26 +36,26 @@ static freestyleNonBuilt(...pathSegments: string[])
 {
     return this.modulesNonBuilt("freestyle", ...pathSegments);
 }
-static greenfield(...pathSegments: string[])
+static builtGreenfield(...pathSegments: string[])
 {
     return path.resolve(__dirname, "../../", ...pathSegments);
 }
-static latestVersion(...pathSegments: string[])
+static builtLatestVersion(...pathSegments: string[])
 {
-    return this.greenfield("v2", ...pathSegments);
+    return this.builtGreenfield("v2", ...pathSegments);
 }
-static modules(...pathSegments: string[])
+static builtModules(...pathSegments: string[])
 {
-    return this.latestVersion("modules", ...pathSegments);
+    return this.builtLatestVersion("modules", ...pathSegments);
 }
-static tpbot(module: string)
+static builtTpbotModules(module: string)
 {
-    return this.modules("tpbot", module.toLowerCase(),
+    return this.builtModules("tpbot", module.toLowerCase(),
         "Main");
 }
-static freestyle(...pathSegments: string[])
+static builtFreestyle(...pathSegments: string[])
 {
-    return this.modules("freestyle", ...pathSegments);
+    return this.builtModules("freestyle", ...pathSegments);
 }
 /*******************************************************************72*/
 }

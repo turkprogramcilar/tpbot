@@ -58,7 +58,7 @@ private summonFreestyle(freestyle: string)
 {
     this.print.info(`Summoning ${freestyle}`);
     this.summoner.summon(
-        Path.freestyle(freestyle),
+        Path.builtFreestyle(freestyle),
         freestyle, `freestyle/${freestyle}`);
 }
 private summonTpClient(botToken: string, botName: string, 
@@ -66,7 +66,7 @@ private summonTpClient(botToken: string, botName: string,
 {
     this.print.info(`Summoning ${environmentKey}`)
     let bot: Minion<BotData>;
-    bot = this.summoner.summon(Path.latestVersion(TpbotClient.name),
+    bot = this.summoner.summon(Path.builtLatestVersion(TpbotClient.name),
         botName, Kernel.name, { token: botToken }, 
         (error) => this.handleTpClientCrash(error),
         (minion) => this.initShellListeners(minion));
