@@ -23,7 +23,7 @@ const db_do = async (f, getf=x=>x) => {
     }
 }
 const db_install_table = (tb) => async(db) => {
-    const file = await fs.readFile("./discordbot/data/"+tb+".json");
+    const file = await fs.readFile(__root+"resources/mongodb/data/"+tb+".json");
     const json = JSON.parse(file);
     const collections = (await db.listCollections().toArray()).map(x=>x.name);
     const installed = collections.includes(tb);

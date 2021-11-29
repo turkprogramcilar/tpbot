@@ -125,8 +125,10 @@ moduletb= "module_states" + (consts.env.debug ? "_debug" : "");
 alltb   = [itemstb, levelstb, /*cardstb card.json is deleted*/]
 //dbname = "test1"
 
-iconpath = './discordbot/icons';
-uipath   = "./discordbot/ui";
+__root = __dirname + "../../../../../../../"
+__bakkal = _root + "resources/bakkal/"
+iconpath = __bakkal + 'icons/';
+uipath   = __bakkal + "ui/";
 
 
 
