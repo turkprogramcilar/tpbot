@@ -125,8 +125,8 @@ moduletb= "module_states" + (consts.env.debug ? "_debug" : "");
 alltb   = [itemstb, levelstb, /*cardstb card.json is deleted*/]
 //dbname = "test1"
 
-__root = __dirname + "../../../../../../../"
-__bakkal = _root + "resources/bakkal/"
+__root = __dirname + "/../../../../../../../"
+__bakkal = __root + "resources/bakkal/"
 iconpath = __bakkal + 'icons/';
 uipath   = __bakkal + "ui/";
 
