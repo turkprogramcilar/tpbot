@@ -6,8 +6,7 @@
     "node": "16.x"
   },
   "scripts": {
-    "start": "node main.js",
-    "debug": "node main.js --inspect=9090",
+    "start": "node build/greenfield/v2/power.js",
     "build": "tsc",
     "postinstall": "npm run build",
     "test": "mocha -r ts-node/register ./tpbot.tests/*.ts"
