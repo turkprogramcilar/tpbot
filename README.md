@@ -52,12 +52,16 @@ tarafından shell bot ile tag eşleştirmesinde kullanılır. Örneğin:
     `TPBOT_SHELL_TAG`    `TPBOT_SHELL_TAG123`    `TPBOT_SHELL_TAG_BOT`
 
 ## tpbot.yaml ayar dosyası
-### shellBots
+Tüm fonksiyonlarıyla örnek bir tanımlama kaynak kodları içerisindedir ve yorum 
+satırlarıyla gerekli alanlarda açıklama mevcuttur.
+
+### TpbotShell modülü
 Shell için kullanılacak olan bot hesabını sunucuya sokmanız gerekmez.
 Gizli tutabilirsiniz. Veya tercihe göre herhangi bir modül görevi olan bota da
-tanımlayabilirsiniz sunucu içerisinde bulunan. Bu bot DM kanalından shell
-komutları kabul edecektir. `tpbot.yaml` dosyasında `shellBots` kısmında DM
-kanalından kimlerin shell komutu çalıştıracağını tanımlayabilirsiniz.
+tanımlayabilirsiniz. Bu bot DM kanalından shell
+komutları kabul edecektir. Environment değerlerinde ilgili hesabın `TOKEN` 
+tanımlamasını yapıp aynı şekilde bu botun `TAG` değerini `SHELL_TAG` kısmında 
+açıklandığı gibi yapmanız gerekmektedir.
 
 ## Geliştirme ve katkıda bulunma
 ### Kodlama stili
