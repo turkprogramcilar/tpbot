@@ -1,14 +1,37 @@
 # Türk Programcılar Bot
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0) ![Chat](https://img.shields.io/discord/698972054740795453?label=chat&logo=discord)
 
-[Türk Programcılar Discord Sunucusu Üyeleri](https://disboard.org/server/698972054740795453) tarafından geliştirilen bot
+[Türk Programcılar Discord Sunucusu Üyeleri](https://disboard.org/server/698972054740795453) 
+tarafından geliştirilen çoklu iş bazlı (multi-threading) bot.
+
+Çoklu iş yapısı sayesinde birden fazla bot aynı sistem altında çalıştırılabilir 
+ve birbirlerinden izole yapılar halinde çalışma prensibinden ötürü çökme veya 
+hata alma durumlarından diğer botlar etkilenmez. Bu sunucu içerisinde 
+geliştirilmekte olan modüllerin daha alfa aşamasından son aşamasına kadar test
+edilmesine güvenli bir şekilde olanak sağlar.
+
+## Gelecekte yapılması planlanan yenilikler
+- Threading yapısı genişletilerek process yapısına geçilip gerektiğinde herhangi
+bir işlemi başlatılarak takibin yapılabilmesi. Bu kapsamda öncü olarak python
+discord modüllerinin çalıştırılması planlanmaktadır.
+- Hot reload/plugin yapısı getirilerek botun ana çekirdek yapısı, yürümekte olan
+bot işlemlerini etkilemeden yeni modüllerin sisteme dahil olup anlık 
+yürütülmesi veya aksi bir durumda yeniden başlatılabilmesi. Canlı ortamda 
+bulunan botun her seferde githubdan yeni bir commit çekerek kendini kapatıp
+yeniden açması hem masraflı hemde canlı yürüyen sürecin aksamasına sebebiyet 
+vermektedir. Sunucu ortamında canlıda bulunan botlar bu sistem sayesinde 
+etkilenmeden arka planda modüllerin yeni versiyonlarını içlerine aktarip 
+yükleyebilecekler.
 
 ## Eski mimari
-[README.md](greenfield/v2/modules/freestyle/legacy/README.md) dosyasından eski mimari için bilgilere ulaşılabilir. TPBOT yeni mimarisinde eski mimari yüklenmesine izin vermektedir ve geriye dönük uyumludur.
-
-## Yeni mimari
-@TODO
+[README.md](greenfield/v2/modules/freestyle/legacy/README.md) dosyasından eski 
+mimari için bilgilere ulaşılabilir. TPBOT yeni mimarisinde eski mimari 
+yüklenmesine izin vermektedir ve geriye dönük uyumludur. 
+`freestyles/legacy/main` noktasından yaml dosyasına `freestyle` modül 
+tanımlaması yapılarak eski mimaride çalışan modüllerin tamamı yüklenebilir.
 
 ## Ortam değişkenleri tanımlamaları (Environment variables)
+
 ### TPBOT_ROOT_DIR
 Sistem TypeScript ile derlendiğinden varsayılan olarak tsconfig ayarlamasında
 biz build/ klasörü içerisine çıkartma yapıyoruz. Fakat burada modüllerin 
@@ -23,10 +46,11 @@ TPBOT_TOKEN ile başlayan her ortam değişkeni (environment variable) sistem
 tarafından TOKEN olarak kabul edilir. Örneğin:
     `TPBOT_TOKEN`    `TPBOT_TOKEN123`    `TPBOT_TOKEN_BOT`
 
-### TPBOT_SHELL_TOKEN
-TPBOT_SHELL_TOKEN ile başlayan her ortam değişkeni (environment variable) sistem 
-tarafından TOKEN olarak kabul edilir. Örneğin:
-    `TPBOT_SHELL_TOKEN`    `TPBOT_SHELL_TOKEN123`    `TPBOT_SHELL_TOKEN_BOT`
+### TPBOT_SHELL_TAG
+TPBOT_SHELL_TAG ile başlayan her ortam değişkeni (environment variable) sistem 
+tarafından shell bot ile tag eşleştirmesinde kullanılır. Örneğin:
+    `TPBOT_SHELL_TAG`    `TPBOT_SHELL_TAG123`    `TPBOT_SHELL_TAG_BOT`
+
 ## tpbot.yaml ayar dosyası
 ### shellBots
 Shell için kullanılacak olan bot hesabını sunucuya sokmanız gerekmez.
