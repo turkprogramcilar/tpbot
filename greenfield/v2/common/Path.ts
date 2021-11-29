@@ -3,17 +3,9 @@ import { Helper } from "./Helper";
 export abstract class Path
 /*******************************************************************72*/
 {
-static builtRoot(...pathSegments: string[])
-{
-    const distance = pathSegments.reduce((a,_) => a+="../", "../");
-    const nested = pathSegments.join("/");
-    const envRoot = "TPBOT_ROOT_DIR";
-    return path.resolve(__dirname, process.env[envRoot] ?? "../", distance, nested);
-}
 static realRoot(...pathSegments: string[])
 {
     return path.resolve(__dirname, "../../../../", ...pathSegments);
-
 }
 static greenfieldNonBuilt(...pathSegments: string[])
 {
@@ -36,9 +28,17 @@ static freestyleNonBuilt(...pathSegments: string[])
 {
     return this.modulesNonBuilt("freestyle", ...pathSegments);
 }
+/*******************************************************************72*/
+static builtRoot(...pathSegments: string[])
+{
+    const distance = pathSegments.reduce((a,_) => a+="../", "../");
+    const nested = pathSegments.join("/");
+    const envRoot = "TPBOT_ROOT_DIR";
+    return path.resolve(__dirname, process.env[envRoot] ?? "../", distance, nested);
+}
 static builtGreenfield(...pathSegments: string[])
 {
-    return path.resolve(__dirname, "../../", ...pathSegments);
+    return this.builtRoot("greenfield", ...pathSegments);
 }
 static builtLatestVersion(...pathSegments: string[])
 {
