@@ -7,7 +7,8 @@ static root(...pathSegments: string[])
 {
     const distance = pathSegments.reduce((a,_) => a+="../", "../");
     const nested = pathSegments.join("/");
-    return path.resolve(__dirname, Helper.load("TPBOT_ROOT_DIR"), distance, nested);
+    const envRoot = "TPBOT_ROOT_DIR";
+    return path.resolve(__dirname, process.env[envRoot] ?? "../", distance, nested);
 }
 static greenfieldNonBuilt(...pathSegments: string[])
 {
