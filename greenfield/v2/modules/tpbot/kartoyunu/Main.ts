@@ -4,11 +4,11 @@ import { TpbotModule } from "../../../TpbotModule";
 export class KartOyunu extends TpbotModule
 {
 /*******************************************************************72*/
-constructor(client: Client)
+constructor()
 {
-    super(KartOyunu.name, client);
+    super(KartOyunu.name);
 }
-protected async textMessage(message: Message)
+async textMessage(message: Message)
 {
     if (message.content === "%ping")
         await message.reply("Pong!");

@@ -4,11 +4,11 @@ import { TpbotModule } from "../../../TpbotModule";
 export class Ping extends TpbotModule
 {
 /*******************************************************************72*/
-constructor(client: Client)
+constructor()
 {
-    super(Ping.name, client);
+    super(Ping.name);
 }
-protected async textMessage(message: Message)
+async textMessage(message: Message)
 {
     if (message.content === "%ping")
         await message.reply("Pong!");

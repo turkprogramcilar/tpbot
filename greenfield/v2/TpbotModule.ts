@@ -5,27 +5,19 @@ export abstract class TpbotModule
 {
 /*******************************************************************72*/
 protected readonly print: Print;
-constructor(public readonly moduleName: string,
-    protected readonly client: Client) 
+constructor(public readonly moduleName: string) 
 { 
-    this.print = new Print(moduleName, this.client.user?.tag);
-    const pairs: [keyof ClientEvents, any][] = [ // @TODO make this type-safe
-        ["messageCreate", (message: Message) => {
-            const chan = message.channel;
-            if (chan instanceof TextChannel) return this.textMessage(message);
-            if (chan instanceof DMChannel) return this.directMessage(message);
-            return Promise.resolve();
-        }],
-    ];
-    for (const [event, listener] of pairs) {
-        this.client.on(event, listener.bind(this));
-    }
+    this.print = new Print(moduleName);
     this.print.info("Super constructor ended");
+}
+setTag(name: string)
+{
+    this.print.setSurname(name);
 }
 /*******************************************************************72*/
 // tslint:disable: no-empty
-protected async textMessage(message: Message): Promise<void> { }
-protected async directMessage(message: Message): Promise<void> { }
+async textMessage(message: Message): Promise<void> { }
+async directMessage(message: Message): Promise<void> { }
 // tslint:enable: no-empty
 /*******************************************************************72*/
 protected async guilds()
