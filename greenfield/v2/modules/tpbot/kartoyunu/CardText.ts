@@ -1,16 +1,15 @@
-import { CardRarity, CardTitle } from "./CardProperties";
+import { CardNo, CardRarity, CardTitle } from "./CardProperties";
 
-/*******************************************************************72*/
 export class CardText
 {
-static getTitle(no: CardTitle): string
+static getTitle(no: CardNo): string
 {
     const list = Object.keys(CardTitle);
     return list.slice(-list.length / 2)[no as number];
 }
 /*******************************************************************72*/
 constructor(
-    public no: CardTitle,
+    public no: CardNo,
     public rarity: CardRarity,
     public description: string,
     public link: string

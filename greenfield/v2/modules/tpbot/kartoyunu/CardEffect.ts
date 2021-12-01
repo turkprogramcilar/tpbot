@@ -9,10 +9,14 @@ export class CardEffect
 {
 /*******************************************************************72*/
 constructor(
-    private readonly execute: (owner: CardUser, targets?: [CardUser]) => CardEffectResult
+    readonly execute: (owner: CardUser, targets?: [CardUser]) => CardEffectResult,
+    readonly targets: number = 0,
 )
 {
-
+}
+get hasTargets()
+{
+    return this.targets > 0;
 }
 
 /*******************************************************************72*/

@@ -1,4 +1,5 @@
 /*******************************************************************72*/
+export type CardNo = CardTitle;
 export enum CardRarity {
     "Yaygın" = 1,
     "Güzide",
