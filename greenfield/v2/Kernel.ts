@@ -29,6 +29,8 @@ private loadSpawns()
 {
     this.print.info("Loading spawns.");
     for (const spawn of this.yamlSpawns()) {
+        if (!spawn)
+            continue;
         this.summonSpawn(spawn);
     }
 }
