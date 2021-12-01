@@ -1,7 +1,7 @@
 import { CardRarity, CardTitle } from "./CardProperties";
 
 /*******************************************************************72*/
-export class Card
+export class CardText
 {
 static getTitle(no: CardTitle): string
 {
@@ -20,7 +20,7 @@ constructor(
 }
 get title(): string
 {
-    return Card.getTitle(this.no);
+    return CardText.getTitle(this.no);
 }
 /*******************************************************************72*/
 }
