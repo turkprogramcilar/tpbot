@@ -21,6 +21,7 @@
   "author": "0xdeadc0de (https://github.com/0xdeadc0de)",
   "license": "GPL-3.0-or-later",
   "dependencies": {
+    "@deepkit/orm": "^1.0.1-alpha.58",
     "@discordjs/builders": "^0.7.0",
     "@discordjs/rest": "^0.1.0-canary.0",
     "bufferutil": "^4.0.5",
