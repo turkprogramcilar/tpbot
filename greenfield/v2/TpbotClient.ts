@@ -3,7 +3,6 @@ import { workerData } from "worker_threads";
 import { BotData } from "./Kernel";
 import { MinionFile } from "./threading/MinionFile";
 import { Boot } from "./Boot"
-import { TpbotFactory } from "./TpbotFactory";
 import { TpbotShell } from "./TpbotShell";
 import { Helper } from "./common/Helper";
 import { TpbotModule } from "./TpbotModule";
@@ -55,8 +54,7 @@ private autorun()
     if ((Helper.prefixed("TPBOT_SHELL_TAG")?.map(([k, v]) => v ?? "") ?? [])
         .some(x => x === this.client.user?.tag ?? "")) {
 
-        new TpbotShell(this.client, this);
-        return;
+        new TpbotShell(this.client.user?.tag ?? "", this);
     }
     const modules = (Boot.getParsedYaml().tokenMapping ?? [])
         .filter(x => x.tag === this.client.user?.tag)
@@ -80,10 +78,12 @@ private loadModule(name: string)
     if (this.client.user)
         module.setTag(this.client.user.tag);
 
+    module.setClient(this.client);
+
     const pairs: [keyof ClientEvents, any][] = [ // @TODO make this type-safe
         ["messageCreate", (message: Message) => {
             const chan = message.channel;
-            if (chan instanceof TextChannel) return module.textMessage(message);
+            if (chan instanceof TextChannel) return module.commandProxy(message);
             if (chan instanceof DMChannel)   return module.directMessage(message);
             return Promise.resolve();
         }],
