@@ -5,7 +5,7 @@ export class CardText
 static getTitle(no: CardNo): string
 {
     const list = Object.keys(CardTitle);
-    return list.slice(-list.length / 2)[no as number];
+    return list.slice(-list.length / 2)[--no as number];
 }
 /*******************************************************************72*/
 constructor(
