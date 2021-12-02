@@ -4,6 +4,10 @@ import { Boot } from "../Boot";
 export abstract class Helper
 {
 /*******************************************************************72*/
+static get IsDebug()
+{
+    return Helper.check("TPBOT_DEBUG");
+}
 static sleep(ms: number)
 {
     return new Promise(res => setTimeout(res, ms));
