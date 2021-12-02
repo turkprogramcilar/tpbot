@@ -83,7 +83,8 @@ private loadModule(name: string)
     const pairs: [keyof ClientEvents, any][] = [ // @TODO make this type-safe
         ["messageCreate", (message: Message) => {
             const chan = message.channel;
-            if (chan instanceof TextChannel) return module.commandProxy(message);
+            if (chan instanceof TextChannel) 
+                return module.commandProxy(message);
             if (chan instanceof DMChannel)   return module.directMessage(message);
             return Promise.resolve();
         }],

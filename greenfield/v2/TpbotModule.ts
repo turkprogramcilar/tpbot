@@ -39,7 +39,7 @@ async commandProxy(message: Message): Promise<void>
         const m = temp.match(regex);
         if (m) {
             try {
-                await command(message, m);
+                await command.bind(this)(message, m);
             }
             catch (error) {
                 this.print.exception(error);
