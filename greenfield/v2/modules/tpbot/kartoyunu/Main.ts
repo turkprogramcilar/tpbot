@@ -2,7 +2,7 @@ import { Message, MessageActionRow, MessageSelectMenu } from "discord.js";
 import { TpbotModule } from "../../../TpbotModule";
 import { CardRepository, FakeCardRepo } from "./CardRepository";
 import { CardTextDatabase } from "./CardTextDatabase";
-import { command } from "../../../TpbotDecorators"
+import { prefixed } from "../../../TpbotDecorators"
 
 export class KartOyunu extends TpbotModule
 {
@@ -13,7 +13,7 @@ constructor()
     super(KartOyunu.name);
 }
 /*******************************************************************72*/
-@command() async deste(message: Message)
+@prefixed async deste(message: Message)
 {
     const deck = (await this.CardRepository.getDeck(message.author.id))
         .map((x, i) => { return {

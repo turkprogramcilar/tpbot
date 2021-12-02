@@ -7,11 +7,16 @@ import { TpbotModule } from "./TpbotModule";
  * @param customRegex Custom regex if you don't want default method name match
  * as command e.g as % is prefix that is your %methodName
  */
-export function command (customRegex?: RegExp, customPrefix?: RegExp)
+export function regex(customRegex?: RegExp, customPrefix?: RegExp)
 {
     return (target: TpbotModule, methodName: string, descriptor: PropertyDescriptor) => {
         target.registerCommand(customRegex ?? new RegExp(`^${methodName}`),
             descriptor.value, customPrefix);
     }
 }
+export const prefixed = (target: TpbotModule, 
+    methodName: string, descriptor: PropertyDescriptor) => 
+{
+    target.registerCommand(new RegExp(`^${methodName}`), descriptor.value);
+};
 /*******************************************************************72*/
