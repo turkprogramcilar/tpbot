@@ -11,7 +11,7 @@ shellAccess:
 
 spawn:
     -
-        python: "PingPy.py"
+        #python: "PingPy.py"
 
 tokenMapping:
     # Provide bot's account TOKENs in TPBOT_TOKEN1, TPBOT_TOKEN2... TPBOT_TOKENX
@@ -26,6 +26,9 @@ tokenMapping:
     # These TOKENs will be logged in and account names are then matched with the
     # following tag name with its module defined below 
     -
+        tag: "TPBOT DEBUG 1#6503"
         modules:
+            tpbot:
+                - "KartOyunu"
             freestyle:
                 #- "legacy/main"

@@ -13,9 +13,9 @@ interface TpbotYaml {
         id: string,
         access: boolean
     }[],
-    spawn?: Spawn[],
+    spawn?: (Spawn | null)[],
     tokenMapping?: {
-        tag: string,
+        tag?: string,
         modules?: {
             freestyle?: string[],
             tpbot?: string[]

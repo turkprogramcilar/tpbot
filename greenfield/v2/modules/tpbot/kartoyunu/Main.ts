@@ -15,8 +15,8 @@ constructor()
 /*******************************************************************72*/
 @command() async deste(message: Message)
 {
-    const deck = (await this.CardRepository.getDeck("")).map((x, i) => {
-        return {
+    const deck = (await this.CardRepository.getDeck(message.author.id))
+        .map((x, i) => { return {
             label: CardTextDatabase[x].title, 
             value: i.toString()
         };
