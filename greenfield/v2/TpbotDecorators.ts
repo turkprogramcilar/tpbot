@@ -11,7 +11,7 @@ const print = new Print("Decorator");
  * @param customRegex Custom regex if you don't want default method name match
  * as command e.g as % is prefix that is your %methodName
  */
-export function regex(customRegex?: RegExp, customPrefix?: RegExp)
+export function RegexCommand(customRegex?: RegExp, customPrefix?: RegExp)
 {
     return (target: TpbotModule, methodName: string, 
         descriptor: PropertyDescriptor) => {
@@ -20,12 +20,12 @@ export function regex(customRegex?: RegExp, customPrefix?: RegExp)
             customRegex ?? new RegExp(`^${methodName}`), customPrefix);
     }
 }
-export const prefixed = (target: TpbotModule, 
+export const PlainCommand = (target: TpbotModule, 
     methodName: string, descriptor: PropertyDescriptor) => 
 {
     target.registerRegex(descriptor.value, new RegExp(`^${methodName}`));
 };
-export function slash(description: string)
+export function SlashCommand(description: string)
 {
     return (target: TpbotModule, methodName: string, 
         descriptor: PropertyDescriptor) => {
@@ -34,7 +34,7 @@ export function slash(description: string)
         descriptor.value = async (...args: any[]) => {
             try { await f(...args); }
             catch (error) { 
-                print.setSurname(target.moduleName).setType(slash.name)
+                print.setSurname(target.moduleName).setType(SlashCommand.name)
                     .exception(error);
             }
         }
@@ -50,19 +50,19 @@ function menu(type: ContextMenuCommandType)
         descriptor.value = async (...args: any[]) => {
             try { await f(...args); }
             catch (error) { 
-                print.setSurname(target.moduleName).setType(slash.name)
+                print.setSurname(target.moduleName).setType(SlashCommand.name)
                     .exception(error);
             }
         }
         target.registerMenu(descriptor.value, methodName, type);
     }
 }
-export const menuOnUser = (target: TpbotModule, methodName: string, 
+export const UserCommand = (target: TpbotModule, methodName: string, 
     descriptor: PropertyDescriptor) =>
 {
     menu(ApplicationCommandType.User)(target, methodName, descriptor);
 }
-export const menuOnMessage = (target: TpbotModule, methodName: string, 
+export const MessageCommand = (target: TpbotModule, methodName: string, 
     descriptor: PropertyDescriptor) =>
 {
     menu(ApplicationCommandType.Message)(target, methodName, descriptor);
