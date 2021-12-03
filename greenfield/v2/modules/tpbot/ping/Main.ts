@@ -22,7 +22,8 @@ async textMessage(message: Message)
 @RegexCommand(/([0-9]+)\s*\+\s*([0-9]+)/)
 async sum(message: Message, match: RegExpMatchArray)
 {
-    return message.reply(match.slice(1).map(Number).reduce((a,c)=>a+=c,0).toString())
+    return message.reply(
+        match.slice(1).map(Number).reduce((a,c)=>a+=c,0).toString())
 }
 @SlashCommand("Pong diye cevap verir.")
 ping(interaction: CommandInteraction)
