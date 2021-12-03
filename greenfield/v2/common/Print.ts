@@ -20,6 +20,10 @@ private format(message: string | unknown, user?: userInfo): string
     this.from = undefined;
     return msg;
 };
+setType(name: string) {
+    this.typeName = name;
+    return this;
+}
 setSurname(name: string) {
     this.surname = name;
     return this;

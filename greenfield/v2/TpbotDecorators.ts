@@ -2,8 +2,10 @@
 
 import { ContextMenuCommandType } from "@discordjs/builders";
 import { ApplicationCommandType } from "discord-api-types";
+import { Print } from "./common/Print";
 import { TpbotModule } from "./TpbotModule";
 
+const print = new Print("Decorator");
 /**
  * Command method to match with a discord message
  * @param customRegex Custom regex if you don't want default method name match
@@ -31,7 +33,10 @@ export function slash(description: string)
         const f = descriptor.value;
         descriptor.value = async (...args: any[]) => {
             try { await f(...args); }
-            catch (error) { console.log(error); /* @TODO */ }
+            catch (error) { 
+                print.setSurname(target.moduleName).setType(slash.name)
+                    .exception(error);
+            }
         }
         target.registerSlash(descriptor.value, methodName, description);
     }
