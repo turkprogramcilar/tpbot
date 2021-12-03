@@ -4,9 +4,13 @@ import { Boot } from "../Boot";
 export abstract class Helper
 {
 /*******************************************************************72*/
-static get IsDebug()
+static get isDebug()
 {
     return Helper.check("TPBOT_DEBUG");
+}
+static debug(postfix: string)
+{
+    return (Helper.isDebug ? "debug_" : "") + postfix;
 }
 static sleep(ms: number)
 {

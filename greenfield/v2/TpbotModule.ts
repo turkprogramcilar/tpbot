@@ -1,17 +1,48 @@
-import { Client, ClientEvents, DMChannel, Message, TextChannel, User } from "discord.js";
-import { Boot } from "./Boot";
+import { ContextMenuCommandType } from "@discordjs/builders";
+import { Client, CommandInteraction, ContextMenuInteraction, Interaction, Message } from "discord.js";
+import { Helper } from "./common/Helper";
 import { Print } from "./common/Print";
+export interface Slash
+{
+    callback: (interaction: CommandInteraction) => Promise<void> | void, 
+    name: string,
+    description: string,
+}
+export interface Menu 
+{
+    callback: (interaction: ContextMenuInteraction) => Promise<void> | void, 
+    name: string,
+    type: ContextMenuCommandType
+}
+export interface Regex
+{
+    callback: (message: Message, m: RegExpMatchArray) => Promise<void> | void,
+    regex: RegExp,
+    prefix: RegExp
+}
+export type Registrar<Type> = {
+    [Property in keyof Type as Exclude<Property, "callback">]: Type[Property]
+};
 export abstract class TpbotModule
 {
 /*******************************************************************72*/
 protected readonly print: Print;
 private client?: Client;
-private commands?: [RegExp, 
-    (message: Message, m: RegExpMatchArray) => Promise<void> | void, RegExp][];
+private commands?: Regex[];
+private slashes?: Slash[];
+private menus?: Menu[];
 constructor(public readonly moduleName: string) 
 { 
     this.print = new Print(moduleName);
     this.print.info("Super constructor ended");
+}
+get slashCommands()
+{ 
+    return (this.slashes ?? []).map(x => x as Registrar<Slash>);
+}
+get menuCommands()
+{ 
+    return (this.menus ?? []).map(x => x as Registrar<Menu>);
 }
 setTag(name: string)
 {
@@ -21,25 +52,50 @@ setClient(client: Client)
 {
     this.client = client;
 }
-registerCommand(regexp: RegExp, 
-    command: (message: Message, m: RegExpMatchArray) => Promise<void> | void, 
-    prefix = /^\$\s*/)
+registerRegex(
+    _callback: (message: Message, m: RegExpMatchArray) => Promise<void> | void, 
+    _regex: RegExp,
+    _prefix = /^\$\s*/)
 {
     if (!this.commands)
         this.commands = [];
-    this.commands.push([regexp, command, prefix]);
+    this.commands.push({
+        callback: _callback,
+        regex: _regex,
+        prefix: _prefix
+    });
+}
+registerSlash(
+    _callback: (interaction: CommandInteraction) => Promise<void> | void, 
+    _name: string, _description: string)
+{
+    if (!this.slashes)
+        this.slashes = [];
+    this.slashes.push({
+        callback: _callback, name: _name, description: _description
+    });
+}
+registerMenu(
+    _callback: (interaction: ContextMenuInteraction) => Promise<void> | void, 
+    _name: string, _type: ContextMenuCommandType)
+{
+    if (!this.menus)
+        this.menus = [];
+    this.menus.push({
+        callback: _callback, name: _name, type: _type
+    });
 }
 /*******************************************************************72*/
 async commandProxy(message: Message): Promise<void> 
 { 
-    for (const [regex, command, prefix] of this.commands ?? []) {
-        if (!message.content.match(prefix))
+    for (const command of this.commands ?? []) {
+        if (!message.content.match(command.prefix))
             continue;
-        const temp = message.content.replace(prefix, "");
-        const m = temp.match(regex);
+        const temp = message.content.replace(command.prefix, "");
+        const m = temp.match(command.regex);
         if (m) {
             try {
-                await command.bind(this)(message, m);
+                await command.callback.bind(this)(message, m);
             }
             catch (error) {
                 this.print.exception(error);
@@ -48,6 +104,26 @@ async commandProxy(message: Message): Promise<void>
         }
     }
     await this.textMessage(message);
+}
+async interactionProxy(int: Interaction): Promise<void>
+{
+    if (int.isCommand()) {
+
+        const slash = this.slashCallback[int.commandName];
+        if (!slash) {
+            return;
+        }
+        return slash.callback(int);
+    }
+    else if (int.isContextMenu())
+    {
+
+        const menu = this.menuCallback[int.commandName];
+        if (!menu) {
+            return;
+        }
+        return menu.callback(int);
+    }
 }
 // tslint:disable: no-empty
 async textMessage(message: Message): Promise<void> { }
@@ -61,6 +137,25 @@ protected async guilds()
 protected async guild(id: string)
 {
     return await this.client!.guilds.fetch(id);
+}
+/*******************************************************************72*/
+private _slashDictionary?: {[key: string]: Slash};
+private get slashCallback()
+{
+    if (!this._slashDictionary)
+        this._slashDictionary = (this.slashes ?? []).reduce((a, c) => {
+            return {...a, [Helper.debug(c.name)]: c};
+        } , {});
+    return this._slashDictionary;
+}
+private _menuDictionary?: {[key: string]: Menu};
+private get menuCallback()
+{
+    if (!this._menuDictionary)
+        this._menuDictionary = (this.menus ?? []).reduce((a, c) => {
+            return {...a, [Helper.debug(c.name)]: c};
+        } , {});
+    return this._menuDictionary;
 }
 /*******************************************************************72*/
 }
