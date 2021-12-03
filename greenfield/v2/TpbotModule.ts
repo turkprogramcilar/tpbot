@@ -55,7 +55,7 @@ setClient(client: Client)
 registerRegex(
     _callback: (message: Message, m: RegExpMatchArray) => Promise<void> | void, 
     _regex: RegExp,
-    _prefix = /^\$\s*/)
+    _prefix = /^\%\s*/)
 {
     if (!this.commands)
         this.commands = [];
