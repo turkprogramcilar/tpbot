@@ -38,7 +38,7 @@ static getParsedYaml(): TpbotYaml
 /*******************************************************************72*/
 readonly print = new Print(Boot.name);
 
-run()
+async run()
 {
     this.print.info("Run has called.");
 
