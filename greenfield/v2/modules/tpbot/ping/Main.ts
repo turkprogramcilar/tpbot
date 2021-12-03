@@ -33,9 +33,9 @@ ping(interaction: CommandInteraction)
 pingOnMessage(interaction: ContextMenuInteraction)
 {
     // @TODO hardcoded see https://github.com/discordjs/discord.js/pull/7003
-    const message = interaction.options.getMessage('message');
+    const message = interaction.options.getMessage('message')!;
     return interaction.reply("TpbotModule Mesaj üstü Pong! Mesaj: "
-        + codeBlock(`${message?.content}`));
+        + codeBlock(`${message.content}`));
 }
 @menuOnUser
 pingOnUser(interaction: ContextMenuInteraction)
