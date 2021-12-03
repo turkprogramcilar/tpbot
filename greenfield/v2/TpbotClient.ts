@@ -81,6 +81,7 @@ private async autorun()
         .filter(x => x !== undefined)
         .map(x => new ContextMenuCommandBuilder()
             .setName(Helper.debug(x.name))
+            .setType(x.type)
             .toJSON())
         ;
 

@@ -46,6 +46,14 @@ function menu(type: ContextMenuCommandType)
     return (target: TpbotModule, methodName: string, 
         descriptor: PropertyDescriptor) => {
         
+        const f = descriptor.value;
+        descriptor.value = async (...args: any[]) => {
+            try { await f(...args); }
+            catch (error) { 
+                print.setSurname(target.moduleName).setType(slash.name)
+                    .exception(error);
+            }
+        }
         target.registerMenu(descriptor.value, methodName, type);
     }
 }
