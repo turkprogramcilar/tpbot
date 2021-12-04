@@ -90,11 +90,17 @@ async deste(interaction: CommandInteraction)
     ]});
 }
 @SlashCommand("Test")
-async test(interaction: CommandInteraction)
+async test2(interaction: CommandInteraction)
 {
     await interaction.reply({embeds: this.cardEmbeds(this.rollCard())})
+    for (const i of [...Array(62).keys()]) {
+        const card = this.cardEmbeds(i+1);
+        await Helper.sleep(1000);
+        await interaction.channel?.send({embeds:card});
+    }
 }
-/*
+
+@SlashCommand("Test")
 async test(interaction: CommandInteraction)
 {
     let min = 1000;
@@ -146,6 +152,6 @@ async test(interaction: CommandInteraction)
         + `per: ${codeBlock(JSON.stringify(per))}`
         + `perCard: ${codeBlock(JSON.stringify(perCard))}`
     );
-}*/
+}
 /*******************************************************************72*/
 }

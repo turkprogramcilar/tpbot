@@ -268,7 +268,7 @@ export const CardTextDatabase: {[key in CardTitle]: CardText} =
     [CardTitle[":IBOYD:"]]: new CardText(CardTitle[":IBOYD:"],
         CardRarity.Güzide,
         "Oyuncu TP sunucusunda en çok kullanılan emojinin geliştirilmiş versiyonunu atar ve :IBOY: kartını ansızın maksimum gücüne ulaştırır.",
-        "https://cdn.discordapp.com/emojis/725714391642931260.gif"
+        "https://cdn.discordapp.com/emojis/861852478499979284.png"
     ),
     [CardTitle["Tempolu Ördek"]]: new CardText(CardTitle["Tempolu Ördek"],
         CardRarity.Güzide,
