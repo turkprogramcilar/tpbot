@@ -30,9 +30,11 @@ export function SlashCommand(description: string)
     return (target: TpbotModule, methodName: string, 
         descriptor: PropertyDescriptor) => {
         
-        const f = descriptor.value;
-        descriptor.value = async (...args: any[]) => {
-            try { await f(...args); }
+        const originalMethod = descriptor.value;
+        descriptor.value = async function (...args: any[]) {
+            try { 
+                return await originalMethod.bind(this)(...args);
+            }
             catch (error) { 
                 print.setSurname(target.moduleName).setType(SlashCommand.name)
                     .exception(error);
@@ -46,9 +48,11 @@ function menu(type: ContextMenuCommandType, name: string)
     return (target: TpbotModule, methodName: string, 
         descriptor: PropertyDescriptor) => {
         
-        const f = descriptor.value;
-        descriptor.value = async (...args: any[]) => {
-            try { await f(...args); }
+        const originalMethod = descriptor.value;
+        descriptor.value = async function (...args: any[]) {
+            try { 
+                return await originalMethod.bind(this)(...args); 
+            }
             catch (error) { 
                 print.setSurname(target.moduleName).setType(SlashCommand.name)
                     .exception(error);
