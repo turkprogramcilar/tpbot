@@ -1,12 +1,8 @@
+import { Helper } from "../../../common/Helper";
 import { CardNo, CardRarity, CardTitle } from "./CardProperties";
 
 export class CardText
 {
-static getTitle(no: CardNo): string
-{
-    const list = Object.keys(CardTitle);
-    return list.slice(-list.length / 2)[--no as number];
-}
 /*******************************************************************72*/
 constructor(
     public no: CardNo,
@@ -19,7 +15,15 @@ constructor(
 }
 get title(): string
 {
-    return CardText.getTitle(this.no);
+    return Helper.getEnumText(this.no - 1, CardTitle);
+}
+get rarityText(): string
+{
+    return Helper.getEnumText(this.rarity - 1, CardRarity);
+}
+get categoryText(): string
+{
+    return "Genel"
 }
 /*******************************************************************72*/
 }

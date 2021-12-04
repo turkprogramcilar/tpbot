@@ -74,5 +74,10 @@ static isMessageInteraction(int: any): int is MessageInteraction
 {
     return (int as MessageInteraction)?.commandName !== undefined;
 }
+static getEnumText<T extends object>(value: number, enu: T): string
+{
+    const list = Object.keys(enu);
+    return list.slice(-list.length / 2)[value as number];
+}
 /*******************************************************************72*/
 }
