@@ -153,7 +153,7 @@ export const CardTextDatabase: {[key in CardTitle]: CardText} =
     [CardTitle["Ricardo Milos"]]: new CardText(CardTitle["Ricardo Milos"],
         CardRarity.Esrarengiz,
         "Oyuncu destesinden bir kartı çekerken Ricardo ile göz göze gelir ve Ricardo gülümser, iki kart çekmesini söyler. Oyuncu Ricardo kartını oynar ve ardından iki kart çeker. ",
-        "https://cdn.discordapp.com/emojis/867493678960214076.png"
+        "https://media2.giphy.com/media/W62wk6w0VI55Ijcnva/giphy.gif?cid=790b7611bff8340e5b25e79b3d4bb4cf177efb5725b6ba9d&rid=giphy.gif&ct=g"
     ),
     // tslint:enable: no-string-literal
 }

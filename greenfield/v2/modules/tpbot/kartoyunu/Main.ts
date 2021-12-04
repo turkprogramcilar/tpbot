@@ -70,11 +70,7 @@ async deste(interaction: CommandInteraction)
 @SlashCommand("Test")
 async test(interaction: CommandInteraction)
 {
-    await interaction.reply({embeds: this.cardEmbeds(1)})
-    await Promise.all(Array(30-1).fill(0).map(async (x, i) => {
-        await interaction.channel?.send({embeds: this.cardEmbeds(i+2)})
-        await Helper.sleep(1000);
-    }));
+    await interaction.reply({embeds: this.cardEmbeds(30)})
 }
 /*******************************************************************72*/
 }
