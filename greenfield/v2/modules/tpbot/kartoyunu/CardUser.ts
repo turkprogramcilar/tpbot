@@ -1,17 +1,15 @@
 import { User } from "discord.js";
-
+import { entity, t } from '@deepkit/type';
+import { CardNo } from "./CardProperties";
+@entity.name(CardUser.name)
 export class CardUser
 {
 /*******************************************************************72*/
-readonly id: string;
-constructor(id: string | User)
+constructor(
+    @t public id: string,
+    @t public deck: CardNo[],
+)
 { 
-    if (id instanceof User) {
-        this.id = id.id;
-    }
-    else {
-        this.id = id;
-    }
 }
 
 /*******************************************************************72*/

@@ -13,7 +13,8 @@ constructor()
     super(KartOyunu.name);
 }
 /*******************************************************************72*/
-@MessageCommand async deste(interaction: CommandInteraction)
+@MessageCommand
+async deste(interaction: CommandInteraction)
 {
     const deck = (await this.CardRepository.getDeck(interaction.user.id))
         .map((x, i) => { return {
