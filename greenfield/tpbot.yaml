@@ -29,6 +29,6 @@ tokenMapping:
         tag: "TPBOT DEBUG 1#6503"
         modules:
             tpbot:
-                - "Ping"
+                - "KartOyunu"
             freestyle:
                 #- "legacy/main"
