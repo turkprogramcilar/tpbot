@@ -95,7 +95,7 @@ async commandProxy(message: Message): Promise<void>
         const m = temp.match(command.regex);
         if (m) {
             try {
-                await command.callback.bind(this)(message, m);
+                await command.callback.apply(this, [message, m]);
             }
             catch (error) {
                 this.print.exception(error);
@@ -113,7 +113,7 @@ async interactionProxy(int: Interaction): Promise<void>
         if (!slash) {
             return;
         }
-        return slash.callback(int);
+        return slash.callback.apply(this, [int]);
     }
     else if (int.isContextMenu())
     {
@@ -122,7 +122,23 @@ async interactionProxy(int: Interaction): Promise<void>
         if (!menu) {
             return;
         }
-        return menu.callback(int);
+        return menu.callback.apply(this, [int]);
+    }
+    else if (int.isMessageComponent() 
+        && Helper.isMessageInteraction(int.message.interaction)) {
+        
+        const commandName = int.message.interaction.commandName;
+        const slash = this.slashCallback[commandName];
+        if (slash) {
+            //return slash.callback.apply(this, [int]);
+        }
+        const menu = this.menuCallback[commandName];
+        if (menu) {
+            //return menu.callback.apply(this, [int]);
+        }
+        else {
+            return;
+        }
     }
 }
 // tslint:disable: no-empty
@@ -139,6 +155,7 @@ protected async guild(id: string)
     return await this.client!.guilds.fetch(id);
 }
 /*******************************************************************72*/
+// @TODO move property definitions up in class def
 private _slashDictionary?: {[key: string]: Slash};
 private get slashCallback()
 {

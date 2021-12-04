@@ -1,4 +1,4 @@
-import { User, Message } from "discord.js";
+import { User, Message, MessageInteraction } from "discord.js";
 import { Boot } from "../Boot";
 
 export abstract class Helper
@@ -69,6 +69,10 @@ static ps(n: number, plural = "s", singular = "")
 static ai(n: number)
 {
     return this.ps(n, "are", "is");
+}
+static isMessageInteraction(int: any): int is MessageInteraction
+{
+    return (int as MessageInteraction)?.commandName !== undefined;
 }
 /*******************************************************************72*/
 }

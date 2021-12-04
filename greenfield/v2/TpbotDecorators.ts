@@ -41,7 +41,7 @@ export function SlashCommand(description: string)
         target.registerSlash(descriptor.value, methodName, description);
     }
 }
-function menu(type: ContextMenuCommandType)
+function menu(type: ContextMenuCommandType, name: string)
 {
     return (target: TpbotModule, methodName: string, 
         descriptor: PropertyDescriptor) => {
@@ -60,11 +60,13 @@ function menu(type: ContextMenuCommandType)
 export const UserCommand = (target: TpbotModule, methodName: string, 
     descriptor: PropertyDescriptor) =>
 {
-    menu(ApplicationCommandType.User)(target, methodName, descriptor);
+    menu(ApplicationCommandType.User, UserCommand.name)
+        (target, methodName, descriptor);
 }
 export const MessageCommand = (target: TpbotModule, methodName: string, 
     descriptor: PropertyDescriptor) =>
 {
-    menu(ApplicationCommandType.Message)(target, methodName, descriptor);
+    menu(ApplicationCommandType.Message, MessageCommand.name)
+        (target, methodName, descriptor);
 }
 /*******************************************************************72*/

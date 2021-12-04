@@ -2,7 +2,7 @@ import { CommandInteraction, Message, MessageActionRow, MessageSelectMenu } from
 import { TpbotModule } from "../../../TpbotModule";
 import { CardRepository, FakeCardRepo } from "./CardRepository";
 import { CardTextDatabase } from "./CardTextDatabase";
-import { MessageCommand } from "../../../TpbotDecorators"
+import { MessageCommand, UserCommand } from "../../../TpbotDecorators"
 
 export class KartOyunu extends TpbotModule
 {
@@ -13,7 +13,7 @@ constructor()
     super(KartOyunu.name);
 }
 /*******************************************************************72*/
-@MessageCommand
+@UserCommand
 async deste(interaction: CommandInteraction)
 {
     const deck = (await this.CardRepository.getDeck(interaction.user.id))
