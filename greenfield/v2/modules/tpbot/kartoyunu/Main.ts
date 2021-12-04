@@ -47,6 +47,28 @@ cardEmbeds(no: CardNo)
             .addField(bold("No"), codeBlock(`${card.no.toString()}`), true)
     ]
 }
+private rollCard(rnd: (() => number) = Math.random): CardNo
+{
+    const groupedByRarity = 
+            Array(Object.keys(CardTitle).length / 2).fill(0).map((x, i) => i+1)
+            .reduce((a: number[][], c) => { 
+                a[CardTextDatabase[c as CardNo].rarity-1].push(c); 
+                return a; 
+            }, [[],[],[],[],[]/* excluded group: -> */,[]])
+            .slice(0, -1);
+
+    const rollScale = groupedByRarity
+            .map((x, i) => x.length/(i+1));
+    const sum = rollScale.reduce((a, c) => a+=c, 0);
+    const roll = rnd() * sum;
+    let s = rollScale[0];
+    let i = 0;
+    for (; roll >= s; i++) {
+        s += rollScale[i+1];
+    }
+    const group = groupedByRarity[i];
+    return group[Math.floor(rnd() * group.length)];
+}
 /*******************************************************************72*/
 @UserCommand
 async deste(interaction: CommandInteraction)
@@ -70,7 +92,60 @@ async deste(interaction: CommandInteraction)
 @SlashCommand("Test")
 async test(interaction: CommandInteraction)
 {
-    await interaction.reply({embeds: this.cardEmbeds(30)})
+    await interaction.reply({embeds: this.cardEmbeds(this.rollCard())})
 }
+/*
+async test(interaction: CommandInteraction)
+{
+    let min = 1000;
+    let max = 0;
+    let cardsDrawn: any = {}
+    for (let i = 0; i < 1000000; i++)
+    {
+        const t = this.rollCard();
+        if (t > max)
+            max = t;
+        else if (t < min)
+            min = t;
+        if (!cardsDrawn[t])
+            cardsDrawn[t] = 1;
+        else
+            cardsDrawn[t]++;
+    }
+    let t = 0;
+    const rarityPerDrawn: {[key in CardRarity]: number} = {
+        1: 0, 2: 0, 3: 0, 4: 0, 5: 0
+    };
+    const cardsPerRarity: {[key in CardRarity]: number} = {
+        1: 0, 2: 0, 3: 0, 4: 0, 5: 0
+    }
+    const per: {[key in CardRarity]: number} = {
+        1: 0, 2: 0, 3: 0, 4: 0, 5: 0
+    }
+    
+    const perCard: {[key in CardRarity]: number} = {
+        1: 0, 2: 0, 3: 0, 4: 0, 5: 0
+    }
+    for (const [key, value] of Object.entries(cardsDrawn))
+    {
+        const cardNo = Number(key);
+        const rarity = CardTextDatabase[cardNo as CardNo].rarity;
+        cardsPerRarity[rarity]++;
+        rarityPerDrawn[rarity] += Number(value);
+        t += Number(value);
+    }
+    for (const i of [...Array(5).keys()]) {
+
+        const ii = (i+1) as CardRarity;
+        per[ii] = rarityPerDrawn[ii] / t 
+        perCard[ii] = rarityPerDrawn[ii] / t / cardsPerRarity[ii] 
+    }
+    await interaction.reply(`min:${min} max:${max} total: ${t} `
+        + `rarityPerDrawn: ${codeBlock(JSON.stringify(rarityPerDrawn))}`
+        + `cardsPerRarity: ${codeBlock(JSON.stringify(cardsPerRarity))}`
+        + `per: ${codeBlock(JSON.stringify(per))}`
+        + `perCard: ${codeBlock(JSON.stringify(perCard))}`
+    );
+}*/
 /*******************************************************************72*/
 }

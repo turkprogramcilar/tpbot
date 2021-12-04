@@ -18,7 +18,7 @@ export enum CardTitle
     "KorkusuzBöyle",
     "Kara Murat benim",
     "Yossi Kohen",
-    "Usta Rakun",
+    "8 Top",
     "Zikir halkası",
     // 10
     "Erotik Ajdar",
@@ -40,11 +40,56 @@ export enum CardTitle
     "HainBöyle",
     // 25
     "İnş cnm ya :)",
+    "Moderatör Savar",
+    "Toxic Moderatör",
+    "Le Bumlugi'nin geri dönüşü",
+    "Kobra Murat",
+
+    // 30
+    "Kage-Bunshin No Umut",
+    "Osbir",
+    "Hediye kart",
+    "PoTaToBeaTeR'ın Baskını",
+    "Fatih'ın geri dönüşü",
+
+    // 35
+    ":TEA:",
+    "ParantezliBöyle",
+    "Kral bump",
+    "MrChuck'ın Susturucu Botu",
+    "Şuku",
+
+    // 40
+    "Bir bak buraya",
+    "Legendary İbo",
+    "Bırakın Lan Beni",
     "@everyone",
     "Etiket",
+
+    // 45
     "Çifte Bump",
     "Bump!",
-    // 30
-    "Ricardo Milos"
+    "Ricardo Milos",
+    ":IBOYD:",
+    "Tempolu Ördek",
+
+    // 50
+    "Kem Gözlü Murat",
+    "Deli Vahit",
+    "Yazık kafana",
+    ":YES:",
+    "Ajan Simit'in Oyunu",
+
+    // 55
+    "The Lord of The Bumps",
+    "Lütfen Komutu",
+    "Yapay Zeka'lı EfsoDuyar",
+    "Kadim Ockis",
+    "Risitasa Veda",
+
+    // 60
+    "Cinnet-i Bump",
+    "Elit Murat",
+    "MİT ajanı MrChunk",
 }
 /*******************************************************************72*/

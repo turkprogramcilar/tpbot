@@ -1,7 +1,7 @@
 import { CardEffect } from "./CardEffect";
 import { CardTitle } from "./CardProperties";
 
-export const CardEffectDatabase: {[key in CardTitle]: CardEffect} =
+export const CardEffectDatabase: {[key in CardTitle]: CardEffect | undefined} =
 {
     // tslint:disable: no-string-literal
     [CardTitle["Efsanevi Atatürk"]]: new CardEffect((x) => 
@@ -32,7 +32,7 @@ export const CardEffectDatabase: {[key in CardTitle]: CardEffect} =
     {
         return {owner: x};
     }),
-    [CardTitle["Usta Rakun"]]: new CardEffect((x) => 
+    [CardTitle["8 Top"]]: new CardEffect((x) => 
     {
         return {owner: x};
     }),
@@ -124,5 +124,37 @@ export const CardEffectDatabase: {[key in CardTitle]: CardEffect} =
     {
         return {owner: x};
     }),
+    26: undefined,
+    27: undefined,
+    28: undefined,
+    29: undefined,
+    30: undefined,
+    31: undefined,
+    32: undefined,
+    33: undefined,
+    34: undefined,
+    35: undefined,
+    36: undefined,
+    37: undefined,
+    38: undefined,
+    39: undefined,
+    40: undefined,
+    41: undefined,
+    42: undefined,
+    48: undefined,
+    49: undefined,
+    50: undefined,
+    51: undefined,
+    52: undefined,
+    53: undefined,
+    54: undefined,
+    55: undefined,
+    56: undefined,
+    57: undefined,
+    58: undefined,
+    59: undefined,
+    60: undefined,
+    61: undefined,
+    62: undefined
     // tslint:enable: no-string-literal
 }

@@ -8,7 +8,8 @@ constructor(
     public no: CardNo,
     public rarity: CardRarity,
     public description: string,
-    public link: string
+    public link: string,
+    public combo: string[] = []
 )
 {
 
