@@ -89,6 +89,7 @@ async deste(interaction: CommandInteraction)
         )
     ]});
 }
+/*
 @SlashCommand("Test")
 async test2(interaction: CommandInteraction)
 {
@@ -99,10 +100,11 @@ async test2(interaction: CommandInteraction)
         await interaction.channel?.send({embeds:card});
     }
 }
-
 @SlashCommand("Test")
 async test(interaction: CommandInteraction)
 {
+	await interaction.deferReply();
+
     let min = 1000;
     let max = 0;
     let cardsDrawn: any = {}
@@ -146,7 +148,7 @@ async test(interaction: CommandInteraction)
         per[ii] = rarityPerDrawn[ii] / t 
         perCard[ii] = rarityPerDrawn[ii] / t / cardsPerRarity[ii] 
     }
-    await interaction.reply(`min:${min} max:${max} total: ${t} `
+    await interaction.editReply(`min:${min} max:${max} total: ${t} `
         + `rarityPerDrawn: ${codeBlock(JSON.stringify(rarityPerDrawn))}`
         + `cardsPerRarity: ${codeBlock(JSON.stringify(cardsPerRarity))}`
         + `per: ${codeBlock(JSON.stringify(per))}`

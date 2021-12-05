@@ -338,7 +338,7 @@ export const CardTextDatabase: {[key in CardTitle]: CardText} =
     ),
     [CardTitle["Elit Murat"]]: new CardText(CardTitle["Elit Murat"],
         CardRarity.Güzide,
-        "İki oyuncu sunucuda atılan everyone etiketinden dolayı bildirim alırlar. Kartı oynayan oyuncu yeni bir kart çeker.",
+        "Murat lüks altın rengi ceketini giyer ve vahşi bir şekilde seksi hareketler yapmaya başlar.Şok olan düşman,oyuncuya istediği 1 kartı verir ve oyuna canından -10 eksilerek devam eder.",
         "https://c.tenor.com/3ieAAe1G0boAAAAd/kobra-murat-kobra.gif"
     ),
     [CardTitle["MİT ajanı MrChunk"]]: new CardText(CardTitle["MİT ajanı MrChunk"],
