@@ -20,7 +20,7 @@ get title(): string
 }
 get rarityText(): string
 {
-    return Helper.getEnumText(this.rarity - 1, CardRarity);
+    return Helper.getEnumText(this.rarity, CardRarity);
 }
 get categoryText(): string
 {

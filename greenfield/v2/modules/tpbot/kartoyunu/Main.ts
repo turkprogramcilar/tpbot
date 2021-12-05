@@ -18,18 +18,18 @@ constructor()
 cardEmbeds(no: CardNo)
 {
     const colors: {[key in CardRarity]: readonly[number,number,number] } = {
-        1: [88,  110, 117],
-        2: [131, 148, 150],
-        3: [42,  161, 152],
-        4: [181, 137, 0],
-        5: [203, 75,  22]
+        [CardRarity.Yaygın]:     [88,  110, 117],
+        [CardRarity.Güzide]:     [131, 148, 150],
+        [CardRarity.Esrarengiz]: [42,  161, 152],
+        [CardRarity.İhtişamlı]:  [181, 137, 0],
+        [CardRarity.Destansı]:   [203, 75,  22]
     }
     const formats: {[key in CardRarity]: string} =  {
-        1: "brainfuck",
-        2: "",
-        3: "yaml",
-        4: "fix",
-        5: "css"
+        [CardRarity.Yaygın]:     "brainfuck",
+        [CardRarity.Güzide]:     "",
+        [CardRarity.Esrarengiz]: "yaml",
+        [CardRarity.İhtişamlı]:  "fix",
+        [CardRarity.Destansı]:   "css"
     }
     const card = CardTextDatabase[no];
     return [
