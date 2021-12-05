@@ -14,7 +14,7 @@ constructor(
 )
 {
 }
-get hasTargets()
+get hasTarget()
 {
     return this.targets > 0;
 }

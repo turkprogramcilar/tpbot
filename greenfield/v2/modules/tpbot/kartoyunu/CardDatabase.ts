@@ -21,6 +21,12 @@ async getDeck(_id: string)
 {
     return (await this.getUser(_id)).deck;
 }
+async getSlashDeck(id: string) {
+    return this.getDeck(id);
+}
+async getUserDeck(id: string) {
+    return this.getDeck(id);
+}
 private async getUser(_id: string)
 {
     let exists = await this.database.query(CardUser).filter({id: _id})

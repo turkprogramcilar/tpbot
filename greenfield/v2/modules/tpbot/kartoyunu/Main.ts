@@ -1,4 +1,4 @@
-import { CommandInteraction, Message, MessageActionRow, MessageEmbed, MessageSelectMenu } from "discord.js";
+import { CommandInteraction, ContextMenuInteraction, Message, MessageActionRow, MessageEmbed, MessageSelectMenu } from "discord.js";
 import { TpbotModule } from "../../../TpbotModule";
 import { CardRepository, FakeCardRepo } from "./CardRepository";
 import { CardTextDatabase } from "./CardTextDatabase";
@@ -15,7 +15,23 @@ constructor()
 {
     super(KartOyunu.name);
 }
-cardEmbeds(no: CardNo)
+deckPanel(deck: CardNo[], customId: string)
+{
+    const menuCards = deck.map((x, i) => { return {
+        label: CardTextDatabase[x].title, 
+        value: i.toString()
+    }});
+    return [
+        new MessageActionRow()
+        .addComponents(
+            new MessageSelectMenu()
+            .setCustomId(customId)
+            .setPlaceholder("Kart seç")
+            .addOptions(menuCards)
+        )
+    ];
+}
+cardEmbed(no: CardNo)
 {
     const colors: {[key in CardRarity]: readonly[number,number,number] } = {
         [CardRarity.Yaygın]:     [88,  110, 117],
@@ -70,24 +86,31 @@ private rollCard(rnd: (() => number) = Math.random): CardNo
     return group[Math.floor(rnd() * group.length)];
 }
 /*******************************************************************72*/
-@UserCommand
+@MessageCommand
+async hedef(interaction: ContextMenuInteraction)
+{
+    const message = await interaction.channel?.messages.fetch(interaction.targetId);
+    if (!message) {
+        this.print.error("Can't fetch message");
+        return;
+    }
+    const deck = (await this.CardRepository.getUserDeck(interaction.user.id));
+    await interaction.reply({content: 
+        `Hedef: ${inlineCode(message.author.username)}`
+        + `\nDestendeki hedefli kartlar:`, components:
+        this.deckPanel(deck, message.author.id), ephemeral: true});
+}
+@SlashCommand("Normal kart destesini açar")
 async deste(interaction: CommandInteraction)
 {
-    const deck = (await this.CardRepository.getDeck(interaction.user.id))
-        .map((x, i) => { return {
-            label: CardTextDatabase[x].title, 
-            value: i.toString()
-        };
-    })
-    await interaction.reply({content: "`Destendeki kartlar`", components: [
-        new MessageActionRow()
-        .addComponents(
-            new MessageSelectMenu()
-            .setCustomId("menu")
-            .setPlaceholder("Kart seç")
-            .addOptions(deck)
-        )
-    ]});
+    const deck = (await this.CardRepository.getSlashDeck(interaction.user.id));
+    await interaction.reply({content: "Destendeki normal kartlar:", components:
+        this.deckPanel(deck, "normal"), ephemeral: true});
+}
+@CustomIdRegex(/normal/)
+async cidNormal(interaction: SelectMenuInteraction)
+{
+    
 }
 /*
 @SlashCommand("Test")

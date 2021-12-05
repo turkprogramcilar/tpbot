@@ -7,9 +7,6 @@ export enum CardRarity {
     "İhtişamlı",
     "Destansı",
 }
-export enum CardKind {
-
-}
 export enum CardTitle
 {
     "Efsanevi Atatürk" = 1,

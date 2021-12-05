@@ -23,7 +23,7 @@ export const CardEffectDatabase: {[key in CardTitle]: CardEffect | undefined} =
     [CardTitle["KorkusuzBöyle"]]: new CardEffect((x) =>
     {
         return { owner: x };
-    }),
+    }, 1),
     [CardTitle["Kara Murat benim"]]: new CardEffect((x) => 
     {
         return {owner: x};
