@@ -7,11 +7,35 @@ import { bold, codeBlock, inlineCode } from "@discordjs/builders";
 import { CardNo, CardRarity, CardTitle } from "./CardProperties";
 import { MessageButtonStyles } from "discord.js/typings/enums";
 import { CardEffectDatabase } from "./CardEffectDatabase";
+import { Helper } from "../../../common/Helper";
+import { CardDatabase } from "./CardDatabase";
 
 export class KartOyunu extends TpbotModule
 {
+static rollCard(rnd: (() => number) = Math.random): CardNo
+{
+    const groupedByRarity = 
+            Array(Object.keys(CardTitle).length / 2).fill(0).map((x, i) => i+1)
+            .reduce((a: number[][], c) => { 
+                a[CardTextDatabase[c as CardNo].rarity-1].push(c); 
+                return a; 
+            }, [[],[],[],[],[]/* excluded group: -> */,[]])
+            .slice(0, -1);
+
+    const rollScale = groupedByRarity
+            .map((x, i) => x.length/(i+1));
+    const sum = rollScale.reduce((a, c) => a+=c, 0);
+    const roll = rnd() * sum;
+    let s = rollScale[0];
+    let i = 0;
+    for (; roll >= s; i++) {
+        s += rollScale[i+1];
+    }
+    const group = groupedByRarity[i];
+    return group[Math.floor(rnd() * group.length)];
+}
 /*******************************************************************72*/
-private readonly CardRepository: CardRepository = new FakeCardRepo();
+private readonly CardRepository: CardRepository = new CardDatabase();//new FakeCardRepo();
 private readonly selectedCard: {[key: string]: CardNo | undefined} = {};
 private readonly selectedTarget: {[key: string]: string | undefined} = {};
 private readonly colors: {[key in CardRarity]: readonly[number,number,number] } = {
@@ -53,6 +77,7 @@ deckPanel(deck: CardNo[], customId: string)
             .setCustomId(customId+"button")
             .setLabel("Kart oyna")
             .setStyle(MessageButtonStyles.PRIMARY)
+            .setDisabled(true)
         )
     ];
 }
@@ -86,30 +111,8 @@ cardEmbed(no: CardNo)
             .addField(bold("No"), codeBlock(`${card.no.toString()}`), true)
     ];
 }
-private rollCard(rnd: (() => number) = Math.random): CardNo
-{
-    const groupedByRarity = 
-            Array(Object.keys(CardTitle).length / 2).fill(0).map((x, i) => i+1)
-            .reduce((a: number[][], c) => { 
-                a[CardTextDatabase[c as CardNo].rarity-1].push(c); 
-                return a; 
-            }, [[],[],[],[],[]/* excluded group: -> */,[]])
-            .slice(0, -1);
-
-    const rollScale = groupedByRarity
-            .map((x, i) => x.length/(i+1));
-    const sum = rollScale.reduce((a, c) => a+=c, 0);
-    const roll = rnd() * sum;
-    let s = rollScale[0];
-    let i = 0;
-    for (; roll >= s; i++) {
-        s += rollScale[i+1];
-    }
-    const group = groupedByRarity[i];
-    return group[Math.floor(rnd() * group.length)];
-}
 /*******************************************************************72*/
-@MessageCommand
+// @MessageCommand
 async hedef(interaction: ContextMenuInteraction)
 {
     const message = await interaction.channel?.messages.fetch(interaction.targetId);
@@ -149,7 +152,12 @@ async normalbutton(interaction: ButtonInteraction)
     if (!no)
         return;
 
-    const hasTarget = CardEffectDatabase[no]?.hasTarget;
+    const effect = CardEffectDatabase[no];
+    if (!effect)
+        return interaction.update(codeBlock("diff",
+            "- Kart şu anda sadece koleksiyonda tutulabilmektedir."));
+            
+    const hasTarget = effect?.hasTarget;
     const target = this.selectedTarget[interaction.user.id];
     if (hasTarget && !target)
         return;
@@ -170,29 +178,27 @@ async normalbutton(interaction: ButtonInteraction)
     else
         return;
 }
-/*******************************************************************72*/
-/*
-@SlashCommand("Test")
+// @SlashCommand("Test")
 async test2(interaction: CommandInteraction)
 {
-    await interaction.reply({embeds: this.cardEmbeds(this.rollCard())})
+    await interaction.reply({embeds: this.cardEmbed(KartOyunu.rollCard())})
     for (const i of [...Array(62).keys()]) {
-        const card = this.cardEmbeds(i+1);
+        const card = this.cardEmbed(i+1);
         await Helper.sleep(1000);
         await interaction.channel?.send({embeds:card});
     }
 }
-@SlashCommand("Test")
+// @SlashCommand("Test")
 async test(interaction: CommandInteraction)
 {
 	await interaction.deferReply();
 
     let min = 1000;
     let max = 0;
-    let cardsDrawn: any = {}
+    const cardsDrawn: any = {}
     for (let i = 0; i < 1000000; i++)
     {
-        const t = this.rollCard();
+        const t = KartOyunu.rollCard();
         if (t > max)
             max = t;
         else if (t < min)
@@ -204,17 +210,17 @@ async test(interaction: CommandInteraction)
     }
     let t = 0;
     const rarityPerDrawn: {[key in CardRarity]: number} = {
-        1: 0, 2: 0, 3: 0, 4: 0, 5: 0
+        1: 0, 2: 0, 3: 0, 4: 0, 0: 0
     };
     const cardsPerRarity: {[key in CardRarity]: number} = {
-        1: 0, 2: 0, 3: 0, 4: 0, 5: 0
+        1: 0, 2: 0, 3: 0, 4: 0, 0: 0
     }
     const per: {[key in CardRarity]: number} = {
-        1: 0, 2: 0, 3: 0, 4: 0, 5: 0
+        1: 0, 2: 0, 3: 0, 4: 0, 0: 0
     }
     
     const perCard: {[key in CardRarity]: number} = {
-        1: 0, 2: 0, 3: 0, 4: 0, 5: 0
+        1: 0, 2: 0, 3: 0, 4: 0, 0: 0
     }
     for (const [key, value] of Object.entries(cardsDrawn))
     {
