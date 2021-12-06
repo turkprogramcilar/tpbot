@@ -58,9 +58,9 @@ constructor()
 }
 deckPanel(deck: CardNo[], customId: string)
 {
-    const menuCards = deck.map((x) => { return {
+    const menuCards = deck.map((x, i) => { return {
         label: CardTextDatabase[x].title, 
-        value: x.toString()
+        value: `${i}_${x.toString()}`
     }});
     return [
         new MessageActionRow()
@@ -139,7 +139,8 @@ async deste(interaction: CommandInteraction)
 @CustomId
 async normalmenu(interaction: SelectMenuInteraction)
 {
-    const no = Number(interaction.values[0]);
+    const match = interaction.values[0].match(/\d+\_(\d+)/);
+    const no = Number(match?.[1]);
     if (isNaN(no))
         return;
     this.selectedCard[interaction.user.id] = no;
