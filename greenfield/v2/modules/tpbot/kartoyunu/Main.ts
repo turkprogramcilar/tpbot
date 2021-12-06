@@ -1,8 +1,8 @@
-import { CommandInteraction, ContextMenuInteraction, Message, MessageActionRow, MessageEmbed, MessageSelectMenu } from "discord.js";
+import { CommandInteraction, ContextMenuInteraction, Message, MessageActionRow, MessageEmbed, MessageSelectMenu, SelectMenuInteraction } from "discord.js";
 import { TpbotModule } from "../../../TpbotModule";
 import { CardRepository, FakeCardRepo } from "./CardRepository";
 import { CardTextDatabase } from "./CardTextDatabase";
-import { MessageCommand, SlashCommand, UserCommand } from "../../../TpbotDecorators"
+import { CustomIdRegex, MessageCommand, SlashCommand, UserCommand } from "../../../TpbotDecorators"
 import { bold, codeBlock, inlineCode } from "@discordjs/builders";
 import { CardNo, CardRarity, CardTitle } from "./CardProperties";
 import { Helper } from "../../../common/Helper";
@@ -108,9 +108,10 @@ async deste(interaction: CommandInteraction)
         this.deckPanel(deck, "normal"), ephemeral: true});
 }
 @CustomIdRegex(/normal/)
-async cidNormal(interaction: SelectMenuInteraction)
+async normal(interaction: SelectMenuInteraction)
 {
-    
+    const no = Number(interaction.values[0])+1;
+    await interaction.update({embeds: this.cardEmbed(no)});    
 }
 /*
 @SlashCommand("Test")

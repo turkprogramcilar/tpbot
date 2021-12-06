@@ -1,5 +1,5 @@
 import { ContextMenuCommandType } from "@discordjs/builders";
-import { Client, CommandInteraction, ContextMenuInteraction, Interaction, Message } from "discord.js";
+import { Client, CommandInteraction, ContextMenuInteraction, Interaction, Message, MessageComponentInteraction } from "discord.js";
 import { Helper } from "./common/Helper";
 import { Print } from "./common/Print";
 export interface Slash
@@ -20,6 +20,11 @@ export interface Regex
     regex: RegExp,
     prefix: RegExp
 }
+export interface CustomIdRegex
+{
+    callback: (interaction: MessageComponentInteraction) => Promise<void> | void,
+    regex: RegExp,
+}
 export type Registrar<Type> = {
     [Property in keyof Type as Exclude<Property, "callback">]: Type[Property]
 };
@@ -30,6 +35,7 @@ protected readonly print: Print;
 private client?: Client;
 private commands?: Regex[];
 private slashes?: Slash[];
+private regexes?: CustomIdRegex[];
 private menus?: Menu[];
 constructor(public readonly moduleName: string) 
 { 
@@ -85,6 +91,16 @@ registerMenu(
         callback: _callback, name: _name, type: _type
     });
 }
+registerCustomIdRegex(
+    _callback: (interaction: MessageComponentInteraction) => Promise<void> | void,
+    _regex: RegExp)
+{
+    if (!this.regexes)
+        this.regexes = [];
+    this.regexes.push({
+        callback: _callback, regex: _regex
+    });
+}
 /*******************************************************************72*/
 async commandProxy(message: Message): Promise<void> 
 { 
@@ -127,18 +143,12 @@ async interactionProxy(int: Interaction): Promise<void>
     else if (int.isMessageComponent() 
         && Helper.isMessageInteraction(int.message.interaction)) {
         
-        const commandName = int.message.interaction.commandName;
-        const slash = this.slashCallback[commandName];
-        if (slash) {
-            //return slash.callback.apply(this, [int]);
-        }
-        const menu = this.menuCallback[commandName];
-        if (menu) {
-            //return menu.callback.apply(this, [int]);
-        }
-        else {
+        // const commandName = int.message.interaction.commandName;
+        const first = (this.regexes ?? []).find(x => int.customId.match(x.regex));
+        if (!first)
             return;
-        }
+        
+        await first.callback.apply(this, [int]);
     }
 }
 // tslint:disable: no-empty

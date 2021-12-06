@@ -16,6 +16,7 @@ export function RegexCommand(customRegex?: RegExp, customPrefix?: RegExp)
     return (target: TpbotModule, methodName: string, 
         descriptor: PropertyDescriptor) => {
 
+        safe(descriptor, methodName, RegexCommand.name);
         target.registerRegex(descriptor.value,
             customRegex ?? new RegExp(`^${methodName}`), customPrefix);
     }
@@ -23,6 +24,7 @@ export function RegexCommand(customRegex?: RegExp, customPrefix?: RegExp)
 export const PlainCommand = (target: TpbotModule, 
     methodName: string, descriptor: PropertyDescriptor) => 
 {
+    safe(descriptor, methodName, PlainCommand.name);
     target.registerRegex(descriptor.value, new RegExp(`^${methodName}`));
 };
 export function SlashCommand(description: string)
@@ -30,36 +32,33 @@ export function SlashCommand(description: string)
     return (target: TpbotModule, methodName: string, 
         descriptor: PropertyDescriptor) => {
         
-        const originalMethod = descriptor.value;
-        descriptor.value = async function (...args: any[]) {
-            try { 
-                return await originalMethod.bind(this)(...args);
-            }
-            catch (error) { 
-                print.setSurname(target.moduleName).setType(SlashCommand.name)
-                    .exception(error);
-            }
-        }
+        safe(descriptor, methodName, SlashCommand.name);
         target.registerSlash(descriptor.value, methodName, description);
     }
 }
-function menu(type: ContextMenuCommandType, name: string)
+export const CustomIdRegex = (regex: RegExp) => 
+    (target: TpbotModule, methodName: string, desciptor: PropertyDescriptor) =>
 {
-    return (target: TpbotModule, methodName: string, 
-        descriptor: PropertyDescriptor) => {
-        
-        const originalMethod = descriptor.value;
-        descriptor.value = async function (...args: any[]) {
-            try { 
-                return await originalMethod.bind(this)(...args); 
-            }
-            catch (error) { 
-                print.setSurname(target.moduleName).setType(SlashCommand.name)
-                    .exception(error);
-            }
+    safe(desciptor, target.moduleName, CustomIdRegex.name);
+    target.registerCustomIdRegex(desciptor.value, regex);
+}
+function safe(descriptor: PropertyDescriptor, surname: string, type: string)
+{
+    const original = descriptor.value;
+    descriptor.value = async function (...args: any[]) {
+        try {
+            return await original.bind(this)(...args);
         }
-        target.registerMenu(descriptor.value, methodName, type);
+        catch (error) {
+            print.setSurname(surname).setType(type).exception(error);
+        }
     }
+}
+const menu = (type: ContextMenuCommandType, name: string) =>
+(target: TpbotModule, methodName: string, descriptor: PropertyDescriptor) =>
+{        
+    safe(descriptor, target.moduleName, name);
+    target.registerMenu(descriptor.value, methodName, type);
 }
 export const UserCommand = (target: TpbotModule, methodName: string, 
     descriptor: PropertyDescriptor) =>
