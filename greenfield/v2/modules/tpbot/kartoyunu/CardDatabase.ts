@@ -4,7 +4,7 @@ import { CardTitle } from "./CardProperties";
 import { CardRepository } from "./CardRepository";
 import { CardUser } from "./CardUser";
 
-export class CardDatabase extends CardRepository
+export class CardDatabase  //extends CardRepository
 {
 private readonly adapter = new SQLiteDatabaseAdapter(':memory:');
 private readonly database = new Database(this.adapter, [CardUser]);

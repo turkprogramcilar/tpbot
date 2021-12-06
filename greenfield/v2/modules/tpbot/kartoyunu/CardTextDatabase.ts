@@ -346,5 +346,15 @@ export const CardTextDatabase: {[key in CardTitle]: CardText} =
         "MİT ajanı MrChuck uzmanlık alanı herhangi bir konya kartı üzerinde etkilidir (öneri taslak)",
         "https://media0.giphy.com/media/VwlbYRAJktWM0LL1iu/giphy.gif?cid=790b76118572fd8000ff122eddc0108738d4b071657c029d&rid=giphy.gif&ct=g"
     ),
+    [CardTitle["Echo"]]: new CardText(CardTitle["Echo"],
+        CardRarity.Yaygın,
+        "MİT ajanı MrChuck uzmanlık alanı herhangi bir konya kartı üzerinde etkilidir (öneri taslak)",
+        "https://media1.giphy.com/media/wadpPRc8Tb1dkRDvsc/giphy.gif?cid=790b76119d3dee2900768aefaf5f0d0d6bf164df2741153b&rid=giphy.gif&ct=g"
+    ),
+    [CardTitle["Kadim Echo"]]: new CardText(CardTitle["Kadim Echo"],
+        CardRarity.Esrarengiz,
+        "Kadim zaman echo gücüne tanıklık etmiş kişilerce anlatılan güce oyuncu bu kart sayesinde erişir ve anonim bir şekilde bulunduğu kanala echo mesajı atar (not: sunucu kuralları ihlalinde kim olduğunuz tespit edilebilmektedir)",
+        "https://c.tenor.com/9UgExGfqauIAAAAC/stars-blue.gif"
+    ),
     // tslint:enable: no-string-literal
 }

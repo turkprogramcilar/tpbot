@@ -1,15 +1,13 @@
+import { CardEffectResult } from "./CardEffectResult";
 import { CardUser } from "./CardUser";
+import { KartOyunu } from "./Main";
 
-export interface CardEffectResult
-{
-    owner: CardUser,
-    targets?: [CardUser],
-}
 export class CardEffect
 {
 /*******************************************************************72*/
 constructor(
-    readonly execute: (owner: CardUser, targets?: [CardUser]) => CardEffectResult,
+    readonly execute: (module: KartOyunu, owner: CardUser, 
+        targets?: [CardUser]) => CardEffectResult,
     readonly targets: number = 0,
 )
 {

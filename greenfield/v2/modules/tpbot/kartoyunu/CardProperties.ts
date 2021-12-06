@@ -91,5 +91,7 @@ export enum CardTitle
     "Cinnet-i Bump",
     "Elit Murat",
     "MİT ajanı MrChunk",
+    "Echo",
+    "Kadim Echo",
 }
 /*******************************************************************72*/

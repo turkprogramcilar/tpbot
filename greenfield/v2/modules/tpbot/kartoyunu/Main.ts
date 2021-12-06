@@ -1,67 +1,90 @@
-import { CommandInteraction, ContextMenuInteraction, Message, MessageActionRow, MessageEmbed, MessageSelectMenu, SelectMenuInteraction } from "discord.js";
+import { ButtonInteraction, CommandInteraction, ContextMenuInteraction, Message, MessageActionRow, MessageButton, MessageComponent, MessageEmbed, MessageSelectMenu, SelectMenuInteraction } from "discord.js";
 import { TpbotModule } from "../../../TpbotModule";
 import { CardRepository, FakeCardRepo } from "./CardRepository";
 import { CardTextDatabase } from "./CardTextDatabase";
-import { CustomIdRegex, MessageCommand, SlashCommand, UserCommand } from "../../../TpbotDecorators"
+import { CustomId, CustomIdRegex, MessageCommand, SlashCommand, UserCommand } from "../../../TpbotDecorators"
 import { bold, codeBlock, inlineCode } from "@discordjs/builders";
 import { CardNo, CardRarity, CardTitle } from "./CardProperties";
-import { Helper } from "../../../common/Helper";
+import { MessageButtonStyles } from "discord.js/typings/enums";
+import { CardEffectDatabase } from "./CardEffectDatabase";
 
 export class KartOyunu extends TpbotModule
 {
 /*******************************************************************72*/
 private readonly CardRepository: CardRepository = new FakeCardRepo();
+private readonly selectedCard: {[key: string]: CardNo | undefined} = {};
+private readonly selectedTarget: {[key: string]: string | undefined} = {};
+private readonly colors: {[key in CardRarity]: readonly[number,number,number] } = {
+    [CardRarity.Yaygın]:     [88,  110, 117],
+    [CardRarity.Güzide]:     [131, 148, 150],
+    [CardRarity.Esrarengiz]: [42,  161, 152],
+    [CardRarity.İhtişamlı]:  [181, 137, 0],
+    [CardRarity.Destansı]:   [203, 75,  22]
+}
+private readonly formats: {[key in CardRarity]: string} =  {
+    [CardRarity.Yaygın]:     "brainfuck",
+    [CardRarity.Güzide]:     "",
+    [CardRarity.Esrarengiz]: "yaml",
+    [CardRarity.İhtişamlı]:  "fix",
+    [CardRarity.Destansı]:   "css"
+}
 constructor()
 {
     super(KartOyunu.name);
 }
 deckPanel(deck: CardNo[], customId: string)
 {
-    const menuCards = deck.map((x, i) => { return {
+    const menuCards = deck.map((x) => { return {
         label: CardTextDatabase[x].title, 
-        value: i.toString()
+        value: x.toString()
     }});
     return [
         new MessageActionRow()
         .addComponents(
             new MessageSelectMenu()
-            .setCustomId(customId)
+            .setCustomId(customId+"menu")
             .setPlaceholder("Kart seç")
-            .addOptions(menuCards)
+            .addOptions(menuCards),
+        )
+        ,
+        new MessageActionRow()
+        .addComponents(
+            new MessageButton()
+            .setCustomId(customId+"button")
+            .setLabel("Kart oyna")
+            .setStyle(MessageButtonStyles.PRIMARY)
         )
     ];
 }
+cardShowOff(no: CardNo)
+{
+    const card = CardTextDatabase[no];
+    return [ new MessageEmbed()
+        .setThumbnail(card.link)
+        .setTitle(inlineCode(card.title))
+        .setDescription(codeBlock(this.formats[card.rarity], `[${card.description}]`))
+        .addField(inlineCode(`Kart cinsi: ${card.rarityText}`), `No: ${no}\n\n\n`)
+        .setColor(this.colors[card.rarity])
+    ];
+}
+
 cardEmbed(no: CardNo)
 {
-    const colors: {[key in CardRarity]: readonly[number,number,number] } = {
-        [CardRarity.Yaygın]:     [88,  110, 117],
-        [CardRarity.Güzide]:     [131, 148, 150],
-        [CardRarity.Esrarengiz]: [42,  161, 152],
-        [CardRarity.İhtişamlı]:  [181, 137, 0],
-        [CardRarity.Destansı]:   [203, 75,  22]
-    }
-    const formats: {[key in CardRarity]: string} =  {
-        [CardRarity.Yaygın]:     "brainfuck",
-        [CardRarity.Güzide]:     "",
-        [CardRarity.Esrarengiz]: "yaml",
-        [CardRarity.İhtişamlı]:  "fix",
-        [CardRarity.Destansı]:   "css"
-    }
     const card = CardTextDatabase[no];
     return [
         new MessageEmbed()
-            .setColor(colors[card.rarity])
+            .setColor(this.colors[card.rarity])
             .setTitle((card.title))
             .setImage(card.link)
             .setFooter(card.description)
         ,
         new MessageEmbed()
-            .setColor(colors[card.rarity])
-            .addField(bold("Tür"), codeBlock(formats[card.rarity], 
+            .setColor(this.colors[card.rarity])
+            .addField(bold("Tür"), codeBlock(this.formats[card.rarity], 
                 `[${card.rarityText}]`), true)
             .addField(bold("Sınıf"), codeBlock(`${card.categoryText}`), true)
             .addField(bold("No"), codeBlock(`${card.no.toString()}`), true)
-    ]
+    ];
 }
 private rollCard(rnd: (() => number) = Math.random): CardNo
 {
@@ -99,6 +122,8 @@ async hedef(interaction: ContextMenuInteraction)
         `Hedef: ${inlineCode(message.author.username)}`
         + `\nDestendeki hedefli kartlar:`, components:
         this.deckPanel(deck, message.author.id), ephemeral: true});
+    this.selectedCard[interaction.user.id] = undefined;
+    this.selectedTarget[interaction.user.id] = message.author.id;
 }
 @SlashCommand("Normal kart destesini açar")
 async deste(interaction: CommandInteraction)
@@ -106,13 +131,46 @@ async deste(interaction: CommandInteraction)
     const deck = (await this.CardRepository.getSlashDeck(interaction.user.id));
     await interaction.reply({content: "Destendeki normal kartlar:", components:
         this.deckPanel(deck, "normal"), ephemeral: true});
+    this.selectedCard[interaction.user.id] = undefined;
 }
-@CustomIdRegex(/normal/)
-async normal(interaction: SelectMenuInteraction)
+@CustomId
+async normalmenu(interaction: SelectMenuInteraction)
 {
-    const no = Number(interaction.values[0])+1;
+    const no = Number(interaction.values[0]);
+    if (isNaN(no))
+        return;
+    this.selectedCard[interaction.user.id] = no;
     await interaction.update({embeds: this.cardEmbed(no)});    
 }
+@CustomId
+async normalbutton(interaction: ButtonInteraction)
+{
+    const no = this.selectedCard[interaction.user.id];
+    if (!no)
+        return;
+
+    const hasTarget = CardEffectDatabase[no]?.hasTarget;
+    const target = this.selectedTarget[interaction.user.id];
+    if (hasTarget && !target)
+        return;
+    
+    // gosterilcekse kart goster
+    // kart panelini guncelle
+    // kart oynandi de
+    // karti oyna ve repodan dus
+    // target efektini koy
+    // general effekti koy
+    if (await this.CardRepository.playCard(interaction.user.id, no))
+        await Promise.all([
+            interaction.channel?.send({content: inlineCode(
+                interaction.user.username + " bir kart oynadı."),
+                embeds: this.cardShowOff(no)}),
+            interaction.update({content:"Kart oynandı", embeds:[], components:[]})
+        ]);
+    else
+        return;
+}
+/*******************************************************************72*/
 /*
 @SlashCommand("Test")
 async test2(interaction: CommandInteraction)

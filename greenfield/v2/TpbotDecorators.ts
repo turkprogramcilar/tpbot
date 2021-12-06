@@ -36,6 +36,12 @@ export function SlashCommand(description: string)
         target.registerSlash(descriptor.value, methodName, description);
     }
 }
+export const CustomId = (target: TpbotModule, methodName: string, 
+    descriptor: PropertyDescriptor) =>
+{
+    safe(descriptor, target.moduleName, CustomId.name);
+    target.registerCustomIdRegex(descriptor.value, new RegExp(methodName));
+}
 export const CustomIdRegex = (regex: RegExp) => 
     (target: TpbotModule, methodName: string, desciptor: PropertyDescriptor) =>
 {
