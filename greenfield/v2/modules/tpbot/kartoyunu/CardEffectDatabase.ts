@@ -2,6 +2,7 @@ import { MessageComponentInteraction } from "discord.js";
 import { CardEffect } from "./CardEffect";
 import { CardEffectResult } from "./CardEffectResult";
 import { CardTitle } from "./CardProperties";
+import { KartOyunu } from "./Main";
 
 export const CardEffectDatabase: {[key in CardTitle]: CardEffect | undefined} =
 {
@@ -189,12 +190,17 @@ export const CardEffectDatabase: {[key in CardTitle]: CardEffect | undefined} =
     60: undefined,
     61: undefined,
     62: undefined,
-    [CardTitle["Echo"]]: new CardEffect(() => new CardEffectResult()
-    .setEffectInteraction(async (int: MessageComponentInteraction) => {
-        await int.reply({content: "Echo kart gücü aktifleştirildi. Bota"
-        + " göndereceğiniz ilk özel mesaj echo olarak gönderilecektir.", 
-        ephemeral: true});
-    })),
+    [CardTitle["Echo"]]: new CardEffect
+    (
+        (module: KartOyunu) => new CardEffectResult()
+            .setEffectInteraction(async (int: MessageComponentInteraction) =>
+            {
+                module.publicEcho.push([int.user.id, int.channelId]);
+                await int.followUp({content: "Echo kart gücü aktifleştirildi. Bota"
+                + " göndereceğiniz ilk özel mesaj echo olarak gönderilecektir.", 
+                ephemeral: true});
+            })
+    ),
     64: undefined,
     // tslint:enable: no-string-literal
     

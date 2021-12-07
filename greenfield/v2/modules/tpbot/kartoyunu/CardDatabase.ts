@@ -30,12 +30,12 @@ async getDeck(_id: string)
 async getSlashDeck(id: string)
 {
     const deck = await this.getDeck(id);
-    return deck.filter(x => !CardEffectDatabase[x]?.hasTarget);
+    return deck.filter(x => !CardEffectDatabase[x]?.canTarget);
 }
 async getUserDeck(id: string) 
 {
     const deck = await this.getDeck(id);
-    return deck.filter(x => CardEffectDatabase[x]?.hasTarget);
+    return deck.filter(x => CardEffectDatabase[x]?.canTarget);
 }
 async hasCard(id: string, no: CardNo)
 {

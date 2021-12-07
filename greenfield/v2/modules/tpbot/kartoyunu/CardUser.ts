@@ -7,7 +7,7 @@ export class CardUser
 /*******************************************************************72*/
 constructor(
     @t public id: string,
-    @t.array(t.number) public deck: CardNo[] = Array(5).fill(CardTitle["Hediye kart"]),
+    @t.array(t.number) public deck: CardNo[] = Array(63, 63, 32, 32, 32),
     @t public lastDaily: Date = new Date()
 )
 { 

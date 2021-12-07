@@ -23,12 +23,12 @@ getDeck(id: string)
 getUserDeck(id: string)
 {
     return Promise.resolve(this.deckRaw
-        .filter(x => CardEffectDatabase[x]?.hasTarget))
+        .filter(x => CardEffectDatabase[x]?.canTarget))
 }
 getSlashDeck(id: string)
 {
     return Promise.resolve(this.deckRaw
-        .filter(x => !CardEffectDatabase[x]?.hasTarget))
+        .filter(x => !(CardEffectDatabase[x]?.canTarget)))
 }
 hasCard(id: string, no: CardNo)
 {

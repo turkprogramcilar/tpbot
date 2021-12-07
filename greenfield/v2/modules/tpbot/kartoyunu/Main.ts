@@ -4,11 +4,12 @@ import { CardRepository, FakeCardRepo } from "./CardRepository";
 import { CardTextDatabase } from "./CardTextDatabase";
 import { CustomId, CustomIdRegex, MessageCommand, SlashCommand, UserCommand } from "../../../TpbotDecorators"
 import { bold, codeBlock, inlineCode } from "@discordjs/builders";
-import { CardNo, CardRarity, CardTitle } from "./CardProperties";
+import { CardNo, CardPlayKind, CardRarity, CardTitle } from "./CardProperties";
 import { MessageButtonStyles } from "discord.js/typings/enums";
 import { CardEffectDatabase } from "./CardEffectDatabase";
 import { Helper } from "../../../common/Helper";
 import { CardDatabase } from "./CardDatabase";
+import { CardUser } from "./CardUser";
 
 export class KartOyunu extends TpbotModule
 {
@@ -35,9 +36,12 @@ static rollCard(rnd: (() => number) = Math.random): CardNo
     return group[Math.floor(rnd() * group.length)];
 }
 /*******************************************************************72*/
-private readonly CardRepository: CardRepository = new CardDatabase();//new FakeCardRepo();
+publicEcho: [string, string][] = [];
+
+private readonly CardRepository: CardRepository = new FakeCardRepo();
 private readonly selectedCard: {[key: string]: CardNo | undefined} = {};
 private readonly selectedTarget: {[key: string]: string | undefined} = {};
+
 private readonly colors: {[key in CardRarity]: readonly[number,number,number] } = {
     [CardRarity.Yaygın]:     [88,  110, 117],
     [CardRarity.Güzide]:     [131, 148, 150],
@@ -56,8 +60,26 @@ constructor()
 {
     super(KartOyunu.name);
 }
+async directMessage(message: Message)
+{
+    const index = this.publicEcho.findIndex(x => x[0] === message.author.id);
+    if (-1 !== index) {
+        const [userId, channelId] = this.publicEcho[index];
+        this.publicEcho.splice(index, 1);
+        await this.channelSend(channelId, message.content);
+        return;
+    }
+}
 deckPanel(deck: CardNo[], customId: string)
 {
+    if (deck.length <= 0)
+        return [ new MessageActionRow().addComponents([
+            new MessageButton()
+            .setCustomId("ignorethis")
+            .setStyle(MessageButtonStyles.SECONDARY)
+            .setDisabled(true)
+            .setLabel("Destede hiç kart yok.")
+        ])];
     const menuCards = deck.map((x, i) => { return {
         label: CardTextDatabase[x].title, 
         value: `${i}_${x.toString()}`
@@ -77,7 +99,7 @@ deckPanel(deck: CardNo[], customId: string)
             .setCustomId(customId+"button")
             .setLabel("Kart oyna")
             .setStyle(MessageButtonStyles.PRIMARY)
-            .setDisabled(true)
+            // .setDisabled(true)
         )
     ];
 }
@@ -92,7 +114,6 @@ cardShowOff(no: CardNo)
         .setColor(this.colors[card.rarity])
     ];
 }
-
 cardEmbed(no: CardNo)
 {
     const card = CardTextDatabase[no];
@@ -158,26 +179,36 @@ async normalbutton(interaction: ButtonInteraction)
         return interaction.update(codeBlock("diff",
             "- Kart şu anda sadece koleksiyonda tutulabilmektedir."));
             
-    const hasTarget = effect?.hasTarget;
     const target = this.selectedTarget[interaction.user.id];
-    if (hasTarget && !target)
+    if (effect.playKind === CardPlayKind.Hedefe && !target)
         return;
     
+    // @TODO we only allow non-targeted for now
+    if (effect.playKind !== CardPlayKind.Ortaya)
+        return;
+
     // gosterilcekse kart goster
     // kart panelini guncelle
     // kart oynandi de
     // karti oyna ve repodan dus
     // target efektini koy
     // general effekti koy
-    if (await this.CardRepository.playCard(interaction.user.id, no))
-        await Promise.all([
-            interaction.channel?.send({content: inlineCode(
-                interaction.user.username + " bir kart oynadı."),
-                embeds: this.cardShowOff(no)}),
-            interaction.update({content:"Kart oynandı", embeds:[], components:[]})
-        ]);
-    else
+    if (!(await this.CardRepository.playCard(interaction.user.id, no)))
         return;
+
+    // @TODO undefined CardUser, define getUser from repo
+    const result = CardEffectDatabase[no]?.execute(this, new CardUser(""));
+
+    await Promise.all([
+        // show off
+        interaction.channel?.send({content: inlineCode(
+            interaction.user.username + " bir kart oynadı."),
+            embeds: this.cardShowOff(no)}),
+        // update interaction and remove panel
+        interaction.update({content:"Kart oynandı", embeds:[], components:[]}),
+        // do card effect if any
+        result?.effectInteraction?.(interaction)
+    ]);
 }
 // @SlashCommand("Test")
 async test2(interaction: CommandInteraction)

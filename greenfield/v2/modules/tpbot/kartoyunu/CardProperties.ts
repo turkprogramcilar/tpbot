@@ -7,6 +7,9 @@ export enum CardRarity {
     "İhtişamlı",
     "Destansı",
 }
+export enum CardPlayKind {
+    "Hedefe", "Ortaya", "Hedefe veya ortaya",
+}
 export enum CardTitle
 {
     "Efsanevi Atatürk" = 1,

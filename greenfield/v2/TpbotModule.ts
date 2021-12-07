@@ -164,6 +164,14 @@ protected async guild(id: string)
 {
     return await this.client!.guilds.fetch(id);
 }
+protected async channelSend(channelId: string, message: string)
+{
+    const channel = await this.client!.channels.fetch(channelId);
+    if (!channel?.isText())
+        return;
+
+    return channel.send(message);
+}
 /*******************************************************************72*/
 // @TODO move property definitions up in class def
 private _slashDictionary?: {[key: string]: Slash};
