@@ -1,14 +1,12 @@
-import { Database } from "@deepkit/orm";
-import { SQLiteDatabaseAdapter } from '@deepkit/sqlite';
 import { CardEffectDatabase } from "./CardEffectDatabase";
 import { CardNo, CardTitle } from "./CardProperties";
 import { CardRepository } from "./CardRepository";
 import { CardUser } from "./CardUser";
 
+import "reflect-metadata";
+
 export class CardDatabase extends CardRepository
 {
-private readonly adapter = new SQLiteDatabaseAdapter(':memory:');
-private readonly database = new Database(this.adapter, [CardUser]);
 private readonly session = this.database.createSession();
 /*******************************************************************72*/
 constructor()
