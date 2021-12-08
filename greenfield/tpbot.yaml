@@ -31,4 +31,4 @@ tokenMapping:
             tpbot:
                 - "KartOyunu"
             freestyle:
-                #- "legacy/main"
+                - "legacy/main"
