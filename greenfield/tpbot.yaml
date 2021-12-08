@@ -9,9 +9,12 @@ shellAccess:
         id: "824573651390562325"
         access: true
 
-spawn:
+spawns:
     -
         #python: "PingPy.py"
+
+freestyles:
+    - "legacy/main"
 
 tokenMapping:
     # Provide bot's account TOKENs in TPBOT_TOKEN1, TPBOT_TOKEN2... TPBOT_TOKENX
@@ -30,5 +33,3 @@ tokenMapping:
         modules:
             tpbot:
                 - "KartOyunu"
-            freestyle:
-                - "legacy/main"

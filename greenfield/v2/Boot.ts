@@ -13,11 +13,11 @@ interface TpbotYaml {
         id: string,
         access: boolean
     }[],
-    spawn?: (Spawn | null)[],
+    spawns?: (Spawn | null)[],
+    freestyles?: (string | undefined)[],
     tokenMapping?: {
         tag?: string,
         modules?: {
-            freestyle?: string[],
             tpbot?: string[]
         }
     }[],
