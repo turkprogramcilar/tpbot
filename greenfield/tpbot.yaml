@@ -26,7 +26,7 @@ tokenMapping:
     # These TOKENs will be logged in and account names are then matched with the
     # following tag name with its module defined below 
     -
-        tag: "TPBOT DEBUG 1#6503"
+        tag: "Bakkal Risitas#8407"
         modules:
             tpbot:
                 - "KartOyunu"
