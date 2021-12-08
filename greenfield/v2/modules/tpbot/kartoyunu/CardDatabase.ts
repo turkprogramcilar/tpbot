@@ -3,11 +3,11 @@ import { CardNo, CardTitle } from "./CardProperties";
 import { CardRepository } from "./CardRepository";
 import { CardUser } from "./CardUser";
 
-import "reflect-metadata";
+import { createConnection, getRepository } from "typeorm";
+import { Helper } from "../../../common/Helper";
 
 export class CardDatabase extends CardRepository
 {
-private readonly session = this.database.createSession();
 /*******************************************************************72*/
 constructor()
 {
@@ -18,7 +18,29 @@ async initialize()
 {
     // const adapter = new SQLiteDatabaseAdapter('./example.sqlite');
     
-    await this.database.migrate();
+    const conn: any = Helper.isDebug
+        ? {
+            type: "sqlite",
+            database: ":memory:",
+            dropSchema: true,
+            entities: [
+                CardUser
+            ],
+            synchronize: true,
+            logging: false
+        }
+        : {
+            type: "mongodb",
+            url: Helper.load("TPBOT_MONGODB"),
+            useNewUrlParser: true,
+            database: "test1",
+            entities: [
+                CardUser
+            ],
+            synchronize: true,
+            logging: false
+        };
+    await createConnection(conn);
 }
 /*******************************************************************72*/
 async getDeck(_id: string)
@@ -48,17 +70,32 @@ async playCard(id: string, no: CardNo)
         return false;
     
     const index = deck.indexOf(no);
-    deck.splice(index, no);
-    await this.database.persist(user);
+    deck.splice(index, 1);
+    await getRepository(CardUser).save(user);
     return true;
+}
+async checkDoDaily(id: string)
+{
+    const user = await this.getUser(id);
+    if (!user.canDaily())
+        return false;
+
+    user.lastDaily = new Date();
+    user.doDaily();    
+    await this.saveUser(user);
+    return true;
+}
+private saveUser(user: CardUser)
+{
+    return getRepository(CardUser).save(user);
 }
 private async getUser(_id: string)
 {
-    let exists = await this.database.query(CardUser).filter({id: _id})
-        .findOneOrUndefined();
-    if (!exists)
+    let exists = await getRepository(CardUser).findOne({id:  _id});
+    if (!exists) {
         exists = new CardUser(_id);
-        this.session.add(exists);
+        await getRepository(CardUser).insert(exists);
+    }
     
     return exists;
 }

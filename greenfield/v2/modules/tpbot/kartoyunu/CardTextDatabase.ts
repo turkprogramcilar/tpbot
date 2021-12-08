@@ -348,7 +348,7 @@ export const CardTextDatabase: {[key in CardTitle]: CardText} =
     ),
     [CardTitle["Echo"]]: new CardText(CardTitle["Echo"],
         CardRarity.Yaygın,
-        "MİT ajanı MrChuck uzmanlık alanı herhangi bir konya kartı üzerinde etkilidir (öneri taslak)",
+        "Oyuncu bu kartı oynadığında oynadığı sunucu kanalı içerisinde bir echo mesaj gücü aktifleştirir.",
         "https://media1.giphy.com/media/wadpPRc8Tb1dkRDvsc/giphy.gif?cid=790b76119d3dee2900768aefaf5f0d0d6bf164df2741153b&rid=giphy.gif&ct=g"
     ),
     [CardTitle["Kadim Echo"]]: new CardText(CardTitle["Kadim Echo"],

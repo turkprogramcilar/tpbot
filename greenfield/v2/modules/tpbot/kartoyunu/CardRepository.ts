@@ -9,6 +9,7 @@ abstract hasCard(id: string, no: CardNo): Promise<boolean>;
 abstract playCard(id: string, no: CardNo): Promise<boolean>;
 abstract getUserDeck(id: string): Promise<CardNo[]>;
 abstract getSlashDeck(id: string): Promise<CardNo[]>;
+abstract checkDoDaily(id: string): Promise<boolean>;
 /*******************************************************************72*/
 }
 // tslint:disable-next-line: max-classes-per-file
@@ -42,6 +43,10 @@ async playCard(id: string, no: CardNo)
     const index = this.deckRaw.indexOf(no);
     this.deckRaw.splice(index, 1);
         return Promise.resolve(true);
+}
+checkDoDaily()
+{
+    return Promise.resolve(false);
 }
 /*******************************************************************72*/
 }

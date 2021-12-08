@@ -3,7 +3,7 @@ import { TpbotModule } from "../../../TpbotModule";
 import { CardRepository, FakeCardRepo } from "./CardRepository";
 import { CardTextDatabase } from "./CardTextDatabase";
 import { CustomId, CustomIdRegex, MessageCommand, SlashCommand, UserCommand } from "../../../TpbotDecorators"
-import { bold, codeBlock, inlineCode } from "@discordjs/builders";
+import { bold, codeBlock, inlineCode, italic, underscore } from "@discordjs/builders";
 import { CardNo, CardPlayKind, CardRarity, CardTitle } from "./CardProperties";
 import { MessageButtonStyles } from "discord.js/typings/enums";
 import { CardEffectDatabase } from "./CardEffectDatabase";
@@ -16,12 +16,12 @@ export class KartOyunu extends TpbotModule
 static rollCard(rnd: (() => number) = Math.random): CardNo
 {
     const groupedByRarity = 
-            Array(Object.keys(CardTitle).length / 2).fill(0).map((x, i) => i+1)
+            Array(Object.keys(CardTitle).length / 2).fill(0).map((x, _i) => _i+1)
             .reduce((a: number[][], c) => { 
-                a[CardTextDatabase[c as CardNo].rarity-1].push(c); 
+                const aa = a[CardTextDatabase[c as CardNo].rarity];
+                aa.push(c); 
                 return a; 
-            }, [[],[],[],[],[]/* excluded group: -> */,[]])
-            .slice(0, -1);
+            }, [[],[],[],[],[]]);
 
     const rollScale = groupedByRarity
             .map((x, i) => x.length/(i+1));
@@ -38,7 +38,7 @@ static rollCard(rnd: (() => number) = Math.random): CardNo
 /*******************************************************************72*/
 publicEcho: [string, string][] = [];
 
-private readonly CardRepository: CardRepository = new FakeCardRepo();
+private readonly CardRepository: CardRepository = new CardDatabase();// new FakeCardRepo();
 private readonly selectedCard: {[key: string]: CardNo | undefined} = {};
 private readonly selectedTarget: {[key: string]: string | undefined} = {};
 
@@ -64,9 +64,19 @@ async directMessage(message: Message)
 {
     const index = this.publicEcho.findIndex(x => x[0] === message.author.id);
     if (-1 !== index) {
+
         const [userId, channelId] = this.publicEcho[index];
         this.publicEcho.splice(index, 1);
-        await this.channelSend(channelId, message.content);
+
+        let send: string = italic(underscore(message.content) + 
+            " -" + message.author.username);
+        if (send.length > 2000) {
+            const clip = send.length - 2000;
+            send = italic(underscore(message.content.slice(clip)) +
+            " -" + message.author.username);
+        }
+
+        await this.channelSend(channelId, send);
         return;
     }
 }
@@ -80,7 +90,8 @@ deckPanel(deck: CardNo[], customId: string)
             .setDisabled(true)
             .setLabel("Destede hiç kart yok.")
         ])];
-    const menuCards = deck.map((x, i) => { return {
+    // @TODO slice 25 limited hardcoded
+    const menuCards = deck.slice(0, 25).map((x, i) => { return {
         label: CardTextDatabase[x].title, 
         value: `${i}_${x.toString()}`
     }});
@@ -152,9 +163,15 @@ async hedef(interaction: ContextMenuInteraction)
 @SlashCommand("Normal kart destesini açar")
 async deste(interaction: CommandInteraction)
 {
-    const deck = (await this.CardRepository.getSlashDeck(interaction.user.id));
-    await interaction.reply({content: "Destendeki normal kartlar:", components:
-        this.deckPanel(deck, "normal"), ephemeral: true});
+    const daily = (await this.CardRepository.checkDoDaily(interaction.user.id))
+        ? codeBlock("diff", "+ Günlük yeni 2 kart hakkın destene eklendi.")
+        : ""
+        ;
+    // @TODO
+    // const deck = (await this.CardRepository.getSlashDeck(interaction.user.id));
+    const deck = (await this.CardRepository.getDeck(interaction.user.id));
+    await interaction.reply({content: daily+"Destendeki normal kartlar:", 
+        components: this.deckPanel(deck, "normal"), ephemeral: true});
     this.selectedCard[interaction.user.id] = undefined;
 }
 @CustomId
