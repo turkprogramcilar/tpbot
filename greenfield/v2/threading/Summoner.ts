@@ -97,7 +97,7 @@ private handleCrash(error: Error | unknown, crash: MinionCrash<T>, name: string,
 
     // if the bot manager is crashing very fast when summon after summon,
     // stop it launching more
-    if (crash.perMinute >= 6 || Helper.check("TPBOT_DEBUG")) {
+    if (crash.perMinute >= 6 || Helper.isDebug) {
         this.print.warn(`${name} is stopped reloading due crashing too fast.`
             + ` [crashes=${crash.count},`
             + ` ${crash.perMinute.toFixed(2)}/m]`);

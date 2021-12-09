@@ -5,11 +5,11 @@ import { TpbotModule } from "../../../TpbotModule";
 export class Crasher extends TpbotModule
 {
 /*******************************************************************72*/
-constructor(client: Client)
+constructor()
 {
-    super(Crasher.name, client);
+    super(Crasher.name);
 }
-protected async textMessage(message: Message)
+async textMessage(message: Message)
 {
     try
     {

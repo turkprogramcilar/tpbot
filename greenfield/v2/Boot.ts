@@ -13,11 +13,11 @@ interface TpbotYaml {
         id: string,
         access: boolean
     }[],
-    spawn?: Spawn[],
+    spawns?: (Spawn | null)[],
+    freestyles?: (string | undefined)[],
     tokenMapping?: {
-        tag: string,
+        tag?: string,
         modules?: {
-            freestyle?: string[],
             tpbot?: string[]
         }
     }[],
@@ -38,7 +38,7 @@ static getParsedYaml(): TpbotYaml
 /*******************************************************************72*/
 readonly print = new Print(Boot.name);
 
-run()
+async run()
 {
     this.print.info("Run has called.");
 

@@ -48,7 +48,7 @@ export class commander extends dcmodule
         const jsonbody = Object.values(flatten).map(x => x.data.toJSON());
         print.verbose("FLATTEN", jsonbody);
         const response = await rest.put(
-            Routes.applicationGuildCommands(id, tpid),
+        Routes.applicationGuildCommands(id, tpid),
             { body: jsonbody },
         );
         print.verbose("RESPONSE", response);

@@ -29,6 +29,9 @@ private loadSpawns()
 {
     this.print.info("Loading spawns.");
     for (const spawn of this.yamlSpawns()) {
+        if (!spawn)
+            continue;
+        this.print.info(`Summonning ${spawn}`);
         this.summonSpawn(spawn);
     }
 }
@@ -45,6 +48,8 @@ private loadFreestyles()
 {
     this.print.info("Loading Freestyle modules.");
     for (const freestyle of this.yamlFreestyles()) {
+        if (!freestyle)
+            continue;
         this.summonFreestyle(freestyle);
     }
 }
@@ -165,12 +170,11 @@ private async handleRequest(body: string, minion: Minion<BotData>)
 }
 private yamlSpawns()
 {
-    return (Boot.getParsedYaml().spawn ?? []);
+    return (Boot.getParsedYaml().spawns ?? []);
 }
 private yamlFreestyles()
 {
-    return (Boot.getParsedYaml().tokenMapping ?? [])
-        .map(x => x.modules?.freestyle ?? []).flat();
+    return (Boot.getParsedYaml().freestyles ?? [])
 }
 private environmentKeyTokens()
 {
