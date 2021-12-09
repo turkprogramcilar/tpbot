@@ -3,6 +3,7 @@ import { MinionCrash } from "./MinionCrash";
 import { Minion } from "./Minion";
 import { Helper } from "../common/Helper";
 import { mapDefined } from "tslint/lib/utils";
+import { spawn } from "child_process";
 
 export class Summoner<T>
 {
@@ -34,6 +35,12 @@ killMinion(id: number): Promise<number> | null
     const promise = this.minions[id].kill();
     delete this.minions[id];
     return promise;
+}
+spawn(fullpath: string)
+{
+    const command = spawn("python", [fullpath]);
+    command.stderr.pipe(process.stderr);
+    command.stdout.pipe(process.stdout);
 }
 summon(fullpath: string, minionName: string, summonerName: string, 
     data?: T, errorCallback?: (error: Error | unknown) => void,
@@ -90,7 +97,7 @@ private handleCrash(error: Error | unknown, crash: MinionCrash<T>, name: string,
 
     // if the bot manager is crashing very fast when summon after summon,
     // stop it launching more
-    if (crash.perMinute >= 6 || Helper.check("TPBOT_DEBUG")) {
+    if (crash.perMinute >= 6 || Helper.isDebug) {
         this.print.warn(`${name} is stopped reloading due crashing too fast.`
             + ` [crashes=${crash.count},`
             + ` ${crash.perMinute.toFixed(2)}/m]`);

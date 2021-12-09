@@ -1,12 +1,11 @@
 import { Print } from "./common/Print";
 import { Summoner } from "./threading/Summoner";
-
-import readline from 'readline';
 import { Minion } from "./threading/Minion";
 import { TpbotClient } from "./TpbotClient";
-import { Boot } from "./Boot";
+import { Boot, Spawn } from "./Boot";
 import { Path } from "./common/Path";
 import { Helper } from "./common/Helper";
+import readline from 'readline';
 
 export interface BotData
 {
@@ -20,10 +19,21 @@ private readonly summoner = new Summoner<BotData>(Kernel.name);
 constructor()
 {
     this.print.info("Constructor has called");
+    this.loadSpawns();
     this.loadFreestyles();
     this.loadTpbotModules();
     this.print.info("Constructor ended");
     // this.awaitStdin();
+}
+private loadSpawns()
+{
+    this.print.info("Loading spawns.");
+    for (const spawn of this.yamlSpawns()) {
+        if (!spawn)
+            continue;
+        this.print.info(`Summonning ${spawn}`);
+        this.summonSpawn(spawn);
+    }
 }
 private loadTpbotModules()
 {
@@ -38,14 +48,22 @@ private loadFreestyles()
 {
     this.print.info("Loading Freestyle modules.");
     for (const freestyle of this.yamlFreestyles()) {
+        if (!freestyle)
+            continue;
         this.summonFreestyle(freestyle);
+    }
+}
+private summonSpawn(spawn: Spawn)
+{
+    if (spawn.python) {
+        this.summoner.spawn(Path.freestyleNonBuilt("python", spawn.python));
     }
 }
 private summonFreestyle(freestyle: string)
 {
     this.print.info(`Summoning ${freestyle}`);
     this.summoner.summon(
-        Path.freestyle(freestyle),
+        Path.builtFreestyle(freestyle),
         freestyle, `freestyle/${freestyle}`);
 }
 private summonTpClient(botToken: string, botName: string, 
@@ -53,7 +71,7 @@ private summonTpClient(botToken: string, botName: string,
 {
     this.print.info(`Summoning ${environmentKey}`)
     let bot: Minion<BotData>;
-    bot = this.summoner.summon(Path.latestVersion(TpbotClient.name),
+    bot = this.summoner.summon(Path.builtLatestVersion(TpbotClient.name),
         botName, Kernel.name, { token: botToken }, 
         (error) => this.handleTpClientCrash(error),
         (minion) => this.initShellListeners(minion));
@@ -150,10 +168,13 @@ private async handleRequest(body: string, minion: Minion<BotData>)
     // tslint:enable: no-conditional-assignment
     minion.emit("response", buffer);
 }
+private yamlSpawns()
+{
+    return (Boot.getParsedYaml().spawns ?? []);
+}
 private yamlFreestyles()
 {
-    return (Boot.getParsedYaml().tokenMapping ?? [])
-        .map(x => x.modules?.freestyle ?? []).flat();
+    return (Boot.getParsedYaml().freestyles ?? [])
 }
 private environmentKeyTokens()
 {

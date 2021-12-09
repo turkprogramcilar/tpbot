@@ -9,6 +9,13 @@ shellAccess:
         id: "824573651390562325"
         access: true
 
+spawns:
+    -
+        #python: "PingPy.py"
+
+freestyles:
+    - "legacy/main"
+
 tokenMapping:
     # Provide bot's account TOKENs in TPBOT_TOKEN1, TPBOT_TOKEN2... TPBOT_TOKENX
     # environment values. We understand that you mean you provided a token when 
@@ -22,6 +29,7 @@ tokenMapping:
     # These TOKENs will be logged in and account names are then matched with the
     # following tag name with its module defined below 
     -
+        tag: "Bakkal Risitas#8407"
         modules:
-            freestyle:
-                - "legacy/main"
+            tpbot:
+                - "KartOyunu"

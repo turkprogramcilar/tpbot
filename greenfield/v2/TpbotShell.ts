@@ -10,9 +10,9 @@ export class TpbotShell extends TpbotModule
 private sessions: {[key: userId]: [string, Message]} = {};
 private readonly shellEnd = "```";
 private readonly shellHead = "```shell\n"
-constructor(client: Client, private kernelsMinion: MinionFile)
+constructor(private botTag: string, private kernelsMinion: MinionFile)
 {
-    super(TpbotShell.name, client);
+    super(TpbotShell.name);
 }
 private async updateTerminal(id: userId, append: string)
 {
@@ -68,7 +68,7 @@ private hasArg(text: string, length: number)
     return text.length > length && text[length].match(/\s/);
 }
 /*******************************************************************72*/
-protected async directMessage(message: Message)
+public async directMessage(message: Message)
 {
     if (false === H.isRoot(message))
         return;
@@ -81,7 +81,7 @@ protected async directMessage(message: Message)
     if (undefined === session) {
 
         const regex = /ssh\s+(?:root)?<@!?([0-9]+)>/;
-        if (!(text.match(regex)?.[1] === this.client.user?.id)) 
+        if (!(text.match(regex)?.[1] === this.botTag)) 
             return;
         
         await this.createSession(message);

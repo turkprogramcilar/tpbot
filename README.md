@@ -39,7 +39,8 @@ birbirlerini yükleyebilmeleri için gerekli klasör yollarının çözümlenmes
 gerekiyor. Burada eğer varsayılan değişirse TypeScript çıkartmasının yolu ve
 kök dizine olan uzaklığı değişeceğinden sizin kök dizine olan mesafeyi
 belirtebilmeniz için oluşturulmuştur. Varsayılan değer build/ klasörüne çıkartım
-yapıldığında `../` olmalıdır.
+yapıldığında `../` olmalıdır. Varsayılan değişmediği sürece bu tanımlamanın 
+yapılmasına gerek yoktur. 
 
 ### TPBOT_TOKEN
 TPBOT_TOKEN ile başlayan her ortam değişkeni (environment variable) sistem 
@@ -52,12 +53,16 @@ tarafından shell bot ile tag eşleştirmesinde kullanılır. Örneğin:
     `TPBOT_SHELL_TAG`    `TPBOT_SHELL_TAG123`    `TPBOT_SHELL_TAG_BOT`
 
 ## tpbot.yaml ayar dosyası
-### shellBots
+Tüm fonksiyonlarıyla örnek bir tanımlama kaynak kodları içerisindedir ve yorum 
+satırlarıyla gerekli alanlarda açıklama mevcuttur.
+
+### TpbotShell modülü
 Shell için kullanılacak olan bot hesabını sunucuya sokmanız gerekmez.
 Gizli tutabilirsiniz. Veya tercihe göre herhangi bir modül görevi olan bota da
-tanımlayabilirsiniz sunucu içerisinde bulunan. Bu bot DM kanalından shell
-komutları kabul edecektir. `tpbot.yaml` dosyasında `shellBots` kısmında DM
-kanalından kimlerin shell komutu çalıştıracağını tanımlayabilirsiniz.
+tanımlayabilirsiniz. Bu bot DM kanalından shell
+komutları kabul edecektir. Environment değerlerinde ilgili hesabın `TOKEN` 
+tanımlamasını yapıp aynı şekilde bu botun `TAG` değerini `SHELL_TAG` kısmında 
+açıklandığı gibi yapmanız gerekmektedir.
 
 ## Geliştirme ve katkıda bulunma
 ### Kodlama stili

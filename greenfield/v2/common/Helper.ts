@@ -1,9 +1,17 @@
-import { User, Message } from "discord.js";
+import { User, Message, MessageInteraction } from "discord.js";
 import { Boot } from "../Boot";
 
 export abstract class Helper
 {
 /*******************************************************************72*/
+static get isDebug()
+{
+    return Helper.check("TPBOT_DEBUG");
+}
+static debug(postfix: string)
+{
+    return (Helper.isDebug ? "debug_" : "") + postfix;
+}
 static sleep(ms: number)
 {
     return new Promise(res => setTimeout(res, ms));
@@ -61,6 +69,15 @@ static ps(n: number, plural = "s", singular = "")
 static ai(n: number)
 {
     return this.ps(n, "are", "is");
+}
+static isMessageInteraction(int: any): int is MessageInteraction
+{
+    return (int as MessageInteraction)?.commandName !== undefined;
+}
+static getEnumText<T extends object>(value: number, enu: T): string
+{
+    const list = Object.keys(enu);
+    return list.slice(-list.length / 2)[value as number];
 }
 /*******************************************************************72*/
 }

@@ -3,36 +3,64 @@ import { Helper } from "./Helper";
 export abstract class Path
 /*******************************************************************72*/
 {
-static root(...pathSegments: string[])
+static realRoot(...pathSegments: string[])
 {
-    const distance = pathSegments.reduce((a,_) => a+="../", "../");
-    const nested = pathSegments.join("/");
-    return path.resolve(__dirname, Helper.load("TPBOT_ROOT_DIR"), distance, nested);
+    // Path.js will be in built folder.
+    const builtDistance = "../";
+    const pathTsDistance = "../../../"
+    return path.resolve(__dirname, builtDistance, pathTsDistance,
+        ...pathSegments);
 }
-static greenfieldNonBuilt(file: string)
+static greenfieldNonBuilt(...pathSegments: string[])
 {
-    return this.root("greenfield", file);
+    return this.realRoot("greenfield", ...pathSegments);
 }
-static greenfield(...pathSegments: string[])
+static latestVersionNonBuilt(...pathSegments: string[])
 {
-    return path.resolve(__dirname, "../../", ...pathSegments);
+    return this.greenfieldNonBuilt("v2", ...pathSegments);
 }
-static latestVersion(...pathSegments: string[])
+static modulesNonBuilt(...pathSegments: string[])
 {
-    return this.greenfield("v2", ...pathSegments);
+    return this.latestVersionNonBuilt("modules", ...pathSegments);
 }
-static modules(...pathSegments: string[])
+static tpbotNonBuilt(module: string)
 {
-    return this.latestVersion("modules", ...pathSegments);
-}
-static tpbot(module: string)
-{
-    return this.modules("tpbot", module.toLowerCase(),
+    return this.modulesNonBuilt("tpbot", module.toLowerCase(),
         "Main");
 }
-static freestyle(...pathSegments: string[])
+static freestyleNonBuilt(...pathSegments: string[])
 {
-    return this.modules("freestyle", ...pathSegments);
+    return this.modulesNonBuilt("freestyle", ...pathSegments);
+}
+/*******************************************************************72*/
+static builtRoot(...pathSegments: string[])
+{
+    return this.realRoot("build", ...pathSegments);
+}
+static builtGreenfield(...pathSegments: string[])
+{
+    return this.builtRoot("greenfield", ...pathSegments);
+}
+static builtGreenfieldTests(...pathSegments: string[])
+{
+    return this.builtRoot("greenfield.tests", ...pathSegments);
+}
+static builtLatestVersion(...pathSegments: string[])
+{
+    return this.builtGreenfield("v2", ...pathSegments);
+}
+static builtModules(...pathSegments: string[])
+{
+    return this.builtLatestVersion("modules", ...pathSegments);
+}
+static builtTpbotModules(module: string)
+{
+    return this.builtModules("tpbot", module.toLowerCase(),
+        "Main");
+}
+static builtFreestyle(...pathSegments: string[])
+{
+    return this.builtModules("freestyle", ...pathSegments);
 }
 /*******************************************************************72*/
 }
