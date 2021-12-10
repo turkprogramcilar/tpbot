@@ -1,3 +1,4 @@
+import { italic } from "@discordjs/builders";
 import { MessageComponentInteraction } from "discord.js";
 import { CardEffect } from "./CardEffect";
 import { CardEffectResult } from "./CardEffectResult";
@@ -159,7 +160,24 @@ export const CardEffectDatabase: {[key in CardTitle]: CardEffect | undefined} =
     29: undefined,
     30: undefined,
     31: undefined,
-    32: undefined,
+    [CardTitle["Hediye kart"]]: new CardEffect
+    (
+        (module: KartOyunu) => new CardEffectResult()
+            .setEffectInteraction(async (int: MessageComponentInteraction) =>
+            {
+                const user = await module.CardRepository.ensure(int.user.id);
+                const roll = KartOyunu.rollCard();
+                user.deck.push(roll);
+                await Promise.all([ 
+                    module.CardRepository.update(user),
+                    int.followUp({content: italic("Hediye kartının üzerindeki"
+                + " büyü çözümlendikten sonra üzerinde belli belirsiz sembol"
+                + " ve yeni yazılar ışıldamaya başladı."),
+                embeds: module.cardEmbed(roll), 
+                ephemeral: true})]);
+
+            })
+    ),
     33: undefined,
     34: undefined,
     35: undefined,

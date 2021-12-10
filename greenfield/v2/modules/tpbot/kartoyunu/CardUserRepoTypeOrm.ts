@@ -1,8 +1,6 @@
-import { CardEffectDatabase } from "./CardEffectDatabase";
-import { CardNo, CardTitle } from "./CardProperties";
 import { CardUser } from "./CardUser";
 
-import { createConnection, getRepository } from "typeorm";
+import { createConnection } from "typeorm";
 import { Helper } from "../../../common/Helper";
 import { CrudRepositoryTypeOrm as CrudRepoTypeOrm } from "../../../common/CrudRepositoryTypeOrm";
 import { CardUserRepo } from "./CardUserRepo";

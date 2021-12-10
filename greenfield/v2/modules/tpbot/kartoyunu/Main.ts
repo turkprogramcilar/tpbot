@@ -38,7 +38,7 @@ static rollCard(rnd: (() => number) = Math.random): CardNo
 /*******************************************************************72*/
 publicEcho: [string, string][] = [];
 
-private readonly CardRepository: CardUserRepo = new CardUserRepoTypeOrm();// new FakeCardRepo();
+readonly CardRepository: CardUserRepo = new CardUserRepoTypeOrm();// new FakeCardRepo();
 private readonly selectedCard: {[key: string]: CardNo | undefined} = {};
 private readonly selectedTarget: {[key: string]: string | undefined} = {};
 
@@ -80,6 +80,7 @@ async directMessage(message: Message)
         return;
     }
 }
+/*******************************************************************72*/
 deckPanel(deck: CardNo[], customId: string)
 {
     if (deck.length <= 0)
@@ -226,7 +227,8 @@ async normalbutton(interaction: ButtonInteraction)
     await Promise.all([
         // show off
         interaction.channel?.send({content: inlineCode(
-            interaction.user.username + " bir kart oynadı."),
+            ((await interaction.guild?.members.fetch(interaction.user.id))
+            ?.displayName ?? interaction.user.username) + " bir kart oynadı."),
             embeds: this.cardShowOff(no)}),
         // update interaction and remove panel
         interaction.update({content:"Kart oynandı", embeds:[], components:[]}),
