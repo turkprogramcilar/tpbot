@@ -1,15 +1,15 @@
-import { ButtonInteraction, CommandInteraction, ContextMenuInteraction, Message, MessageActionRow, MessageButton, MessageComponent, MessageEmbed, MessageSelectMenu, SelectMenuInteraction } from "discord.js";
+import { ButtonInteraction, CommandInteraction, ContextMenuInteraction, Message, MessageActionRow, MessageButton, MessageEmbed, MessageSelectMenu, SelectMenuInteraction } from "discord.js";
 import { TpbotModule } from "../../../TpbotModule";
-import { KartOyunuRepository, FakeRepo } from "./CardRepository";
 import { CardTextDatabase } from "./CardTextDatabase";
-import { CustomId, CustomIdRegex, MessageCommand, SlashCommand, UserCommand } from "../../../TpbotDecorators"
+import { CustomId, SlashCommand } from "../../../TpbotDecorators"
 import { bold, codeBlock, inlineCode, italic, underscore } from "@discordjs/builders";
 import { CardNo, CardPlayKind, CardRarity, CardTitle } from "./CardProperties";
 import { MessageButtonStyles } from "discord.js/typings/enums";
 import { CardEffectDatabase } from "./CardEffectDatabase";
 import { Helper } from "../../../common/Helper";
-import { TypeOrmRepository } from "./CardDatabase";
+import { CardUserRepoTypeOrm } from "./CardUserRepoTypeOrm";
 import { CardUser } from "./CardUser";
+import { CardUserRepo } from "./CardUserRepo";
 
 export class KartOyunu extends TpbotModule
 {
@@ -38,7 +38,7 @@ static rollCard(rnd: (() => number) = Math.random): CardNo
 /*******************************************************************72*/
 publicEcho: [string, string][] = [];
 
-private readonly CardRepository: KartOyunuRepository = new TypeOrmRepository();// new FakeCardRepo();
+private readonly CardRepository: CardUserRepo = new CardUserRepoTypeOrm();// new FakeCardRepo();
 private readonly selectedCard: {[key: string]: CardNo | undefined} = {};
 private readonly selectedTarget: {[key: string]: string | undefined} = {};
 
@@ -152,7 +152,8 @@ async hedef(interaction: ContextMenuInteraction)
         this.print.error("Can't fetch message");
         return;
     }
-    const deck = (await this.CardRepository.getUserDeck(interaction.user.id));
+    const user = (await this.CardRepository.ensure(interaction.user.id));
+    const deck = user.deck;
     await interaction.reply({content: 
         `Hedef: ${inlineCode(message.author.username)}`
         + `\nDestendeki hedefli kartlar:`, components:
@@ -163,13 +164,17 @@ async hedef(interaction: ContextMenuInteraction)
 @SlashCommand("Normal kart destesini açar")
 async deste(interaction: CommandInteraction)
 {
-    const daily = (await this.CardRepository.checkDoDaily(interaction.user.id))
+    const user = (await this.CardRepository.ensure(interaction.user.id));
+    const didDaily = user.checkDoDaily(); 
+    if (didDaily)
+        await this.CardRepository.update(user);
+    const daily = didDaily
         ? codeBlock("diff", "+ Günlük yeni 2 kart hakkın destene eklendi.")
         : ""
         ;
     // @TODO
     // const deck = (await this.CardRepository.getSlashDeck(interaction.user.id));
-    const deck = (await this.CardRepository.getDeck(interaction.user.id));
+    const deck = user.deck;
     await interaction.reply({content: daily+"Destendeki normal kartlar:", 
         components: this.deckPanel(deck, "normal"), ephemeral: true});
     this.selectedCard[interaction.user.id] = undefined;
@@ -210,8 +215,10 @@ async normalbutton(interaction: ButtonInteraction)
     // karti oyna ve repodan dus
     // target efektini koy
     // general effekti koy
-    if (!(await this.CardRepository.playCard(interaction.user.id, no)))
+    const user = (await this.CardRepository.ensure(interaction.user.id));
+    if (!(user.playCard(no)))
         return;
+    await this.CardRepository.update(user);
 
     // @TODO undefined CardUser, define getUser from repo
     const result = CardEffectDatabase[no]?.execute(this, new CardUser(""));

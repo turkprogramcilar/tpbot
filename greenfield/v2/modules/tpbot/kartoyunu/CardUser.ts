@@ -1,6 +1,7 @@
 import { User } from "discord.js";
 import { Column, Entity, ObjectID, ObjectIdColumn, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { Helper } from "../../../common/Helper";
+import { CardEffectDatabase } from "./CardEffectDatabase";
 import { CardNo, CardTitle } from "./CardProperties";
 import { KartOyunu } from "./Main";
 const TpbotPrimaryKey = Helper.isDebug
@@ -24,6 +25,40 @@ constructor(
 )
 { 
     this.id = id;
+}
+getDeck(_id: string)
+{
+    return this.deck;
+}
+getSlashDeck(id: string)
+{
+    return this.deck.filter(x => !CardEffectDatabase[x]?.canTarget);
+}
+getUserDeck(id: string) 
+{
+    return this.deck.filter(x => CardEffectDatabase[x]?.canTarget);
+}
+hasCard(id: string, no: CardNo)
+{
+    return this.deck.includes(no);
+}
+playCard(no: CardNo)
+{
+    if (!this.deck.includes(no))
+        return false;
+    
+    const index = this.deck.indexOf(no);
+    this.deck.splice(index, 1);
+    return true;
+}
+checkDoDaily()
+{
+    if (!this.canDaily())
+        return false;
+
+    this.lastDaily = new Date();
+    this.doDaily();    
+    return true;
 }
 canDaily()
 {
