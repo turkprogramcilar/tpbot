@@ -1,6 +1,6 @@
 import { ButtonInteraction, CommandInteraction, ContextMenuInteraction, Message, MessageActionRow, MessageButton, MessageComponent, MessageEmbed, MessageSelectMenu, SelectMenuInteraction } from "discord.js";
 import { TpbotModule } from "../../../TpbotModule";
-import { CardRepository, FakeCardRepo } from "./CardRepository";
+import { KartOyunuRepository, FakeRepo } from "./CardRepository";
 import { CardTextDatabase } from "./CardTextDatabase";
 import { CustomId, CustomIdRegex, MessageCommand, SlashCommand, UserCommand } from "../../../TpbotDecorators"
 import { bold, codeBlock, inlineCode, italic, underscore } from "@discordjs/builders";
@@ -38,7 +38,7 @@ static rollCard(rnd: (() => number) = Math.random): CardNo
 /*******************************************************************72*/
 publicEcho: [string, string][] = [];
 
-private readonly CardRepository: CardRepository = new CardDatabase();// new FakeCardRepo();
+private readonly CardRepository: KartOyunuRepository = new CardDatabase();// new FakeCardRepo();
 private readonly selectedCard: {[key: string]: CardNo | undefined} = {};
 private readonly selectedTarget: {[key: string]: string | undefined} = {};
 

@@ -1,7 +1,7 @@
 import { CardEffectDatabase } from "./CardEffectDatabase";
 import { CardNo } from "./CardProperties";
 
-export abstract class CardRepository
+export abstract class KartOyunuRepository
 {
 /*******************************************************************72*/
 abstract getDeck(id: string): Promise<CardNo[]>;
@@ -13,7 +13,7 @@ abstract checkDoDaily(id: string): Promise<boolean>;
 /*******************************************************************72*/
 }
 // tslint:disable-next-line: max-classes-per-file
-export class FakeCardRepo extends CardRepository
+export class FakeRepo extends KartOyunuRepository
 {
 /*******************************************************************72*/
 deckRaw: CardNo[] = [1, 5, 63, 64];

@@ -1,12 +1,12 @@
 import { CardEffectDatabase } from "./CardEffectDatabase";
 import { CardNo, CardTitle } from "./CardProperties";
-import { CardRepository } from "./CardRepository";
+import { KartOyunuRepository } from "./CardRepository";
 import { CardUser } from "./CardUser";
 
 import { createConnection, getRepository } from "typeorm";
 import { Helper } from "../../../common/Helper";
 
-export class CardDatabase extends CardRepository
+export class CardDatabase extends KartOyunuRepository
 {
 /*******************************************************************72*/
 constructor()
