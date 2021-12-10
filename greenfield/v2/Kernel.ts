@@ -27,7 +27,7 @@ constructor()
 }
 private loadSpawns()
 {
-    this.print.info("Loading spawns.");
+    this.print.info("Loading Spawns.");
     for (const spawn of this.yamlSpawns()) {
         if (!spawn)
             continue;

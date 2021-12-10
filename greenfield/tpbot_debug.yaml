@@ -22,13 +22,8 @@ tokenMapping:
     # These TOKENs will be logged in and account names are then matched with the
     # following tag name with its module defined below 
     -
-        tag: "TPBOT DEBUG 2#0621"
+        tag: "TPBOT DEBUG 1#6503"
         modules:
             tpbot:
-                #- "Crasher"
-                - "Ping"
-    -
-        tag: "TPBOT DEBUG 3#7380"
-        modules:
-            freestyle:
-                - "legacy/main"
+                - "KartOyunu"
+        #tag: "TPBOT DEBUG 3#7380"

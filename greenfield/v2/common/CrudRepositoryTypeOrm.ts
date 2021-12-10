@@ -2,15 +2,8 @@ import { throws } from "assert";
 import { Connection, EntityTarget } from "typeorm";
 import { CrudRepository } from "./CrudRepository";
 
-export class CrudRepositoryTypeOrm<T> 
-    extends CrudRepository<T, string>
+export class CrudRepositoryTypeOrm<T> extends CrudRepository<T, string>
 {
-update(entry: T): Promise<boolean> {
-    throw new Error("Method not implemented.");
-}
-delete(entry: T): Promise<boolean> {
-    throw new Error("Method not implemented.");
-}
 private connection?: Connection;
 /*******************************************************************72*/
 constructor(private target: EntityTarget<T>, init: () => Promise<Connection>)
@@ -31,6 +24,16 @@ async read(key: string)
         return undefined;
     else
         return result;
+}
+async update(entity: T)
+{
+    await this.repo().save(entity);
+    return true;
+}
+async delete(entity: T)
+{
+    await this.repo().delete(entity);
+    return true;
 }
 private repo()
 {

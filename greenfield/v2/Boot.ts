@@ -4,6 +4,7 @@ import { Print } from "./common/Print";
 import fs from 'fs'
 import YAML from 'yaml'
 import { Path } from "./common/Path";
+import { Helper } from "./common/Helper";
 export interface Spawn {
     python?: string
 }
@@ -29,7 +30,9 @@ private static _parsedYaml: TpbotYaml | null = null;
 static getParsedYaml(): TpbotYaml
 {
     if (this._parsedYaml === null) {
-        const fullPath = Path.greenfieldNonBuilt("tpbot.yaml");
+        const fullPath = Path.greenfieldNonBuilt(`tpbot${
+            Helper.isDebug ? "_debug" : ""
+        }.yaml`);
         const file = fs.readFileSync(fullPath, 'utf8');
         this._parsedYaml = YAML.parse(file) as TpbotYaml;
     }
