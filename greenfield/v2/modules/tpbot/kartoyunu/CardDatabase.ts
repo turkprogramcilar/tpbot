@@ -6,7 +6,7 @@ import { CardUser } from "./CardUser";
 import { createConnection, getRepository } from "typeorm";
 import { Helper } from "../../../common/Helper";
 
-export class CardDatabase extends KartOyunuRepository
+export class TypeOrmRepository extends KartOyunuRepository
 {
 /*******************************************************************72*/
 constructor()

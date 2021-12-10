@@ -8,7 +8,7 @@ import { CardNo, CardPlayKind, CardRarity, CardTitle } from "./CardProperties";
 import { MessageButtonStyles } from "discord.js/typings/enums";
 import { CardEffectDatabase } from "./CardEffectDatabase";
 import { Helper } from "../../../common/Helper";
-import { CardDatabase } from "./CardDatabase";
+import { TypeOrmRepository } from "./CardDatabase";
 import { CardUser } from "./CardUser";
 
 export class KartOyunu extends TpbotModule
@@ -38,7 +38,7 @@ static rollCard(rnd: (() => number) = Math.random): CardNo
 /*******************************************************************72*/
 publicEcho: [string, string][] = [];
 
-private readonly CardRepository: KartOyunuRepository = new CardDatabase();// new FakeCardRepo();
+private readonly CardRepository: KartOyunuRepository = new TypeOrmRepository();// new FakeCardRepo();
 private readonly selectedCard: {[key: string]: CardNo | undefined} = {};
 private readonly selectedTarget: {[key: string]: string | undefined} = {};
 
