@@ -15,30 +15,8 @@ export class CardUser
 @Column() public id: string;
 @Column("simple-json") public deck: CardNo[] = Array(
     CardTitle["Echo"],
-    CardTitle["Echo"],
-    CardTitle["Echo"],
-    CardTitle["Echo"],
-    CardTitle["Echo"],
-    CardTitle["Echo"],
-    CardTitle["Echo"],
-    CardTitle["Echo"],
-    CardTitle["Echo"],
-    CardTitle["Echo"],
-    CardTitle["Echo"],
-    CardTitle["Echo"],
-    CardTitle["Echo"],
-    CardTitle["Echo"],
-    CardTitle["Echo"],
-    CardTitle["Echo"],
-    CardTitle["Echo"],
-    CardTitle["Echo"],
-    CardTitle["Echo"],
-    CardTitle["Echo"],
-    CardTitle["Hediye kart"],
     CardTitle["Hediye kart"],
     KartOyunu.rollCard(),
-    // KartOyunu.rollCard(),
-    // KartOyunu.rollCard(),
 );
 @Column() public lastDaily: Date = new Date(new Date().getTime() - 1000*60*60*24);
 constructor(
