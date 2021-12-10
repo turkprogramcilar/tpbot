@@ -4,16 +4,20 @@ import { Helper } from "../../../common/Helper";
 import { CardEffectDatabase } from "./CardEffectDatabase";
 import { CardNo, CardTitle } from "./CardProperties";
 import { KartOyunu } from "./Main";
-const TpbotPrimaryKey = Helper.isDebug
-    ? () => PrimaryGeneratedColumn()
-    : ObjectIdColumn
+const ReleasePrimaryKey = !Helper.isDebug
+    ? ObjectIdColumn
+    : () => Column("simple-json", {nullable: true})
+    ;
+const DebugPrimaryKey = Helper.isDebug
+    ? PrimaryColumn
+    : Column
     ;
 @Entity()
 export class CardUser
 {
 /*******************************************************************72*/
-@TpbotPrimaryKey() public _id: any;
-@Column() public id: string;
+@ReleasePrimaryKey() public _id: any;
+@DebugPrimaryKey() public id: string;
 @Column("simple-json") public deck: CardNo[] = Array(
     CardTitle["Echo"],
     CardTitle["Hediye kart"],
@@ -30,15 +34,15 @@ getDeck(_id: string)
 {
     return this.deck;
 }
-getSlashDeck(id: string)
+getSlashDeck()
 {
     return this.deck.filter(x => !CardEffectDatabase[x]?.canTarget);
 }
-getUserDeck(id: string) 
+getUserDeck() 
 {
     return this.deck.filter(x => CardEffectDatabase[x]?.canTarget);
 }
-hasCard(id: string, no: CardNo)
+hasCard(no: CardNo)
 {
     return this.deck.includes(no);
 }

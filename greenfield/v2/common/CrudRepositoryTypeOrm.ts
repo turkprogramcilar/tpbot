@@ -28,6 +28,7 @@ async read(key: string)
 async update(entity: T)
 {
     await this.repo().save(entity);
+    const test = await this.repo().find();
     return true;
 }
 async delete(entity: T)
