@@ -1,8 +1,14 @@
 import { throws } from "assert";
-import { Connection, EntityTarget } from "typeorm";
+import { Connection, DeepPartial, EntityTarget, getRepository } from "typeorm";
+import { CardUser } from "../modules/tpbot/kartoyunu/CardUser";
 import { CrudRepository } from "./CrudRepository";
 
-export class CrudRepositoryTypeOrm<T> extends CrudRepository<T, string>
+export interface TypeOrmEntity
+{
+    id: string
+}
+export class CrudRepositoryTypeOrm<T extends TypeOrmEntity> 
+    extends CrudRepository<T, string>
 {
 private connection?: Connection;
 /*******************************************************************72*/
@@ -13,13 +19,13 @@ constructor(private target: EntityTarget<T>, init: () => Promise<Connection>)
 }
 async create(entity: T)
 {
-    await this.repo().insert(entity);
-    await this.repo().save(entity);
+    await this.repo().insert(entity as any);
+    await this.repo().save(entity as any);
     return true;
 }
 async read(key: string)
 {
-    const result = this.repo().findOne(key);
+    const result = this.repo().findOne({id: key} as any);
     if (!result)
         return undefined;
     else
@@ -27,7 +33,6 @@ async read(key: string)
 }
 async update(entity: T)
 {
-    await this.repo().save(entity);
     const test = await this.repo().find();
     return true;
 }
