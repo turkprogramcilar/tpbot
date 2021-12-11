@@ -1,7 +1,7 @@
 import { User } from "discord.js";
 import { Column, Entity, ObjectID, ObjectIdColumn, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { Helper } from "../../../common/Helper";
-import { CardEffectDatabase } from "./CardEffectDatabase";
+import { CardEffectData } from "./CardEffectDatabase";
 import { CardNo, CardTitle } from "./CardProperties";
 import { KartOyunu } from "./Main";
 const ReleasePrimaryKey = !Helper.isDebugDb
@@ -36,11 +36,11 @@ getDeck(_id: string)
 }
 getSlashDeck()
 {
-    return this.deck.filter(x => !CardEffectDatabase[x]?.canTarget);
+    return this.deck.filter(x => !CardEffectData[x]?.canTarget);
 }
 getUserDeck() 
 {
-    return this.deck.filter(x => CardEffectDatabase[x]?.canTarget);
+    return this.deck.filter(x => CardEffectData[x]?.canTarget);
 }
 hasCard(no: CardNo)
 {

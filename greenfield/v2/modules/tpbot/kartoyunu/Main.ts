@@ -1,11 +1,11 @@
 import { ButtonInteraction, CommandInteraction, ContextMenuInteraction, Message, MessageActionRow, MessageButton, MessageEmbed, MessageSelectMenu, SelectMenuInteraction } from "discord.js";
 import { TpbotModule } from "../../../TpbotModule";
-import { CardTextDatabase } from "./CardTextDatabase";
+import { CardTextData } from "./CardTextDatabase";
 import { CustomId, SlashCommand } from "../../../TpbotDecorators"
 import { bold, codeBlock, inlineCode, italic, underscore } from "@discordjs/builders";
 import { CardNo, CardPlayKind, CardRarity, CardTitle } from "./CardProperties";
 import { MessageButtonStyles } from "discord.js/typings/enums";
-import { CardEffectDatabase } from "./CardEffectDatabase";
+import { CardEffectData } from "./CardEffectDatabase";
 import { Helper } from "../../../common/Helper";
 import { CardUserTypeOrm } from "./CardUserTypeOrm";
 import { CardUser } from "./CardUser";
@@ -18,7 +18,7 @@ static rollCard(rnd: (() => number) = Math.random): CardNo
     const groupedByRarity = 
             Array(Object.keys(CardTitle).length / 2).fill(0).map((x, _i) => _i+1)
             .reduce((a: number[][], c) => { 
-                const aa = a[CardTextDatabase[c as CardNo].rarity];
+                const aa = a[CardTextData[c as CardNo].rarity];
                 aa.push(c); 
                 return a; 
             }, [[],[],[],[],[]]);
@@ -93,7 +93,7 @@ deckPanel(deck: CardNo[], customId: string)
         ])];
     // @TODO slice 25 limited hardcoded
     const menuCards = deck.slice(0, 25).map((x, i) => { return {
-        label: CardTextDatabase[x].title, 
+        label: CardTextData[x].title, 
         value: `${i}_${x.toString()}`
     }});
     return [
@@ -117,7 +117,7 @@ deckPanel(deck: CardNo[], customId: string)
 }
 cardShowOff(no: CardNo)
 {
-    const card = CardTextDatabase[no];
+    const card = CardTextData[no];
     return [ new MessageEmbed()
         .setThumbnail(card.link)
         .setTitle(inlineCode(card.title))
@@ -128,7 +128,7 @@ cardShowOff(no: CardNo)
 }
 cardEmbed(no: CardNo)
 {
-    const card = CardTextDatabase[no];
+    const card = CardTextData[no];
     return [
         new MessageEmbed()
             .setColor(this.colors[card.rarity])
@@ -197,7 +197,7 @@ async normalbutton(interaction: ButtonInteraction)
     if (!no)
         return;
 
-    const effect = CardEffectDatabase[no];
+    const effect = CardEffectData[no];
     if (!effect)
         return interaction.update(codeBlock("diff",
             "- Kart şu anda sadece koleksiyonda tutulabilmektedir."));
@@ -222,7 +222,7 @@ async normalbutton(interaction: ButtonInteraction)
     await this.CardRepository.update(user);
 
     // @TODO undefined CardUser, define getUser from repo
-    const result = CardEffectDatabase[no]?.execute(this, new CardUser(""));
+    const result = CardEffectData[no]?.execute(this, new CardUser(""));
 
     await Promise.all([
         // show off
@@ -283,7 +283,7 @@ async test(interaction: CommandInteraction)
     for (const [key, value] of Object.entries(cardsDrawn))
     {
         const cardNo = Number(key);
-        const rarity = CardTextDatabase[cardNo as CardNo].rarity;
+        const rarity = CardTextData[cardNo as CardNo].rarity;
         cardsPerRarity[rarity]++;
         rarityPerDrawn[rarity] += Number(value);
         t += Number(value);

@@ -5,7 +5,7 @@ import { CardEffectResult } from "./CardEffectResult";
 import { CardTitle } from "./CardProperties";
 import { KartOyunu } from "./Main";
 
-export const CardEffectDatabase: {[key in CardTitle]: CardEffect | undefined} =
+export const CardEffectData: {[key in CardTitle]: CardEffect | undefined} =
 {
     // tslint:disable: no-string-literal
     /*

@@ -2,7 +2,7 @@ import { CardText } from "./CardText";
 import { CardRarity, CardTitle } from "./CardProperties";
 
 /*******************************************************************72*/
-export const CardTextDatabase: {[key in CardTitle]: CardText} =
+export const CardTextData: {[key in CardTitle]: CardText} =
 {
     // tslint:disable: no-string-literal
 
