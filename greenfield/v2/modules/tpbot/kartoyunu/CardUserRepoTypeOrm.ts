@@ -2,17 +2,17 @@ import { CardUser } from "./CardUser";
 
 import { createConnection } from "typeorm";
 import { Helper } from "../../../common/Helper";
-import { CrudRepositoryTypeOrm as CrudRepoTypeOrm } from "../../../common/CrudRepositoryTypeOrm";
+import { CrudTypeOrm as CrudTypeOrm } from "../../../common/CrudRepositoryTypeOrm";
 import { CardUserRepo } from "./CardUserRepo";
 
-export class CardUserRepoTypeOrm extends CardUserRepo
+export class CardUserTypeOrm extends CardUserRepo
 {
 /*******************************************************************72*/
-private repo: CrudRepoTypeOrm<CardUser>
+private repo: CrudTypeOrm<CardUser>
 constructor()
 {
     super();
-    this.repo = new CrudRepoTypeOrm(CardUser, () => {
+    this.repo = new CrudTypeOrm(CardUser, () => {
         // const adapter = new SQLiteDatabaseAdapter('./example.sqlite');
         
         const conn: any = Helper.isDebugDb

@@ -1,5 +1,5 @@
 
-export abstract class CrudRepository<T, PK>
+export abstract class CrudRepo<T, PK>
 {
 /*******************************************************************72*/
 abstract create(row: T): Promise<boolean>;

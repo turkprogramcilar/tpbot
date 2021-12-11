@@ -1,14 +1,14 @@
 import { throws } from "assert";
 import { Connection, DeepPartial, EntityTarget, getRepository } from "typeorm";
 import { CardUser } from "../modules/tpbot/kartoyunu/CardUser";
-import { CrudRepository } from "./CrudRepository";
+import { CrudRepo } from "./CrudRepository";
 
 export interface TypeOrmEntity
 {
     id: string
 }
-export class CrudRepositoryTypeOrm<T extends TypeOrmEntity> 
-    extends CrudRepository<T, string>
+export class CrudTypeOrm<T extends TypeOrmEntity> 
+    extends CrudRepo<T, string>
 {
 private connection?: Connection;
 /*******************************************************************72*/

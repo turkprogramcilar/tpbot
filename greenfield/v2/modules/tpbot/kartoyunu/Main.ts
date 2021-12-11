@@ -7,7 +7,7 @@ import { CardNo, CardPlayKind, CardRarity, CardTitle } from "./CardProperties";
 import { MessageButtonStyles } from "discord.js/typings/enums";
 import { CardEffectDatabase } from "./CardEffectDatabase";
 import { Helper } from "../../../common/Helper";
-import { CardUserRepoTypeOrm } from "./CardUserRepoTypeOrm";
+import { CardUserTypeOrm } from "./CardUserRepoTypeOrm";
 import { CardUser } from "./CardUser";
 import { CardUserRepo } from "./CardUserRepo";
 
@@ -38,7 +38,7 @@ static rollCard(rnd: (() => number) = Math.random): CardNo
 /*******************************************************************72*/
 publicEcho: [string, string][] = [];
 
-readonly CardRepository: CardUserRepo = new CardUserRepoTypeOrm();// new FakeCardRepo();
+readonly CardRepository: CardUserRepo = new CardUserTypeOrm();// new FakeCardRepo();
 private readonly selectedCard: {[key: string]: CardNo | undefined} = {};
 private readonly selectedTarget: {[key: string]: string | undefined} = {};
 
