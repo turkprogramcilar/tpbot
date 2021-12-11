@@ -1,4 +1,4 @@
-import { CrudRepo as CrudRepo } from "../../../common/CrudRepository";
+import { CrudRepo as CrudRepo } from "../../../common/CrudRepo";
 import { CardUser } from "./CardUser";
 
 export abstract class CardUserRepo extends CrudRepo<CardUser, string>

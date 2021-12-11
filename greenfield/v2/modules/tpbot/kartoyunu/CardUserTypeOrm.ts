@@ -2,7 +2,7 @@ import { CardUser } from "./CardUser";
 
 import { createConnection } from "typeorm";
 import { Helper } from "../../../common/Helper";
-import { CrudTypeOrm as CrudTypeOrm } from "../../../common/CrudRepositoryTypeOrm";
+import { CrudTypeOrm as CrudTypeOrm } from "../../../common/CrudTypeOrm";
 import { CardUserRepo } from "./CardUserRepo";
 
 export class CardUserTypeOrm extends CardUserRepo

@@ -7,7 +7,7 @@ import { CardNo, CardPlayKind, CardRarity, CardTitle } from "./CardProperties";
 import { MessageButtonStyles } from "discord.js/typings/enums";
 import { CardEffectDatabase } from "./CardEffectDatabase";
 import { Helper } from "../../../common/Helper";
-import { CardUserTypeOrm } from "./CardUserRepoTypeOrm";
+import { CardUserTypeOrm } from "./CardUserTypeOrm";
 import { CardUser } from "./CardUser";
 import { CardUserRepo } from "./CardUserRepo";
 

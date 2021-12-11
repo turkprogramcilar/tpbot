@@ -1,7 +1,7 @@
 import { throws } from "assert";
 import { Connection, DeepPartial, EntityTarget, getRepository } from "typeorm";
 import { CardUser } from "../modules/tpbot/kartoyunu/CardUser";
-import { CrudRepo } from "./CrudRepository";
+import { CrudRepo } from "./CrudRepo";
 
 export interface TypeOrmEntity
 {
