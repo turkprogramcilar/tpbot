@@ -15,7 +15,7 @@ constructor()
     this.repo = new CrudRepoTypeOrm(CardUser, () => {
         // const adapter = new SQLiteDatabaseAdapter('./example.sqlite');
         
-        const conn: any = Helper.isDebug
+        const conn: any = Helper.isDebugDb
             ? {
                 type: "sqlite",
                 database: ":memory:",

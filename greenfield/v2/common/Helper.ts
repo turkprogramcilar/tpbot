@@ -8,6 +8,10 @@ static get isDebug()
 {
     return Helper.check("TPBOT_DEBUG");
 }
+static get isDebugDb()
+{
+    return Helper.check("TPBOT_DEBUG_DB");
+}
 static debug(postfix: string)
 {
     return (Helper.isDebug ? "debug_" : "") + postfix;

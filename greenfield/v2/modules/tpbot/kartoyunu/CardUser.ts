@@ -4,11 +4,11 @@ import { Helper } from "../../../common/Helper";
 import { CardEffectDatabase } from "./CardEffectDatabase";
 import { CardNo, CardTitle } from "./CardProperties";
 import { KartOyunu } from "./Main";
-const ReleasePrimaryKey = !Helper.isDebug
+const ReleasePrimaryKey = !Helper.isDebugDb
     ? ObjectIdColumn
     : () => Column("simple-json", {nullable: true})
     ;
-const DebugPrimaryKey = Helper.isDebug
+const DebugPrimaryKey = Helper.isDebugDb
     ? PrimaryColumn
     : Column
     ;

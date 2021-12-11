@@ -7,7 +7,8 @@ export class CardEffectResult
 constructor(
     public ownerAfter?: CardUser,
     public targetsAfter?: [CardUser],
-    public effectInteraction?: (interaction: MessageComponentInteraction) => Promise<void>
+    public effectInteraction?: (interaction: MessageComponentInteraction)
+        => Promise<void>
 )
 {
 
