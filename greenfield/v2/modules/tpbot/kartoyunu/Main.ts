@@ -225,13 +225,17 @@ async normalbutton(interaction: ButtonInteraction)
     const result = CardEffectData[no]?.execute(this, new CardUser(""));
 
     await Promise.all([
+        /* @TODO show off is disabled by default
         // show off
         interaction.channel?.send({content: inlineCode(
             ((await interaction.guild?.members.fetch(interaction.user.id))
             ?.displayName ?? interaction.user.username) + " bir kart oynadı."),
             embeds: this.cardShowOff(no)}),
+        */
+
         // update interaction and remove panel
         interaction.update({content:"Kart oynandı", embeds:[], components:[]}),
+
         // do card effect if any
         result?.effectInteraction?.(interaction)
     ]);
