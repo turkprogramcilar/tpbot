@@ -1,11 +1,11 @@
 import { ButtonInteraction, CommandInteraction, ContextMenuInteraction, Message, MessageActionRow, MessageButton, MessageEmbed, MessageSelectMenu, SelectMenuInteraction } from "discord.js";
 import { TpbotModule } from "../../../TpbotModule";
-import { CardTextData } from "./CardTextDatabase";
+import { CardTextData } from "./CardTextData";
 import { CustomId, SlashCommand } from "../../../TpbotDecorators"
 import { bold, codeBlock, inlineCode, italic, underscore } from "@discordjs/builders";
 import { CardNo, CardPlayKind, CardRarity, CardTitle } from "./CardProperties";
 import { MessageButtonStyles } from "discord.js/typings/enums";
-import { CardEffectData } from "./CardEffectDatabase";
+import { CardEffectData } from "./CardEffectData";
 import { Helper } from "../../../common/Helper";
 import { CardUserTypeOrm } from "./CardUserTypeOrm";
 import { CardUser } from "./CardUser";

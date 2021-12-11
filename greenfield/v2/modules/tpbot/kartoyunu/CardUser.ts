@@ -1,7 +1,7 @@
 import { User } from "discord.js";
 import { Column, Entity, ObjectID, ObjectIdColumn, PrimaryColumn, PrimaryGeneratedColumn } from "typeorm";
 import { Helper } from "../../../common/Helper";
-import { CardEffectData } from "./CardEffectDatabase";
+import { CardEffectData } from "./CardEffectData";
 import { CardNo, CardTitle } from "./CardProperties";
 import { KartOyunu } from "./Main";
 const ReleasePrimaryKey = !Helper.isDebugDb
