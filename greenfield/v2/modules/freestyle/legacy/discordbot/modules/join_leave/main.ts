@@ -50,7 +50,7 @@ export const m = new class join_leave extends dcmodule
     {
         const channel_id = process.env.DCBOT_DEBUG
             ? tp.channel_id.tpbot_test_odasi
-            : tp.channel_id.sohbet
+            : tp.channel_id.sicardo_nvidia
             ;
         
         const channel = await member.guild.channels.fetch(channel_id);
