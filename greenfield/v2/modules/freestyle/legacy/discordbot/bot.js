@@ -89,6 +89,7 @@ exports.init = async (state, token, mods = [], ws_f = ()=>{}) => {
         modules.push(loaded);
         promises.push(loaded.init(cloned_state));
     }
+    console.log("client.login(token) for modules: "+mods)
     client.login(token);
 
     client.on('ready', async () => {
