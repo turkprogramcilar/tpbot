@@ -1,6 +1,6 @@
 import { ContextMenuCommandBuilder } from "@discordjs/builders";
 import { ApplicationCommandType } from "discord-api-types";
-import { ApplicationCommandPermissionData, ButtonInteraction, ContextMenuInteraction, Message, MessageEmbed, TextBasedChannels, User } from "discord.js";
+import { ApplicationCommandPermissionData, ButtonInteraction, ContextMenuInteraction, Message, MessageEmbed, TextBasedChannel, User } from "discord.js";
 import { ApplicationCommandPermissionTypes } from "discord.js/typings/enums";
 import { command, operation } from "./command";
 import { known_interactions, command_user_state } from "./commander";
@@ -14,7 +14,7 @@ export abstract class mod_command extends command
 		command_name: string, 
 		op: User, 
 		target_user: User, 
-		mod_channel: TextBasedChannels,
+		mod_channel: TextBasedChannel,
 		target_message: Message,
 		full_command: string,
 		interaction: ContextMenuInteraction | ButtonInteraction
